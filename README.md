@@ -36,6 +36,9 @@ Cleans all build artifacts and runs build in all packages
 `yarn build:watch`
 Watch mode of the above
 
+`yarn clean`
+Cleans everything
+
 `yarn cleanup`
 Cleans build artifacts
 
