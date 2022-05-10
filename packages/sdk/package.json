@@ -1,0 +1,35 @@
+{
+    "name": "@convexus/sdk",
+    "version": "1.0.0",
+    "description": "⚒️ An SDK for building applications on top of Convexus",
+    "license": "Apache-2.0",
+    "keywords": [
+      "convexus",
+      "sdk",
+      "icon"
+    ],
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "test": "jest --config ../../jest.config.json --rootDir",
+        "compile": "tsc",
+        "compile:watch": "tsc -w",
+        "clean": "npx rimraf -rf dist coverage node_modules package-lock.json yarn.lock",
+        "cleanup": "npx rimraf -rf dist coverage",
+        "lint": "eslint '**/*.ts{,x}' -e '**/**/*d.ts' -e '**/node_modules/**' -p ."
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "dependencies": {
+        "jsbi": "^4.3.0",
+        "tiny-invariant": "^1.2.0"
+    },
+    "devDependencies": {
+        "@convexus/sdk-core": "^1.0.0",
+        "typescript": "^4.6.4"
+    },
+    "peerDependency": {
+        "@convexus/sdk-core": "*"
+    }
+}

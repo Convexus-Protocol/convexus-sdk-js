@@ -1,0 +1,44 @@
+{
+  "folders": [
+    {
+      "name": "sdk",
+      "path": "./packages/sdk"
+    },
+    {
+      "name": "sdk-core",
+      "path": "./packages/sdk-core"
+    },
+    {
+      "name": "demo",
+      "path": "./packages/sdk-demo"
+    },
+    {
+      "name": "root",
+      "path": "./"
+    },
+  ],
+
+  "settings": {
+    "files.exclude": {
+      "node_modules": true,
+      "packages": true,
+      "package-lock.json": true,
+      "**/*.lock": true,
+      "**/*.map": true
+    },
+		
+    "jest.autoRun": {
+      "watch": true, 
+      "onSave": "test-file", 
+      "onStartup": ["all-tests"]
+    },
+    "jest.disabledWorkspaceFolders": ["ROOT"]
+	},
+	
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "orta.vscode-jest",
+    ],
+  }
+}

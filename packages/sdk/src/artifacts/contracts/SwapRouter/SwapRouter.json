@@ -1,0 +1,86 @@
+{
+    "contractName": "SwapRouter",
+    "abi": [
+        {
+            "inputs": [
+                {
+                    "name": "amount0Delta",
+                    "type": "int"
+                },
+                {
+                    "name": "amount1Delta",
+                    "type": "int"
+                },
+                {
+                    "name": "data",
+                    "type": "bytes"
+                }
+            ],
+            "name": "convexusSwapCallback",
+            "outputs": [],
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "name": "_from",
+                    "type": "Address"
+                },
+                {
+                    "name": "_value",
+                    "type": "int"
+                },
+                {
+                    "default": null,
+                    "name": "_data",
+                    "type": "bytes"
+                }
+            ],
+            "name": "tokenFallback",
+            "outputs": [],
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "Address"
+                }
+            ],
+            "name": "withdraw",
+            "outputs": [],
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "name": "user",
+                    "type": "Address"
+                },
+                {
+                    "name": "token",
+                    "type": "Address"
+                }
+            ],
+            "name": "deposited",
+            "outputs": [
+                {
+                    "type": "int"
+                }
+            ],
+            "readonly": "0x1",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "name",
+            "outputs": [
+                {
+                    "type": "str"
+                }
+            ],
+            "readonly": "0x1",
+            "type": "function"
+        }
+    ]
+}

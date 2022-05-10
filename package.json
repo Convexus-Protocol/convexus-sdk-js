@@ -1,0 +1,32 @@
+{
+  "name": "convexus",
+  "description": "⚒️ An SDK for building applications on top of Convexus",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "keywords": [
+    "convexus",
+    "sdk",
+    "icon"
+  ],
+  "scripts": {
+    "bootstrap": "npx lerna bootstrap && npm install",
+    "reset": "npm run clean && npx lerna clean -y",
+    "test": "npx lerna run test",
+    "build": "npm run cleanup && npx lerna run compile",
+    "build:watch": "npm run cleanup && npx lerna run compile:watch --stream --no-sort",
+    "cleanup": "npx lerna run cleanup --stream --parallel",
+    "clean": "npx rimraf -rf node_modules package-lock.json yarn.lock && npx lerna run clean --stream --parallel",
+    "demo": "npm run build && (cd packages/sdk-demo && npm run start)",
+    "lint": "npx lerna run lint",
+    "publish": "npx lerna publish --force-publish=* --skip-npm --skip-git",
+    "prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "lerna": "^4.0.0",
+    "rimraf": "^3.0.2"
+  }
+}
