@@ -32,7 +32,7 @@
       "onSave": "test-file", 
       "onStartup": ["all-tests"]
     },
-    "jest.disabledWorkspaceFolders": ["ROOT"]
+    "jest.disabledWorkspaceFolders": ["root"]
 	},
 	
   "extensions": {

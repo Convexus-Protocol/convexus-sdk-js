@@ -4,14 +4,14 @@
     "description": "⚒️ An SDK for building applications on top of Convexus",
     "license": "Apache-2.0",
     "keywords": [
-      "convexus",
-      "sdk",
-      "icon"
+        "convexus",
+        "sdk",
+        "icon"
     ],
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "test": "jest --config ../../jest.config.json --rootDir",
+        "test": "jest --config ../../jest.config.json --rootDir ../../ --passWithNoTests",
         "compile": "tsc",
         "compile:watch": "tsc -w",
         "clean": "npx rimraf -rf dist coverage node_modules package-lock.json yarn.lock",
@@ -27,6 +27,9 @@
     },
     "devDependencies": {
         "@convexus/sdk-core": "^1.0.0",
+        "@types/jest": "^27.5.1",
+        "jest": "^28.1.0",
+        "ts-jest": "^28.0.2",
         "typescript": "^4.6.4"
     },
     "peerDependency": {
