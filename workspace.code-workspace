@@ -1,29 +1,16 @@
 {
   "folders": [
     {
-      "name": "sdk",
-      "path": "./packages/sdk"
-    },
-    {
-      "name": "sdk-core",
-      "path": "./packages/sdk-core"
-    },
-    {
-      "name": "demo",
-      "path": "./packages/sdk-demo"
-    },
-    {
-      "name": "root",
-      "path": "./"
-    },
+      "path": "."
+    }
   ],
 
   "settings": {
     "files.exclude": {
-      "dist": true,
-      "node_modules": true,
-      "packages": true,
-      "package-lock.json": true,
+      "**/dist": true,
+      "**/node_modules": true,
+      "**/package-lock.json": true,
+      "**/tsconfig.tsbuildinfo": true,
       "**/*.lock": true,
       "**/*.map": true
     },

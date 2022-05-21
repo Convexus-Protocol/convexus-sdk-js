@@ -1,26 +1,27 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "module": "esnext",
-    "target": "esnext",
-    
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "incremental": true,
+    "composite": true,
     "declaration": true,
-    "noImplicitAny": true,
+    "declarationMap": true,
+    "downlevelIteration": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
     "preserveConstEnums": true,
-    "removeComments": true,
+    "importHelpers": true,
+    "lib": ["esnext", "dom"],
+    "module": "esnext",
+    "moduleResolution": "node",
     "sourceMap": true,
-    
-    "lib": [
-      "dom",
-      "esnext"
-    ]
-  },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "tests"
-  ]
+    "paths": {
+      "*": ["typings/*", "includes/*"]
+    },
+    "resolveJsonModule": true,
+    "noUnusedLocals": true,
+    "strict": true,
+    "target": "es5"
+  }
 }

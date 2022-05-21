@@ -14,9 +14,12 @@ An SDK for building applications on top of Convexus
 
 ```bash
 $ yarn reset
+$ yarn install
 $ yarn bootstrap
 $ # It should be OK! Try if everything works properly
 $ yarn demo
+$ # If you want to cleanup everything built, run this command
+$ yarn clean
 ```
 
 ## ⚙️ Commands

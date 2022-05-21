@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "include": ["./typings/**/*.d.ts"],
+  "references": [
+    { "path": "packages/sdk" },
+    { "path": "packages/sdk-core" },
+    { "path": "packages/sdk-demo" }
+  ]
+}
