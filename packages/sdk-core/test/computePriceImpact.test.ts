@@ -1,0 +1,38 @@
+import { CurrencyAmount, Icx, Percent, Price, Token } from '../src/entities'
+import { computePriceImpact } from '../src/utils/computePriceImpact'
+
+describe('#computePriceImpact', () => {
+  const ADDRESS_ZERO = 'hx0000000000000000000000000000000000000000'
+  const ADDRESS_ONE = 'hx0000000000000000000000000000000000000001'
+
+  const t0 = new Token(ADDRESS_ZERO, 18)
+  const t1 = new Token(ADDRESS_ONE, 18)
+
+  it('is correct for zero', () => {
+    expect(
+      computePriceImpact(
+        new Price(new Icx(), t0, 10, 100),
+        CurrencyAmount.fromRawAmount(new Icx(), 10),
+        CurrencyAmount.fromRawAmount(t0, 100)
+      )
+    ).toEqual(new Percent(0, 10000))
+  })
+  it('is correct for half output', () => {
+    expect(
+      computePriceImpact(
+        new Price(t0, t1, 10, 100),
+        CurrencyAmount.fromRawAmount(t0, 10),
+        CurrencyAmount.fromRawAmount(t1, 50)
+      )
+    ).toEqual(new Percent(5000, 10000))
+  })
+  it('is negative for more output', () => {
+    expect(
+      computePriceImpact(
+        new Price(t0, t1, 10, 100),
+        CurrencyAmount.fromRawAmount(t0, 10),
+        CurrencyAmount.fromRawAmount(t1, 200)
+      )
+    ).toEqual(new Percent(-10000, 10000))
+  })
+})

@@ -16,6 +16,8 @@ An SDK for building applications on top of Convexus
 $ yarn reset
 $ yarn install
 $ yarn bootstrap
+$ # Run tests if you want to test the code
+$ yarn test
 $ # It should be OK! Try if everything works properly
 $ yarn demo
 $ # If you want to cleanup everything built, run this command

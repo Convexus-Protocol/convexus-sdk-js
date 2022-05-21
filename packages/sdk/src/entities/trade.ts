@@ -7,8 +7,8 @@ import { PoolFactoryProvider as PoolFactoryProvider } from './factoryProvider'
 
 /**
  * Trades comparator, an extension of the input output comparator that also considers other dimensions of the trade in ranking them
- * @template TInput The input token, either Ether or an ERC-20
- * @template TOutput The output token, either Ether or an ERC-20
+ * @template TInput The input token, either ICX or an IRC-2
+ * @template TOutput The output token, either ICX or an IRC-2
  * @template TTradeType The trade type, either exact input or exact output
  * @param a The first trade to compare
  * @param b The second trade to compare
@@ -59,8 +59,8 @@ export interface BestTradeOptions {
  *
  * Does not account for slippage, i.e., changes in price environment that can occur between
  * the time the trade is submitted and when it is executed.
- * @template TInput The input token, either Ether or an ERC-20
- * @template TOutput The output token, either Ether or an ERC-20
+ * @template TInput The input token, either ICX or an IRC-2
+ * @template TOutput The output token, either ICX or an IRC-2
  * @template TTradeType The trade type, either exact input or exact output
  */
 export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType extends TradeType> {
@@ -186,8 +186,8 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
 
   /**
    * Constructs an exact in trade with the given amount in and route
-   * @template TInput The input token, either Ether or an ERC-20
-   * @template TOutput The output token, either Ether or an ERC-20
+   * @template TInput The input token, either ICX or an IRC-2
+   * @template TOutput The output token, either ICX or an IRC-2
    * @param factoryProvider A Convexus Pool Factory provider
    * @param route The route of the exact in trade
    * @param amountIn The amount being passed in
@@ -203,8 +203,8 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
 
   /**
    * Constructs an exact out trade with the given amount out and route
-   * @template TInput The input token, either Ether or an ERC-20
-   * @template TOutput The output token, either Ether or an ERC-20
+   * @template TInput The input token, either ICX or an IRC-2
+   * @template TOutput The output token, either ICX or an IRC-2
    * @param route The route of the exact out trade
    * @param amountOut The amount returned by the trade
    * @returns The exact out trade
@@ -219,8 +219,8 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
 
   /**
    * Constructs a trade by simulating swaps through the given route
-   * @template TInput The input token, either Ether or an ERC-20.
-   * @template TOutput The output token, either Ether or an ERC-20.
+   * @template TInput The input token, either ICX or an IRC-2.
+   * @template TOutput The output token, either ICX or an IRC-2.
    * @template TTradeType The type of the trade, either exact in or exact out.
    * @param route route to swap through
    * @param amount the amount specified, either input or output, depending on tradeType
@@ -275,8 +275,8 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
   /**
    * Constructs a trade from routes by simulating swaps
    *
-   * @template TInput The input token, either Ether or an ERC-20.
-   * @template TOutput The output token, either Ether or an ERC-20.
+   * @template TInput The input token, either ICX or an IRC-2.
+   * @template TOutput The output token, either ICX or an IRC-2.
    * @template TTradeType The type of the trade, either exact in or exact out.
    * @param routes the routes to swap through and how much of the amount should be routed through each
    * @param tradeType whether the trade is an exact input or exact output swap
@@ -351,8 +351,8 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
   /**
    * Creates a trade without computing the result of swapping through the route. Useful when you have simulated the trade
    * elsewhere and do not have any tick data
-   * @template TInput The input token, either Ether or an ERC-20
-   * @template TOutput The output token, either Ether or an ERC-20
+   * @template TInput The input token, either ICX or an IRC-2
+   * @template TOutput The output token, either ICX or an IRC-2
    * @template TTradeType The type of the trade, either exact in or exact out
    * @param constructorArguments The arguments passed to the trade constructor
    * @returns The unchecked trade
@@ -389,8 +389,8 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
   /**
    * Creates a trade without computing the result of swapping through the routes. Useful when you have simulated the trade
    * elsewhere and do not have any tick data
-   * @template TInput The input token, either Ether or an ERC-20
-   * @template TOutput The output token, either Ether or an ERC-20
+   * @template TInput The input token, either ICX or an IRC-2
+   * @template TOutput The output token, either ICX or an IRC-2
    * @template TTradeType The type of the trade, either exact in or exact out
    * @param constructorArguments The arguments passed to the trade constructor
    * @returns The unchecked trade

@@ -1,6 +1,7 @@
 export * from './token'
 export * from './fractions'
 export * from './baseCurrency'
+export * from './icx'
 export * from './nativeCurrency'
 export * from './currency'
 export * from './errors'

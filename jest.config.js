@@ -40,7 +40,8 @@ const config = {
     },
   },
   testURL: 'http://localhost',
-  collectCoverage: true,
+  // collectCoverage: true,
+  collectCoverage: false,
   collectCoverageFrom: [
     '<rootDir>/packages/*/src/**/*.{ts,js}',
     '!**/node_modules/**',
