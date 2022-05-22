@@ -22,6 +22,7 @@ export default {
     },
     module: {
         rules: arrayFilterEmpty([
+            rules.fullySpecifiedRule,
             rules.javascriptRule,
             rules.typescriptRule,
             rules.htmlRule,

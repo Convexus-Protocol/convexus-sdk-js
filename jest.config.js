@@ -1,6 +1,6 @@
 //  Copyright (C) 2022 Convexus
 //
-//  This file is part of convexus
+//  This file is part of Convexus SDK
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,33 +23,21 @@ const config = {
     '<rootDir>/packages/**/test/*.spec.ts'
   ],
   moduleDirectories: [
-    'packages/*/src',
-    '<rootDir>/includes',
+    '<rootDir>/packages/*/src',
     '<rootDir>/node_modules',
     '<rootDir>/*/node_modules',
   ],
-  moduleFileExtensions: ['js', 'ts', 'node', 'json'],
   moduleNameMapper: {
     '^@convexus/sdk': '<rootDir>/packages/sdk/src/index.ts',
     '^@convexus/sdk-core': '<rootDir>/packages/sdk-core/src/index.ts',
     '^@convexus/sdk-demo': '<rootDir>/packages/sdk-demo/src/index.ts'
   },
+  moduleFileExtensions: ['js', 'ts', 'json'],
   globals: {
     'ts-jest': {
       tsconfig: './tsconfig.test.json',
     },
   },
-  testURL: 'http://localhost',
-  // collectCoverage: true,
-  collectCoverage: false,
-  collectCoverageFrom: [
-    '<rootDir>/packages/*/src/**/*.{ts,js}',
-    '!**/node_modules/**',
-  ],
-  testEnvironment: 'jsdom',
-  automock: false,
-  resetMocks: false,
-  setupFiles: ['<rootDir>/jest-setup.js'],
 };
 
 module.exports = config;

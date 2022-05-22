@@ -13,7 +13,7 @@ An SDK for building applications on top of Convexus
 # 🏗️ Build
 
 ```bash
-$ yarn reset
+$ yarn clean
 $ yarn install
 $ yarn bootstrap
 $ # Run tests if you want to test the code

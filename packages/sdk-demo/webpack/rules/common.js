@@ -12,6 +12,16 @@ export const typescriptRule = {
     exclude: /node_modules/,
 };
 /**
+ * @see https://webpack.js.org/configuration/module/#resolvefullyspecified
+ */
+export const fullySpecifiedRule = {
+    test: /\.m?js$/,
+    resolve: {
+        fullySpecified: false, // disable the behaviour
+    },
+};
+
+/**
  * @see https://webpack.js.org/loaders/babel-loader
  */
 export const javascriptRule = {

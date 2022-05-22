@@ -1,7 +1,7 @@
 {
   "name": "@convexus/sdk-core",
   "version": "1.0.0",
-  "description": "Used for signing transactions.",
+  "description": "Convexus SDK Core package",
   "main": "dist/index.js",
   "node": "dist/index.js",
   "browser": "dist/index.umd.js",
