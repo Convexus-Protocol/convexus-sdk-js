@@ -1,6 +1,6 @@
 import { Token, CurrencyAmount } from '@convexus/sdk-core'
 import { FeeAmount, TICK_SPACINGS } from '../src/constants'
-import { NoPoolFactoryProvider } from '../src/entities/factoryProvider'
+import { PoolFactoryProvider } from '../src/entities/factoryProvider'
 import { nearestUsableTick } from '../src/utils/nearestUsableTick'
 import { TickMath } from '../src/utils/tickMath'
 import { Pool } from '../src/entities/pool'
@@ -13,14 +13,9 @@ const ONE_ICX = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18))
 describe('Pool', () => {
   const USDC = new Token('cxa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', 6, 'USDC', 'USD Coin')
   const DAI = new Token('cx6b175474e89094c44da98b954eedeac495271d0f', 18, 'DAI', 'DAI Stablecoin')
+  const BNUSD = new Token('cx6b175474e89094c44da98b954eedeac495271d0e', 18, 'bnUSD', 'Balanced USD')
 
   describe('constructor', () => {
-    it('cannot be used for tokens on different chains', () => {
-      expect(() => {
-        new Pool(USDC, DAI, FeeAmount.MEDIUM, encodeSqrtRatioX96(1, 1), 0, 0, [])
-      }).toThrow('CHAIN_IDS')
-    })
-
     it('fee must be integer', () => {
       expect(() => {
         new Pool(USDC, DAI, FeeAmount.MEDIUM + 0.5, encodeSqrtRatioX96(1, 1), 0, 0, [])
@@ -67,9 +62,16 @@ describe('Pool', () => {
 
   describe('#getAddress', () => {
     it('matches an example', () => {
-      const factory = new NoPoolFactoryProvider()
-      const result = Pool.getAddress(factory, USDC, DAI, FeeAmount.LOW)
-      expect(result).toEqual('0x6c6Bc977E13Df9b0de53b251522280BB72383700')
+      class MyPoolFactoryProvider implements PoolFactoryProvider {
+        getPool (tokenA: Token, tokenB: Token, fee: FeeAmount): Promise<string> {
+          return new Promise((resolve, reject) => { return resolve("0x6c6Bc977E13Df9b0de53b251522280BB72383700") });
+        }
+      }
+
+      const factory = new MyPoolFactoryProvider()
+      Pool.getAddress(factory, USDC, DAI, FeeAmount.LOW).then(result => {
+        expect(result).toEqual('0x6c6Bc977E13Df9b0de53b251522280BB72383700')
+      })
     })
   })
 
@@ -152,7 +154,7 @@ describe('Pool', () => {
     })
 
     it('throws if invalid token', () => {
-      expect(() => pool.priceOf(DAI)).toThrow('TOKEN')
+      expect(() => pool.priceOf(BNUSD)).toThrow('TOKEN')
     })
   })
 
@@ -160,7 +162,6 @@ describe('Pool', () => {
     const pool = new Pool(USDC, DAI, FeeAmount.LOW, encodeSqrtRatioX96(1, 1), 0, 0, [])
     expect(pool.involvesToken(USDC)).toEqual(true)
     expect(pool.involvesToken(DAI)).toEqual(true)
-    expect(pool.involvesToken(DAI)).toEqual(false)
   })
 
   describe('swaps', () => {

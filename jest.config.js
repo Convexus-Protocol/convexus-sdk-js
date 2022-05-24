@@ -23,14 +23,15 @@ const config = {
     '<rootDir>/packages/**/test/*.spec.ts'
   ],
   moduleDirectories: [
-    '<rootDir>/packages/*/src',
+    '<rootDir>/packages/sdk/src',
+    '<rootDir>/packages/sdk-core/src',
     '<rootDir>/node_modules',
     '<rootDir>/*/node_modules',
   ],
   moduleNameMapper: {
-    '^@convexus/sdk': '<rootDir>/packages/sdk/src/index.ts',
-    '^@convexus/sdk-core': '<rootDir>/packages/sdk-core/src/index.ts',
-    '^@convexus/sdk-demo': '<rootDir>/packages/sdk-demo/src/index.ts'
+    // '@convexus/sdk': '<rootDir>/packages/sdk/src/index.ts',
+    '@convexus/sdk-core': '<rootDir>/packages/sdk-core/src/index.ts',
+    // '@convexus/sdk-demo': '<rootDir>/packages/sdk-demo/src/index.ts'
   },
   moduleFileExtensions: ['js', 'ts', 'json'],
   globals: {

@@ -9,6 +9,8 @@
     "src/artifacts/**/*.json", 
     "../../typings/**/*.d.ts"
   ],
+  
+  "files": [],
   "references": [
     { "path": "../sdk-core" },
   ]
