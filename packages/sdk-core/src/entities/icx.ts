@@ -12,7 +12,7 @@ export class Icx extends NativeCurrency {
   }
 
   public get wrapped (): Token {
-    throw new Error('Method not implemented.')
+    return new Token('cx1000000000000000000000000000000000000004', 18, 'wicx')
   }
 
   public equals(other: Currency): boolean {
