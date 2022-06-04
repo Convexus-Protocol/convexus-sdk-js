@@ -19,7 +19,7 @@ function addressToBytes (address: string): Uint8Array {
   const hexAddress = Uint8Array.from(Buffer.from(address.substring(2), 'hex'));
 
   return new Uint8Array([
-    ... isEoa ? new Uint8Array(0) : new Uint8Array(1),
+    ... isEoa ? new Uint8Array([0]) : new Uint8Array([1]),
     ... hexAddress
   ])
 }
@@ -66,5 +66,5 @@ export function pack (types: ReadonlyArray<string>, values: ReadonlyArray<any>) 
     tight.push(packSingle(type, values[index]));
   });
 
-  return Buffer.from(concat(tight)).toString('hex');
+  return "0x" + Buffer.from(concat(tight)).toString('hex');
 }
