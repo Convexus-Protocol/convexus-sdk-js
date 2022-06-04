@@ -343,7 +343,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
       tradeType
     })
 
-    trade.checkRoute(poolFactoryProvider)
+    await trade.checkRoute(poolFactoryProvider)
 
     return trade;
   }
@@ -357,7 +357,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
    * @param constructorArguments The arguments passed to the trade constructor
    * @returns The unchecked trade
    */
-  public static createUncheckedTrade<
+  public static async createUncheckedTrade<
     TInput extends Currency,
     TOutput extends Currency,
     TTradeType extends TradeType
@@ -369,19 +369,26 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
       outputAmount: CurrencyAmount<TOutput>
       tradeType: TTradeType
     }
-  ): Trade<TInput, TOutput, TTradeType> {
-    const trade = new Trade({
-      ...constructorArguments,
-      routes: [
-        {
-          inputAmount: constructorArguments.inputAmount,
-          outputAmount: constructorArguments.outputAmount,
-          route: constructorArguments.route
-        }
-      ]
-    })
+  ): Promise<Trade<TInput, TOutput, TTradeType>> {
 
-    trade.checkRoute(poolFactoryProvider)
+    let trade = null
+
+    try {
+      trade = new Trade({
+        ...constructorArguments,
+        routes: [
+          {
+            inputAmount: constructorArguments.inputAmount,
+            outputAmount: constructorArguments.outputAmount,
+            route: constructorArguments.route
+          }
+        ]
+      })
+    } catch (err) {
+      return Promise.reject(err)
+    }
+
+    trade.checkRoute(poolFactoryProvider).catch(err => Promise.reject(err))
 
     return trade
   }
@@ -395,7 +402,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
    * @param constructorArguments The arguments passed to the trade constructor
    * @returns The unchecked trade
    */
-  public static createUncheckedTradeWithMultipleRoutes<
+  public static async createUncheckedTradeWithMultipleRoutes<
     TInput extends Currency,
     TOutput extends Currency,
     TTradeType extends TradeType
@@ -409,9 +416,9 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
     }[]
     tradeType: TTradeType
     }
-  ): Trade<TInput, TOutput, TTradeType> {
+  ): Promise<Trade<TInput, TOutput, TTradeType>> {
     const trade = new Trade(constructorArguments)
-    trade.checkRoute(poolFactoryProvider)
+    await trade.checkRoute(poolFactoryProvider)
     return trade
   }
 
@@ -433,6 +440,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
   }) {
     const inputCurrency = routes[0].inputAmount.currency
     const outputCurrency = routes[0].outputAmount.currency
+
     invariant(
       routes.every(({ route }) => inputCurrency.wrapped.equals(route.input.wrapped)),
       'INPUT_CURRENCY_MATCH'

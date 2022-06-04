@@ -1,12 +1,12 @@
 import { Token, CurrencyAmount } from '@convexus/sdk-core'
 import { FeeAmount, TICK_SPACINGS } from '../src/constants'
-import { PoolFactoryProvider } from '../src/entities/factoryProvider'
 import { nearestUsableTick } from '../src/utils/nearestUsableTick'
 import { TickMath } from '../src/utils/tickMath'
 import { Pool } from '../src/entities/pool'
 import { encodeSqrtRatioX96 } from '../src/utils/encodeSqrtRatioX96'
 import JSBI from 'jsbi'
 import { NEGATIVE_ONE } from '../src/internalConstants'
+import { TestPoolFactoryProvider } from './TestPoolFactoryProvider'
 
 const ONE_ICX = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18))
 
@@ -62,15 +62,9 @@ describe('Pool', () => {
 
   describe('#getAddress', () => {
     it('matches an example', () => {
-      class MyPoolFactoryProvider implements PoolFactoryProvider {
-        getPool (tokenA: Token, tokenB: Token, fee: FeeAmount): Promise<string> {
-          return new Promise((resolve, reject) => { return resolve("0x6c6Bc977E13Df9b0de53b251522280BB72383700") });
-        }
-      }
-
-      const factory = new MyPoolFactoryProvider()
+      const factory = new TestPoolFactoryProvider()
       Pool.getAddress(factory, USDC, DAI, FeeAmount.LOW).then(result => {
-        expect(result).toEqual('0x6c6Bc977E13Df9b0de53b251522280BB72383700')
+        expect(result).toEqual('cx12392d3f1239909112393afe12395912123969d4')
       })
     })
   })

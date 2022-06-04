@@ -16,6 +16,7 @@
     },
 		
     "jest.disabledWorkspaceFolders": ["root"],
+    "jest.autoRun": {"watch": false, "onSave": false, "onStartup": []},
     "jest.jestCommandLine": "yarn test"
 	},
 	

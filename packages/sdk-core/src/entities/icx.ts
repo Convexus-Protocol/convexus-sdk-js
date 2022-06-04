@@ -12,7 +12,7 @@ export class Icx extends NativeCurrency {
   }
 
   public get wrapped (): Token {
-    return new Token('cx1000000000000000000000000000000000000004', 18, 'wicx')
+    return new Token('cx1111111111111111111111111111111111111111', 18, 'wicx')
   }
 
   public equals(other: Currency): boolean {
