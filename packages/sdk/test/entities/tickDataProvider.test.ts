@@ -1,4 +1,4 @@
-import { NoTickDataProvider } from '../src/entities/tickDataProvider'
+import { NoTickDataProvider } from '../../src/entities/tickDataProvider'
 
 describe('TickDataProvider', () => {
   describe('NoTickDataProvider', () => {

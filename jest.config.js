@@ -19,8 +19,8 @@ const config = {
     '^.+\\.ts$': 'ts-jest',
   },
   testMatch: [
-    '<rootDir>/packages/**/test/*.test.ts',
-    '<rootDir>/packages/**/test/*.spec.ts'
+    '<rootDir>/packages/**/test/**/*.test.ts',
+    '<rootDir>/packages/**/test/**/*.spec.ts'
   ],
   moduleDirectories: [
     '<rootDir>/packages/sdk/src',

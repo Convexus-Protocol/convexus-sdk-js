@@ -1,11 +1,11 @@
 import { Percent, Token } from '@convexus/sdk-core'
 import JSBI from 'jsbi'
-import { FeeAmount, TICK_SPACINGS } from '../src/constants'
-import { encodeSqrtRatioX96 } from '../src/utils/encodeSqrtRatioX96'
-import { nearestUsableTick } from '../src/utils/nearestUsableTick'
-import { TickMath } from '../src/utils/tickMath'
-import { Pool } from '../src/entities/pool'
-import { Position } from '../src/entities/position'
+import { FeeAmount, TICK_SPACINGS } from '../../src/constants'
+import { encodeSqrtRatioX96 } from '../../src/utils/encodeSqrtRatioX96'
+import { nearestUsableTick } from '../../src/utils/nearestUsableTick'
+import { TickMath } from '../../src/utils/tickMath'
+import { Pool } from '../../src/entities/pool'
+import { Position } from '../../src/entities/position'
 
 describe('Position', () => {
   const USDC = new Token('cxa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', 6, 'USDC', 'USD Coin')

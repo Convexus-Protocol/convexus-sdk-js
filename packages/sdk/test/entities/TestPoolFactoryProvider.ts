@@ -1,6 +1,6 @@
 import { Token } from "@convexus/sdk-core";
-import { FeeAmount } from "../src/constants";
-import { PoolFactoryProvider } from "../src/entities/factoryProvider";
+import { FeeAmount } from "../../src/constants";
+import { PoolFactoryProvider } from "../../src/entities/factoryProvider";
 
 export class TestPoolFactoryProvider implements PoolFactoryProvider {
 

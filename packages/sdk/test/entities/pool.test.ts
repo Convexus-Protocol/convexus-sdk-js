@@ -1,11 +1,11 @@
 import { Token, CurrencyAmount } from '@convexus/sdk-core'
-import { FeeAmount, TICK_SPACINGS } from '../src/constants'
-import { nearestUsableTick } from '../src/utils/nearestUsableTick'
-import { TickMath } from '../src/utils/tickMath'
-import { Pool } from '../src/entities/pool'
-import { encodeSqrtRatioX96 } from '../src/utils/encodeSqrtRatioX96'
+import { FeeAmount, TICK_SPACINGS } from '../../src/constants'
+import { nearestUsableTick } from '../../src/utils/nearestUsableTick'
+import { TickMath } from '../../src/utils/tickMath'
+import { Pool } from '../../src/entities/pool'
+import { encodeSqrtRatioX96 } from '../../src/utils/encodeSqrtRatioX96'
 import JSBI from 'jsbi'
-import { NEGATIVE_ONE } from '../src/internalConstants'
+import { NEGATIVE_ONE } from '../../src/internalConstants'
 import { TestPoolFactoryProvider } from './TestPoolFactoryProvider'
 
 const ONE_ICX = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18))

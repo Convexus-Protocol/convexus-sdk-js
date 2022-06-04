@@ -1,5 +1,5 @@
-import { TickMath } from '../src/utils/tickMath'
-import { Tick } from '../src/entities/tick'
+import { TickMath } from '../../src/utils/tickMath'
+import { Tick } from '../../src/entities/tick'
 
 describe('Tick', () => {
   describe('constructor', () => {
