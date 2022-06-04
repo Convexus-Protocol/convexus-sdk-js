@@ -190,7 +190,7 @@ export abstract class Staker {
   /**
    *
    * @param incentiveKey An `IncentiveKey` which represents a unique staking program.
-   * @returns An encoded IncentiveKey to be read by ethers
+   * @returns An encoded IncentiveKey to be read
    */
   private static _encodeIncentiveKey(poolFactoryProvider: PoolFactoryProvider, incentiveKey: IncentiveKey): {} {
     const { token0, token1, fee } = incentiveKey.pool

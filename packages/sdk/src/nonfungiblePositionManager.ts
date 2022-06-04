@@ -55,7 +55,7 @@ export interface CommonAddLiquidityOptions {
   deadline: BigintIsh
 
   /**
-   * Whether to spend ether. If true, one of the pool tokens must be WETH, by default false
+   * Whether to spend ICX. If true, one of the pool tokens must be WICX, by default false
    */
   useNative?: NativeCurrency
 }
@@ -246,11 +246,11 @@ export abstract class NonfungiblePositionManager {
 
     if (options.useNative) {
       const wrapped = options.useNative.wrapped
-      invariant(position.pool.token0.equals(wrapped) || position.pool.token1.equals(wrapped), 'NO_WETH')
+      invariant(position.pool.token0.equals(wrapped) || position.pool.token1.equals(wrapped), 'NO_WICX')
 
       const wrappedValue = position.pool.token0.equals(wrapped) ? amount0Desired : amount1Desired
 
-      // we only need to refund if we're actually sending ETH
+      // we only need to refund if we're actually sending ICX
       if (JSBI.greaterThan(wrappedValue, ZERO)) {
         calldatas.push(Payments.encodeRefundICX())
       }
@@ -269,7 +269,7 @@ export abstract class NonfungiblePositionManager {
 
     const tokenId = toHex(options.tokenId)
 
-    const involvesETH =
+    const involvesICX =
       options.expectedCurrencyOwed0.currency.isNative || options.expectedCurrencyOwed1.currency.isNative
 
     const recipient = validateAndParseAddress(options.recipient)
@@ -279,15 +279,15 @@ export abstract class NonfungiblePositionManager {
       NonfungiblePositionManager.INTERFACE.encodeFunctionData('collect', [
         {
           tokenId,
-          recipient: involvesETH ? ADDRESS_ZERO : recipient,
+          recipient: involvesICX ? ADDRESS_ZERO : recipient,
           amount0Max: MaxUint128,
           amount1Max: MaxUint128
         }
       ])
     )
 
-    if (involvesETH) {
-      const ethAmount = options.expectedCurrencyOwed0.currency.isNative
+    if (involvesICX) {
+      const icxAmount = options.expectedCurrencyOwed0.currency.isNative
         ? options.expectedCurrencyOwed0.quotient
         : options.expectedCurrencyOwed1.quotient
       const token = options.expectedCurrencyOwed0.currency.isNative
@@ -297,7 +297,7 @@ export abstract class NonfungiblePositionManager {
         ? options.expectedCurrencyOwed1.quotient
         : options.expectedCurrencyOwed0.quotient
 
-      calldatas.push(Payments.encodeUnwrapSICX(ethAmount, recipient))
+      calldatas.push(Payments.encodeUnwrapSICX(icxAmount, recipient))
       calldatas.push(Payments.encodeSweepToken(token, tokenAmount, recipient))
     }
 

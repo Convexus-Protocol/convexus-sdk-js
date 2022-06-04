@@ -14,7 +14,7 @@ describe('NonfungiblePositionManager', () => {
   const WICX = ICX.wrapped
 
   const pool_0_1 = new Pool(token0, token1, fee, encodeSqrtRatioX96(1, 1), 0, 0, [])
-  const pool_1_weth = new Pool(token1, WICX, fee, encodeSqrtRatioX96(1, 1), 0, 0, [])
+  const pool_1_wicx = new Pool(token1, WICX, fee, encodeSqrtRatioX96(1, 1), 0, 0, [])
 
   const recipient = 'hx0000000000000000000000000000000000000003'
   const sender = 'hx0000000000000000000000000000000000000004'
@@ -48,7 +48,7 @@ describe('NonfungiblePositionManager', () => {
       ).toThrow('ZERO_LIQUIDITY')
     })
 
-    it('throws if pool does not involve ether and useNative is true', () => {
+    it('throws if pool does not involve ICX and useNative is true', () => {
       expect(() =>
         NonfungiblePositionManager.addCallParameters(
           new Position({
@@ -59,7 +59,7 @@ describe('NonfungiblePositionManager', () => {
           }),
           { recipient, slippageTolerance, deadline, useNative: ICX }
         )
-      ).toThrow('NO_WETH')
+      ).toThrow('NO_WICX')
     })
 
     it('succeeds for mint', () => {
@@ -116,7 +116,7 @@ describe('NonfungiblePositionManager', () => {
     it('useNative', () => {
       const { calldata, value } = NonfungiblePositionManager.addCallParameters(
         new Position({
-          pool: pool_1_weth,
+          pool: pool_1_wicx,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
           tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
           liquidity: 1
@@ -146,7 +146,7 @@ describe('NonfungiblePositionManager', () => {
       expect(value).toEqual('0x00')
     })
 
-    it('works with eth', () => {
+    it('works with ICX', () => {
       const { calldata, value } = NonfungiblePositionManager.collectCallParameters({
         tokenId,
         expectedCurrencyOwed0: CurrencyAmount.fromRawAmount(token1, 0),
@@ -289,13 +289,13 @@ describe('NonfungiblePositionManager', () => {
       expect(value).toEqual('0x00')
     })
 
-    it('works with eth', () => {
-      const ethAmount = CurrencyAmount.fromRawAmount(ICX, 0)
+    it('works with ICX', () => {
+      const icxAmount = CurrencyAmount.fromRawAmount(ICX, 0)
       const tokenAmount = CurrencyAmount.fromRawAmount(token1, 0)
 
       const { calldata, value } = NonfungiblePositionManager.removeCallParameters(
         new Position({
-          pool: pool_1_weth,
+          pool: pool_1_wicx,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
           tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
           liquidity: 100
@@ -306,8 +306,8 @@ describe('NonfungiblePositionManager', () => {
           slippageTolerance,
           deadline,
           collectOptions: {
-            expectedCurrencyOwed0: pool_1_weth.token0.equals(token1) ? tokenAmount : ethAmount,
-            expectedCurrencyOwed1: pool_1_weth.token0.equals(token1) ? ethAmount : tokenAmount,
+            expectedCurrencyOwed0: pool_1_wicx.token0.equals(token1) ? tokenAmount : icxAmount,
+            expectedCurrencyOwed1: pool_1_wicx.token0.equals(token1) ? icxAmount : tokenAmount,
             recipient
           }
         }
@@ -319,13 +319,13 @@ describe('NonfungiblePositionManager', () => {
       expect(value).toEqual('0x00')
     })
 
-    it('works for partial with eth', () => {
-      const ethAmount = CurrencyAmount.fromRawAmount(ICX, 0)
+    it('works for partial with ICX', () => {
+      const icxAmount = CurrencyAmount.fromRawAmount(ICX, 0)
       const tokenAmount = CurrencyAmount.fromRawAmount(token1, 0)
 
       const { calldata, value } = NonfungiblePositionManager.removeCallParameters(
         new Position({
-          pool: pool_1_weth,
+          pool: pool_1_wicx,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
           tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
           liquidity: 100
@@ -336,8 +336,8 @@ describe('NonfungiblePositionManager', () => {
           slippageTolerance,
           deadline,
           collectOptions: {
-            expectedCurrencyOwed0: pool_1_weth.token0.equals(token1) ? tokenAmount : ethAmount,
-            expectedCurrencyOwed1: pool_1_weth.token0.equals(token1) ? ethAmount : tokenAmount,
+            expectedCurrencyOwed0: pool_1_wicx.token0.equals(token1) ? tokenAmount : icxAmount,
+            expectedCurrencyOwed1: pool_1_wicx.token0.equals(token1) ? icxAmount : tokenAmount,
             recipient
           }
         }

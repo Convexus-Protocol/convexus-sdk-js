@@ -45,7 +45,7 @@ describe('Payments', () => {
     })
   })
 
-  it('#encodeRefundETH', () => {
+  it('#encodeRefundICX', () => {
     const calldata = Payments.encodeRefundICX()
     expect(calldata).toBe('0x12210e8a')
   })
