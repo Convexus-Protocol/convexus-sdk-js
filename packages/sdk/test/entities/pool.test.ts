@@ -64,7 +64,7 @@ describe('Pool', () => {
     it('matches an example', () => {
       const factory = new TestPoolFactoryProvider()
       Pool.getAddress(factory, USDC, DAI, FeeAmount.LOW).then(result => {
-        expect(result).toEqual('cx12392d3f1239909112393afe12395912123969d4')
+        expect(result).toEqual('cx41cb9a6b41cba89e41cb9c2241cba0f241cba129')
       })
     })
   })
@@ -153,9 +153,11 @@ describe('Pool', () => {
   })
 
   describe('#involvesToken', () => {
-    const pool = new Pool(USDC, DAI, FeeAmount.LOW, encodeSqrtRatioX96(1, 1), 0, 0, [])
-    expect(pool.involvesToken(USDC)).toEqual(true)
-    expect(pool.involvesToken(DAI)).toEqual(true)
+    it('equals', () => {
+      const pool = new Pool(USDC, DAI, FeeAmount.LOW, encodeSqrtRatioX96(1, 1), 0, 0, [])
+      expect(pool.involvesToken(USDC)).toEqual(true)
+      expect(pool.involvesToken(DAI)).toEqual(true)
+    })
   })
 
   describe('swaps', () => {

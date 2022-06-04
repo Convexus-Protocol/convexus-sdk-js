@@ -1,4 +1,4 @@
-import { Icx, Token } from '../src/entities'
+import { Icx, Token } from '../../src/entities'
 
 describe('Currency', () => {
   const ADDRESS_ZERO = 'hx0000000000000000000000000000000000000000'

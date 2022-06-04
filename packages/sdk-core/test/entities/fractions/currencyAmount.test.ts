@@ -1,9 +1,9 @@
 import JSBI from 'jsbi'
-import { MaxUint256 } from '../src/constants'
-import { Icx } from '../src/entities/icx'
-import { Token } from '../src/entities/token'
-import { CurrencyAmount } from '../src/entities/fractions/currencyAmount'
-import { Percent } from '../src/entities/fractions/percent'
+import { MaxUint256 } from '../../../src/constants'
+import { Icx } from '../../../src/entities/icx'
+import { Token } from '../../../src/entities/token'
+import { CurrencyAmount } from '../../../src/entities/fractions/currencyAmount'
+import { Percent } from '../../../src/entities/fractions/percent'
 
 describe('CurrencyAmount', () => {
   const ADDRESS_ONE = 'hx0000000000000000000000000000000000000001'

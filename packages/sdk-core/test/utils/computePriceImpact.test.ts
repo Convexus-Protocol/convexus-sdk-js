@@ -1,5 +1,5 @@
-import { CurrencyAmount, Icx, Percent, Price, Token } from '../src/entities'
-import { computePriceImpact } from '../src/utils/computePriceImpact'
+import { CurrencyAmount, Icx, Percent, Price, Token } from '../../src/entities'
+import { computePriceImpact } from '../../src/utils/computePriceImpact'
 
 describe('#computePriceImpact', () => {
   const ADDRESS_ZERO = 'hx0000000000000000000000000000000000000000'

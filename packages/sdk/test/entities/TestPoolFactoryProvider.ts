@@ -8,7 +8,7 @@ export class TestPoolFactoryProvider implements PoolFactoryProvider {
   // algorithm based on the token addresses
   checksum (s: String)
   {
-    var chk = 0x12345678;
+    var chk = 1103515245;
     var len = s.length;
     for (var i = 0; i < len; i++) {
         chk += (s.charCodeAt(i) * (i + 1));
@@ -33,11 +33,11 @@ export class TestPoolFactoryProvider implements PoolFactoryProvider {
 
       if (chunks !== null && chunks.length == 5) {
         return resolve("cx" 
-          + this.checksum(seed + chunks[0])
-          + this.checksum(seed + chunks[1])
-          + this.checksum(seed + chunks[2])
-          + this.checksum(seed + chunks[3])
-          + this.checksum(seed + chunks[4]))
+          + this.checksum(fee.toString(10) + chunks[0] + seed)
+          + this.checksum(fee.toString(10) + chunks[1] + seed)
+          + this.checksum(fee.toString(10) + chunks[2] + seed)
+          + this.checksum(fee.toString(10) + chunks[3] + seed)
+          + this.checksum(fee.toString(10) + chunks[4] + seed))
       }
 
       return reject("Invalid chunks")

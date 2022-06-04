@@ -1,6 +1,6 @@
-import { Token } from '../src/entities/token'
-import { CurrencyAmount } from '../src/entities/fractions/currencyAmount'
-import { Price } from '../src/entities/fractions/price'
+import { Token } from '../../../src/entities/token'
+import { CurrencyAmount } from '../../../src/entities/fractions/currencyAmount'
+import { Price } from '../../../src/entities/fractions/price'
 
 describe('Price', () => {
   const ADDRESS_ZERO = 'hx0000000000000000000000000000000000000000'

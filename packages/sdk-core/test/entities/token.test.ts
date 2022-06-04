@@ -1,4 +1,4 @@
-import { Token } from '../src/entities/token'
+import { Token } from '../../src/entities/token'
 
 describe('Token', () => {
   const ADDRESS_ONE = 'hx0000000000000000000000000000000000000001'
