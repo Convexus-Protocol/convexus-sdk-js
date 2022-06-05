@@ -4,12 +4,12 @@ describe('Multicall', () => {
   describe('#encodeMulticall', () => {
     it('works for string', async () => {
       const calldata = Multicall.encodeMulticall('0x01')
-      expect(calldata).toBe('0x01')
+      expect(calldata).toStrictEqual('0x01')
     })
 
     it('works for string array with length 1', async () => {
       const calldata = Multicall.encodeMulticall(['0x01'])
-      expect(calldata).toBe('0x01')
+      expect(calldata).toStrictEqual('0x01')
     })
 
     it('works for string array with length >1', async () => {
@@ -18,7 +18,7 @@ describe('Multicall', () => {
       //   '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
       // ])
       // TODO:
-      // expect(calldata).toBe(
+      // expect(calldata).toStrictEqual(
       //   '0xac9650d800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000020aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0000000000000000000000000000000000000000000000000000000000000020bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
       // )
     })

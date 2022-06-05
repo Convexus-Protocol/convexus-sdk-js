@@ -162,7 +162,7 @@ export interface RemoveLiquidityOptions {
 }
 
 export abstract class NonfungiblePositionManager {
-  public static INTERFACE: Interface = new Interface(INonfungiblePositionManager.abi)
+  public static INTERFACE: Interface = new Interface(INonfungiblePositionManager)
 
   /**
    * Cannot be constructed.

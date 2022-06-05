@@ -16,14 +16,14 @@ describe('Payments', () => {
   describe('#encodeUnwrapSICX', () => {
     it('works without feeOptions', () => {
       const calldata = Payments.encodeUnwrapSICX(amount, recipient)
-      expect(calldata).toBe(
+      expect(calldata).toStrictEqual(
         '0x49404b7c000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000003'
       )
     })
 
     it('works with feeOptions', () => {
       const calldata = Payments.encodeUnwrapSICX(amount, recipient, feeOptions)
-      expect(calldata).toBe(
+      expect(calldata).toStrictEqual(
         '0x9b2c0a37000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000009'
       )
     })
@@ -32,14 +32,14 @@ describe('Payments', () => {
   describe('#encodeSweepToken', () => {
     it('works without feeOptions', () => {
       const calldata = Payments.encodeSweepToken(token, amount, recipient)
-      expect(calldata).toBe(
+      expect(calldata).toStrictEqual(
         '0xdf2ab5bb0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000003'
       )
     })
 
     it('works with feeOptions', () => {
       const calldata = Payments.encodeSweepToken(token, amount, recipient, feeOptions)
-      expect(calldata).toBe(
+      expect(calldata).toStrictEqual(
         '0xe0e189a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000009'
       )
     })
@@ -47,6 +47,6 @@ describe('Payments', () => {
 
   it('#encodeRefundICX', () => {
     const calldata = Payments.encodeRefundICX()
-    expect(calldata).toBe('0x12210e8a')
+    expect(calldata).toStrictEqual('0x12210e8a')
   })
 })

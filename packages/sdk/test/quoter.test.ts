@@ -9,8 +9,8 @@ import { Route, Trade } from '../src/entities'
 import { TestPoolFactoryProvider } from './entities/TestPoolFactoryProvider'
 
 describe('SwapQuoter', () => {
-  const token0 = new Token('0x0000000000000000000000000000000000000001', 18, 't0', 'token0')
-  const token1 = new Token('0x0000000000000000000000000000000000000002', 18, 't1', 'token1')
+  const token0 = new Token('cx0000000000000000000000000000000000000001', 18, 't0', 'token0')
+  const token1 = new Token('cx0000000000000000000000000000000000000002', 18, 't1', 'token1')
 
   const poolFactoryProvider = new TestPoolFactoryProvider()
 
@@ -53,8 +53,19 @@ describe('SwapQuoter', () => {
           trade.tradeType
         )
 
-        expect(calldata).toBe(
-          '0xf7729d43000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000bb800000000000000000000000000000000000000000000000000000000000000640000000000000000000000000000000000000000000000000000000000000000'
+        expect(calldata).toStrictEqual(
+          {
+            "method": "quoteExactInputSingle",
+            "params": {
+                "params": {
+                    "amountIn": "0xbb8",
+                    "fee": "0x64",
+                    "sqrtPriceLimitX96": "0x0",
+                    "tokenIn": "cx0000000000000000000000000000000000000001",
+                    "tokenOut": "cx0000000000000000000000000000000000000002"
+                }
+            }
+          }
         )
         expect(value).toBe('0x00')
       })
@@ -72,8 +83,19 @@ describe('SwapQuoter', () => {
           trade.tradeType
         )
 
-        expect(calldata).toBe(
-          '0x30d07f21000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000bb800000000000000000000000000000000000000000000000000000000000000640000000000000000000000000000000000000000000000000000000000000000'
+        expect(calldata).toStrictEqual(
+          {
+            "method": "quoteExactOutputSingle",
+            "params": {
+                "params": {
+                    "amount": "0xbb8",
+                    "fee": "0x64",
+                    "sqrtPriceLimitX96": "0x0",
+                    "tokenIn": "cx0000000000000000000000000000000000000001",
+                    "tokenOut": "cx0000000000000000000000000000000000000002"
+                }
+            }
+          }
         )
         expect(value).toBe('0x00')
       })
@@ -87,8 +109,16 @@ describe('SwapQuoter', () => {
         )
         const { calldata, value } = SwapQuoter.quoteCallParameters(trade.route, trade.inputAmount, trade.tradeType)
 
-        expect(calldata).toBe(
-          '0xcdca17530000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000000420000000000000000000000000000000000000001000bb80000000000000000000000000000000000000002000bb8c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000000000000000'
+        expect(calldata).toStrictEqual(
+          {
+            "method": "quoteExactInput",
+            "params": {
+              "params": {
+                "amountIn": "0x64",
+                "path": "0x01000000000000000000000000000000000000000100000bb801000000000000000000000000000000000000000200000bb8011111111111111111111111111111111111111111"
+              }
+            }
+          }
         )
         expect(value).toBe('0x00')
       })
@@ -102,8 +132,16 @@ describe('SwapQuoter', () => {
         )
         const { calldata, value } = SwapQuoter.quoteCallParameters(trade.route, trade.outputAmount, trade.tradeType)
 
-        expect(calldata).toBe(
-          '0x2f80bb1d000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000640000000000000000000000000000000000000000000000000000000000000042c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb80000000000000000000000000000000000000002000bb80000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000'
+        expect(calldata).toStrictEqual(
+          {
+            "method": "quoteExactOutput",
+            "params": {
+                "params": {
+                    "amountOut": "0x64",
+                    "path": "0x01111111111111111111111111111111111111111100000bb801000000000000000000000000000000000000000200000bb8010000000000000000000000000000000000000001"
+                }
+            }
+          }
         )
         expect(value).toBe('0x00')
       })
@@ -118,8 +156,19 @@ describe('SwapQuoter', () => {
           sqrtPriceLimitX96: JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(128))
         })
 
-        expect(calldata).toBe(
-          '0xf7729d43000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000bb800000000000000000000000000000000000000000000000000000000000000640000000000000000000000000000000100000000000000000000000000000000'
+        expect(calldata).toStrictEqual(
+          {
+            "method": "quoteExactInputSingle",
+            "params": {
+                "params": {
+                    "amountIn": "0xbb8",
+                    "fee": "0x64",
+                    "sqrtPriceLimitX96": "0x100000000000000000000000000000000",
+                    "tokenIn": "cx0000000000000000000000000000000000000001",
+                    "tokenOut": "cx0000000000000000000000000000000000000002"
+                }
+            }
+          }
         )
         expect(value).toBe('0x00')
       })

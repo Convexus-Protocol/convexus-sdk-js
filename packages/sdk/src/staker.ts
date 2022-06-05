@@ -1,6 +1,6 @@
 import { BigintIsh, Token, validateAndParseAddress } from '@convexus/sdk-core'
 import { MethodParameters, toHex } from './utils/calldata'
-import IUniswapV3Staker from './artifacts/contracts/UniswapV3Staker/UniswapV3Staker.json'
+import IConvexusStaker from './artifacts/contracts/ConvexusStaker/ConvexusStaker.json'
 import { Pool, PoolFactoryProvider } from './entities'
 import { Interface, defaultAbiCoder } from './utils'
 import { Multicall } from './multicall'
@@ -67,7 +67,7 @@ export interface WithdrawOptions {
 }
 
 export abstract class Staker {
-  public static INTERFACE: Interface = new Interface(IUniswapV3Staker.abi)
+  public static INTERFACE: Interface = new Interface(IConvexusStaker.abi)
 
   protected constructor() {}
   private static INCENTIVE_KEY_ABI =

@@ -17,11 +17,11 @@ export interface QuoteOptions {
 }
 
 /**
- * Represents the Uniswap V3 QuoterV1 contract with a method for returning the formatted
+ * Represents the Convexus Quoter contract with a method for returning the formatted
  * calldata needed to call the quoter contract.
  */
 export abstract class SwapQuoter {
-  public static INTERFACE: Interface = new Interface(IQuoter.abi)
+  public static INTERFACE: Interface = new Interface(IQuoter)
 
   /**
    * Produces the on-chain method name of the appropriate function within QuoterV2,
@@ -46,29 +46,37 @@ export abstract class SwapQuoter {
     if (singleHop) {
       if (tradeType === TradeType.EXACT_INPUT) {
         calldata = SwapQuoter.INTERFACE.encodeFunctionData(`quoteExactInputSingle`, [
-          route.tokenPath[0].address,
-          route.tokenPath[1].address,
-          route.pools[0].fee,
-          quoteAmount,
-          toHex(options?.sqrtPriceLimitX96 ?? 0)
-        ])
+          [
+            route.tokenPath[0].address,
+            route.tokenPath[1].address,
+            route.pools[0].fee,
+            quoteAmount,
+            toHex(options?.sqrtPriceLimitX96 ?? 0)
+          ]
+      ])
       } else {
         calldata = SwapQuoter.INTERFACE.encodeFunctionData(`quoteExactOutputSingle`, [
-          route.tokenPath[0].address,
-          route.tokenPath[1].address,
-          route.pools[0].fee,
-          quoteAmount,
-          toHex(options?.sqrtPriceLimitX96 ?? 0)
-        ])
+          [
+            route.tokenPath[0].address,
+            route.tokenPath[1].address,
+            route.pools[0].fee,
+            quoteAmount,
+            toHex(options?.sqrtPriceLimitX96 ?? 0)
+          ]
+      ])
       }
     } else {
       invariant(options?.sqrtPriceLimitX96 === undefined, 'MULTIHOP_PRICE_LIMIT')
       const path: string = encodeRouteToPath(route, tradeType === TradeType.EXACT_OUTPUT)
 
       if (tradeType === TradeType.EXACT_INPUT) {
-        calldata = SwapQuoter.INTERFACE.encodeFunctionData('quoteExactInput', [path, quoteAmount])
+        calldata = SwapQuoter.INTERFACE.encodeFunctionData('quoteExactInput', [
+          [path, quoteAmount]
+        ])
       } else {
-        calldata = SwapQuoter.INTERFACE.encodeFunctionData('quoteExactOutput', [path, quoteAmount])
+        calldata = SwapQuoter.INTERFACE.encodeFunctionData('quoteExactOutput', [
+          [path, quoteAmount]
+        ])
       }
     }
     return {

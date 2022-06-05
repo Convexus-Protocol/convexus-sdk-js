@@ -18,4 +18,8 @@ export class Icx extends NativeCurrency {
   public equals(other: Currency): boolean {
     return other.isNative && other.symbol === this.symbol
   }
+
+  public static isWrappedAddress (address: string): boolean {
+    return new Icx().wrapped.address === address
+  }
 }
