@@ -5,8 +5,9 @@ import { ADDRESS_ZERO } from './constants'
 import { encodeRouteToPath, Interface } from './utils'
 import { MethodParameters, toHex } from './utils/calldata'
 import ISwapRouter from './artifacts/contracts/SwapRouter/SwapRouter.json'
-import { Multicall } from './multicall'
-import { FeeOptions, Payments } from './payments'
+// import { Multicall } from './multicall'
+import { FeeOptions /*, Payments*/ } from './payments'
+import { Route } from './entities'
 
 /**
  * Options for producing the arguments to send calls to the router.
@@ -79,15 +80,8 @@ export abstract class SwapRouter {
     const calldatas: string[] = []
 
     const ZERO_IN: CurrencyAmount<Currency> = CurrencyAmount.fromRawAmount(trades[0].inputAmount.currency, 0)
-    const ZERO_OUT: CurrencyAmount<Currency> = CurrencyAmount.fromRawAmount(trades[0].outputAmount.currency, 0)
-
-    const totalAmountOut: CurrencyAmount<Currency> = trades.reduce(
-      (sum, trade) => sum.add(trade.minimumAmountOut(options.slippageTolerance)),
-      ZERO_OUT
-    )
 
     // flag for whether a refund needs to happen
-    const mustRefund = sampleTrade.inputAmount.currency.isNative && sampleTrade.tradeType === TradeType.EXACT_OUTPUT
     const inputIsNative = sampleTrade.inputAmount.currency.isNative
     // flags for whether funds should be send first to the router
     const outputIsNative = sampleTrade.outputAmount.currency.isNative
@@ -96,12 +90,6 @@ export abstract class SwapRouter {
     const totalValue: CurrencyAmount<Currency> = inputIsNative
       ? trades.reduce((sum, trade) => sum.add(trade.maximumAmountIn(options.slippageTolerance)), ZERO_IN)
       : ZERO_IN
-
-    // encode permit if necessary
-    // if (options.inputTokenPermit) {
-    //   invariant(sampleTrade.inputAmount.currency.isToken, 'NON_TOKEN_PERMIT')
-    //   calldatas.push(SelfPermit.encodePermit(sampleTrade.inputAmount.currency, options.inputTokenPermit))
-    // }
 
     const recipient: string = validateAndParseAddress(options.recipient)
     const deadline = toHex(options.deadline)
@@ -116,191 +104,250 @@ export abstract class SwapRouter {
 
         if (singleHop) {
           if (trade.tradeType === TradeType.EXACT_INPUT) {
-
-            if (Icx.isWrappedAddress(route.tokenPath[0].address)) {
-              const exactInputSingleParams = [
-                [
-                  route.tokenPath[1].address,
-                  route.pools[0].fee,
-                  routerMustCustody ? ADDRESS_ZERO : recipient,
-                  deadline,
-                  amountOut,
-                  toHex(options.sqrtPriceLimitX96 ?? 0)
-                ]
-              ]
-
-              calldatas.push(
-                SwapRouter.INTERFACE.encodeFunctionData(
-                  'exactInputSingleIcx', 
-                  exactInputSingleParams
-                )
-              )
-
-            } else {
-              
-            const exactInputSingleParams = [
-              [
-                route.tokenPath[0].address,
-                route.tokenPath[1].address,
-                route.pools[0].fee,
-                routerMustCustody ? ADDRESS_ZERO : recipient,
-                deadline,
-                amountIn,
-                amountOut,
-                toHex(options.sqrtPriceLimitX96 ?? 0)
-              ]
-            ]
-
-            const exactInputSingleInputs = [{
-              fields: [
-                { name: 'tokenIn', type: 'Address' },
-                { name: 'tokenOut', type: 'Address' },
-                { name: 'fee', type: 'int' },
-                { name: 'recipient', type: 'Address' },
-                { name: 'deadline', type: 'int' },
-                { name: 'amountIn', type: 'int' },
-                { name: 'amountOutMinimum', type: 'int' },
-                { name: 'sqrtPriceLimitX96', type: 'int' }
-              ],
-              name: 'params',
-              type: 'struct'
-            }]
-            
-              calldatas.push(
-                SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
-                  'exactInputSingle', 
-                  exactInputSingleInputs, 
-                  exactInputSingleParams
-                )
-              )
-            }
+            calldatas.push(SwapRouter.encodeExactInputSingle(route, routerMustCustody, recipient, deadline, amountOut, amountIn, options))
           } else {
-            const exactOutputSingleParams = [[
-              route.tokenPath[0].address,
-              route.tokenPath[1].address,
-              route.pools[0].fee,
-              routerMustCustody ? ADDRESS_ZERO : recipient,
-              deadline,
-              amountOut,
-              amountIn,
-              toHex(options.sqrtPriceLimitX96 ?? 0)
-            ]]
-
-            const exactOutputSingleInputs = [{
-              fields: [
-                { name: 'tokenIn', type: 'Address' },
-                { name: 'tokenOut', type: 'Address' },
-                { name: 'fee', type: 'int' },
-                { name: 'recipient', type: 'Address' },
-                { name: 'deadline', type: 'int' },
-                { name: 'amountOut', type: 'int' },
-                { name: 'amountInMaximum', type: 'int' },
-                { name: 'sqrtPriceLimitX96', type: 'int' }
-              ],
-              name: 'params',
-              type: 'struct'
-            }]
-
-            calldatas.push(
-              SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
-                'exactOutputSingle', 
-                exactOutputSingleInputs, 
-                exactOutputSingleParams
-              )
-            )
+            calldatas.push(SwapRouter.encodeExactOutputSingle(route, routerMustCustody, recipient, deadline, amountOut, amountIn, options))
           }
         } else {
           invariant(options.sqrtPriceLimitX96 === undefined, 'MULTIHOP_PRICE_LIMIT')
-
-          const path: string = encodeRouteToPath(route, trade.tradeType === TradeType.EXACT_OUTPUT)
-
           if (trade.tradeType === TradeType.EXACT_INPUT) {
-            const exactInputParams = [[
-              path,
-              routerMustCustody ? ADDRESS_ZERO : recipient,
-              deadline,
-              amountIn,
-              amountOut
-            ]]
-
-            const exactInputInputs = [{
-              fields: [
-                { name: 'path', type: 'bytes' },
-                { name: 'recipient', type: 'Address' },
-                { name: 'deadline', type: 'int' },
-                { name: 'amountIn', type: 'int' },
-                { name: 'amountOutMinimum', type: 'int' }
-              ],
-              name: 'params',
-              type: 'struct'
-            }]
-
-            calldatas.push(SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
-              'exactInput',
-              exactInputInputs,
-              exactInputParams
-            ))
+            calldatas.push(SwapRouter.encodeExactInput(trade, route, routerMustCustody, recipient, deadline, amountIn, amountOut))
           } else {
-            const exactOutputParams = [[
-              path,
-              routerMustCustody ? ADDRESS_ZERO : recipient,
-              deadline,
-              amountOut,
-              amountIn
-            ]]
-
-            const exactOutputInputs = [{
-              fields: [
-                { name: 'path', type: 'bytes' },
-                { name: 'recipient', type: 'Address' },
-                { name: 'deadline', type: 'int' },
-                { name: 'amountOut', type: 'int' },
-                { name: 'amountInMaximum', type: 'int' }
-              ],
-              name: 'params',
-              type: 'struct'
-            }]
-
-            calldatas.push(SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
-              'exactOutput', 
-              exactOutputInputs,
-              exactOutputParams
-            ))
+            calldatas.push(SwapRouter.encodeExactOutput(trade, route, routerMustCustody, recipient, deadline, amountOut, amountIn))
           }
         }
       }
     }
 
-    // unwrap
-    if (routerMustCustody) {
-      if (!!options.fee) {
-        if (outputIsNative) {
-          calldatas.push(Payments.encodeUnwrapSICX(totalAmountOut.quotient, recipient, options.fee))
-        } else {
-          calldatas.push(
-            Payments.encodeSweepToken(
-              sampleTrade.outputAmount.currency.wrapped,
-              totalAmountOut.quotient,
-              recipient,
-              options.fee
-            )
-          )
-        }
-      } else {
-        calldatas.push(Payments.encodeUnwrapSICX(totalAmountOut.quotient, recipient))
-      }
-    }
-
-    // refund
-    if (mustRefund) {
-      calldatas.push(Payments.encodeRefundICX())
-    }
-
-    console.log("calldatas=", JSON.stringify(calldatas, null, 4))
-
     return {
-      calldata: Multicall.encodeMulticall(calldatas),
+      calldata: calldatas,
       value: toHex(totalValue.quotient)
+    }
+  }
+
+  private static encodeExactOutput (
+    trade: Trade<Currency, Currency, TradeType>,
+    route: Route<Currency, Currency>,
+    routerMustCustody: boolean, 
+    recipient: string, 
+    deadline: string, 
+    amountOut: string, 
+    amountIn: string
+  ): string {
+    
+    const path: string = encodeRouteToPath(route, trade.tradeType === TradeType.EXACT_OUTPUT)
+
+    if (Icx.isWrappedAddress(route.tokenPath[0].address)) {
+      const exactOutputParams = [
+        [
+          path,
+          routerMustCustody ? ADDRESS_ZERO : recipient,
+          deadline,
+          amountOut
+        ]
+      ]
+
+      return SwapRouter.INTERFACE.encodeFunctionData(
+        'exactOutputIcx',
+        exactOutputParams
+      )
+    } else {
+      const exactOutputParams = [[
+        path,
+        routerMustCustody ? ADDRESS_ZERO : recipient,
+        deadline,
+        amountOut,
+        amountIn
+      ]]
+  
+      const exactOutputInputs = [{
+        fields: [
+          { name: 'path', type: 'bytes' },
+          { name: 'recipient', type: 'Address' },
+          { name: 'deadline', type: 'int' },
+          { name: 'amountOut', type: 'int' },
+          { name: 'amountInMaximum', type: 'int' }
+        ],
+        name: 'params',
+        type: 'struct'
+      }]
+  
+      return SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
+        'exactOutput',
+        exactOutputInputs,
+        exactOutputParams
+      )
+    }
+  }
+
+  private static encodeExactInput (
+    trade: Trade<Currency, Currency, TradeType>,
+    route: Route<Currency, Currency>,
+    routerMustCustody: boolean,
+    recipient: string,
+    deadline: string,
+    amountIn: string,
+    amountOut: string,
+  ): string {
+    const path: string = encodeRouteToPath(route, trade.tradeType === TradeType.EXACT_OUTPUT)
+
+    if (Icx.isWrappedAddress(route.tokenPath[0].address)) {
+      const exactInputParams = [[
+        path,
+        routerMustCustody ? ADDRESS_ZERO : recipient,
+        deadline,
+        amountOut
+      ]]
+
+      return SwapRouter.INTERFACE.encodeFunctionData(
+        'exactInputIcx',
+        exactInputParams
+      )
+    } else {
+      const exactInputParams = [[
+        path,
+        routerMustCustody ? ADDRESS_ZERO : recipient,
+        deadline,
+        amountIn,
+        amountOut
+      ]]
+
+      const exactInputInputs = [{
+        fields: [
+          { name: 'path', type: 'bytes' },
+          { name: 'recipient', type: 'Address' },
+          { name: 'deadline', type: 'int' },
+          { name: 'amountIn', type: 'int' },
+          { name: 'amountOutMinimum', type: 'int' }
+        ],
+        name: 'params',
+        type: 'struct'
+      }]
+      
+      return SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
+        'exactInput',
+        exactInputInputs,
+        exactInputParams
+      )
+    }
+  }
+
+  private static encodeExactOutputSingle (
+    route: Route<Currency, Currency>,
+    routerMustCustody: boolean,
+    recipient: string,
+    deadline: string,
+    amountOut: string,
+    amountIn: string,
+    options: SwapOptions
+  ): string {
+    if (Icx.isWrappedAddress(route.tokenPath[0].address)) {
+      const exactOutputSingleParams = [[
+        route.tokenPath[1].address,
+        route.pools[0].fee,
+        routerMustCustody ? ADDRESS_ZERO : recipient,
+        deadline,
+        amountOut,
+        toHex(options.sqrtPriceLimitX96 ?? 0)
+      ]]
+
+      return SwapRouter.INTERFACE.encodeFunctionData(
+        'exactOutputSingleIcx',
+        exactOutputSingleParams
+      )
+    } else {
+      const exactOutputSingleParams = [[
+        route.tokenPath[0].address,
+        route.tokenPath[1].address,
+        route.pools[0].fee,
+        routerMustCustody ? ADDRESS_ZERO : recipient,
+        deadline,
+        amountOut,
+        amountIn,
+        toHex(options.sqrtPriceLimitX96 ?? 0)
+      ]]
+  
+      const exactOutputSingleInputs = [{
+        fields: [
+          { name: 'tokenIn', type: 'Address' },
+          { name: 'tokenOut', type: 'Address' },
+          { name: 'fee', type: 'int' },
+          { name: 'recipient', type: 'Address' },
+          { name: 'deadline', type: 'int' },
+          { name: 'amountOut', type: 'int' },
+          { name: 'amountInMaximum', type: 'int' },
+          { name: 'sqrtPriceLimitX96', type: 'int' }
+        ],
+        name: 'params',
+        type: 'struct'
+      }]
+
+      return SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
+        'exactOutputSingle',
+        exactOutputSingleInputs,
+        exactOutputSingleParams
+      )
+    }
+  }
+
+  private static encodeExactInputSingle (
+    route: Route<Currency, Currency>, 
+    routerMustCustody: boolean, 
+    recipient: string,
+    deadline: string,
+    amountOut: string,
+    amountIn: string,
+    options: SwapOptions): string {
+    if (Icx.isWrappedAddress(route.tokenPath[0].address)) {
+      const exactInputSingleParams = [
+        [
+          route.tokenPath[1].address,
+          route.pools[0].fee,
+          routerMustCustody ? ADDRESS_ZERO : recipient,
+          deadline,
+          amountOut,
+          toHex(options.sqrtPriceLimitX96 ?? 0)
+        ]
+      ]
+
+      return SwapRouter.INTERFACE.encodeFunctionData(
+        'exactInputSingleIcx',
+        exactInputSingleParams
+      )
+    } else {
+      const exactInputSingleParams = [
+        [
+          route.tokenPath[0].address,
+          route.tokenPath[1].address,
+          route.pools[0].fee,
+          routerMustCustody ? ADDRESS_ZERO : recipient,
+          deadline,
+          amountIn,
+          amountOut,
+          toHex(options.sqrtPriceLimitX96 ?? 0)
+        ]
+      ]
+
+      const exactInputSingleInputs = [{
+        fields: [
+          { name: 'tokenIn', type: 'Address' },
+          { name: 'tokenOut', type: 'Address' },
+          { name: 'fee', type: 'int' },
+          { name: 'recipient', type: 'Address' },
+          { name: 'deadline', type: 'int' },
+          { name: 'amountIn', type: 'int' },
+          { name: 'amountOutMinimum', type: 'int' },
+          { name: 'sqrtPriceLimitX96', type: 'int' }
+        ],
+        name: 'params',
+        type: 'struct'
+      }]
+
+      return SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
+        'exactInputSingle',
+        exactInputSingleInputs,
+        exactInputSingleParams
+      )
     }
   }
 }

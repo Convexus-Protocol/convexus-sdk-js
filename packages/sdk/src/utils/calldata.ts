@@ -8,7 +8,7 @@ export interface MethodParameters {
   /**
    * The calldata to perform the given operation
    */
-  calldata: string
+  calldata: string[]
   /**
    * The amount of ICX (in loops) to send in hex.
    */
