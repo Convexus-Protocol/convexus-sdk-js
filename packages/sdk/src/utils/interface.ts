@@ -52,7 +52,7 @@ export class Interface {
       } break
 
       default:
-        throw new Error("INVALID_PARAM_TYPE")
+        throw new Error("INVALID_PARAM_TYPE: " + inputType)
     }
 
     return result

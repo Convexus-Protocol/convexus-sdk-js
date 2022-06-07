@@ -16,7 +16,6 @@ import { Interface } from './utils'
 import INonfungiblePositionManager from './artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json'
 import { ADDRESS_ZERO } from './constants'
 import { Pool } from './entities'
-import { Multicall } from './multicall'
 import { Payments } from './payments'
 
 const MaxUint128 = toHex(JSBI.subtract(JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(128)), JSBI.BigInt(1)))
@@ -180,7 +179,7 @@ export abstract class NonfungiblePositionManager {
 
   public static createCallParameters(pool: Pool): MethodParameters {
     return {
-      calldata: this.encodeCreate(pool),
+      calldata: [this.encodeCreate(pool)],
       value: toHex(0)
     }
   }
@@ -259,7 +258,8 @@ export abstract class NonfungiblePositionManager {
     }
 
     return {
-      calldata: Multicall.encodeMulticall(calldatas),
+      calldata: calldatas,
+      // calldata: Multicall.encodeMulticall(calldatas),
       value
     }
   }
@@ -308,7 +308,8 @@ export abstract class NonfungiblePositionManager {
     const calldatas: string[] = NonfungiblePositionManager.encodeCollect(options)
 
     return {
-      calldata: Multicall.encodeMulticall(calldatas),
+      calldata: calldatas,
+      // calldata: Multicall.encodeMulticall(calldatas),
       value: toHex(0)
     }
   }
@@ -389,7 +390,8 @@ export abstract class NonfungiblePositionManager {
     }
 
     return {
-      calldata: Multicall.encodeMulticall(calldatas),
+      calldata: calldatas,
+      // calldata: Multicall.encodeMulticall(calldatas),
       value: toHex(0)
     }
   }
@@ -401,18 +403,18 @@ export abstract class NonfungiblePositionManager {
     let calldata: string
     if (options.data) {
       calldata = NonfungiblePositionManager.INTERFACE.encodeFunctionData(
-        'safeTransferFrom(address,address,uint256,bytes)',
+        'safeTransferFrom',
         [sender, recipient, toHex(options.tokenId), options.data]
       )
     } else {
-      calldata = NonfungiblePositionManager.INTERFACE.encodeFunctionData('safeTransferFrom(address,address,uint256)', [
+      calldata = NonfungiblePositionManager.INTERFACE.encodeFunctionData('safeTransferFrom', [
         sender,
         recipient,
         toHex(options.tokenId)
       ])
     }
     return {
-      calldata: calldata,
+      calldata: [calldata],
       value: toHex(0)
     }
   }

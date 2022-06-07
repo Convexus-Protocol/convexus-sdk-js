@@ -1,9 +1,8 @@
 import { BigintIsh, Token, validateAndParseAddress } from '@convexus/sdk-core'
-import { MethodParameters, toHex } from './utils/calldata'
+import { MethodParameters, toHex, toHexString } from './utils/calldata'
 import IConvexusStaker from './artifacts/contracts/ConvexusStaker/ConvexusStaker.json'
 import { Pool, PoolFactoryProvider } from './entities'
-import { Interface, defaultAbiCoder } from './utils'
-import { Multicall } from './multicall'
+import { Interface } from './utils'
 
 export type FullWithdrawOptions = ClaimOptions & WithdrawOptions
 /**
@@ -67,11 +66,9 @@ export interface WithdrawOptions {
 }
 
 export abstract class Staker {
-  public static INTERFACE: Interface = new Interface(IConvexusStaker.abi)
+  public static INTERFACE: Interface = new Interface(IConvexusStaker)
 
   protected constructor() {}
-  private static INCENTIVE_KEY_ABI =
-    'tuple(address rewardToken, address pool, uint256 startTime, uint256 endTime, address refundee)'
 
   /**
    *  To claim rewards, must unstake and then claim.
@@ -79,14 +76,21 @@ export abstract class Staker {
    * @param options Options for producing the calldata to claim. Can't claim unless you unstake.
    * @returns The calldatas for 'unstakeToken' and 'claimReward'.
    */
-  private static encodeClaim(poolFactoryProvider: PoolFactoryProvider, incentiveKey: IncentiveKey, options: ClaimOptions): string[] {
+  private static async encodeClaim(
+    poolFactoryProvider: PoolFactoryProvider, 
+    incentiveKey: IncentiveKey, 
+    options: ClaimOptions
+  ): Promise<string[]> {
     const calldatas: string[] = []
+    console.debug("=>", incentiveKey)
+    console.debug("=>", await this._encodeIncentiveKey(poolFactoryProvider, incentiveKey))
     calldatas.push(
       Staker.INTERFACE.encodeFunctionData('unstakeToken', [
-        this._encodeIncentiveKey(poolFactoryProvider, incentiveKey),
+        await this._encodeIncentiveKey(poolFactoryProvider, incentiveKey),
         toHex(options.tokenId)
       ])
     )
+
     const recipient: string = validateAndParseAddress(options.recipient)
     const amount = options.amount ?? 0
     calldatas.push(
@@ -104,7 +108,11 @@ export abstract class Staker {
    * Note that you can only specify one amount and one recipient across the various programs if you are collecting from multiple programs at once.
    * @returns
    */
-  public static collectRewards(poolFactoryProvider: PoolFactoryProvider, incentiveKeys: IncentiveKey | IncentiveKey[], options: ClaimOptions): MethodParameters {
+  public static async collectRewards(
+    poolFactoryProvider: PoolFactoryProvider, 
+    incentiveKeys: IncentiveKey | IncentiveKey[], 
+    options: ClaimOptions
+  ): Promise<MethodParameters> {
     incentiveKeys = Array.isArray(incentiveKeys) ? incentiveKeys : [incentiveKeys]
     let calldatas: string[] = []
 
@@ -112,17 +120,18 @@ export abstract class Staker {
       // the unique program tokenId is staked in
       const incentiveKey = incentiveKeys[i]
       // unstakes and claims for the unique program
-      calldatas = calldatas.concat(this.encodeClaim(poolFactoryProvider, incentiveKey, options))
+      calldatas = calldatas.concat(await this.encodeClaim(poolFactoryProvider, incentiveKey, options))
       // re-stakes the position for the unique program
       calldatas.push(
         Staker.INTERFACE.encodeFunctionData('stakeToken', [
-          this._encodeIncentiveKey(poolFactoryProvider, incentiveKey),
+          await this._encodeIncentiveKey(poolFactoryProvider, incentiveKey),
           toHex(options.tokenId)
         ])
       )
     }
     return {
-      calldata: Multicall.encodeMulticall(calldatas),
+      calldata: calldatas,
+      // calldata: Multicall.encodeMulticall(calldatas),
       value: toHex(0)
     }
   }
@@ -133,11 +142,11 @@ export abstract class Staker {
    * @param withdrawOptions Options for producing claim calldata and withdraw calldata. Can't withdraw without unstaking all programs for `tokenId`.
    * @returns Calldata for unstaking, claiming, and withdrawing.
    */
-  public static withdrawToken(
+  public static async withdrawToken(
     poolFactoryProvider: PoolFactoryProvider,
     incentiveKeys: IncentiveKey | IncentiveKey[],
     withdrawOptions: FullWithdrawOptions
-  ): MethodParameters {
+  ): Promise<MethodParameters> {
     let calldatas: string[] = []
 
     incentiveKeys = Array.isArray(incentiveKeys) ? incentiveKeys : [incentiveKeys]
@@ -150,7 +159,7 @@ export abstract class Staker {
 
     for (let i = 0; i < incentiveKeys.length; i++) {
       const incentiveKey = incentiveKeys[i]
-      calldatas = calldatas.concat(this.encodeClaim(poolFactoryProvider, incentiveKey, claimOptions))
+      calldatas = calldatas.concat(await this.encodeClaim(poolFactoryProvider, incentiveKey, claimOptions))
     }
     const owner = validateAndParseAddress(withdrawOptions.owner)
     calldatas.push(
@@ -161,46 +170,54 @@ export abstract class Staker {
       ])
     )
     return {
-      calldata: Multicall.encodeMulticall(calldatas),
+      calldata: calldatas,
+      // calldata: Multicall.encodeMulticall(calldatas),
       value: toHex(0)
     }
   }
 
   /**
-   *
    * @param incentiveKeys A single IncentiveKey or array of IncentiveKeys to be encoded and used in the data parameter in `safeTransferFrom`
    * @returns An IncentiveKey as a string
    */
-  public static encodeDeposit(poolFactoryProvider: PoolFactoryProvider, incentiveKeys: IncentiveKey | IncentiveKey[]): string {
+  public static async encodeDeposit(
+    poolFactoryProvider: PoolFactoryProvider, 
+    incentiveKeys: IncentiveKey | IncentiveKey[]
+  ): Promise<string> {
     incentiveKeys = Array.isArray(incentiveKeys) ? incentiveKeys : [incentiveKeys]
-    let data: string
+    let data: [string, string, string, string, string][]
 
     if (incentiveKeys.length > 1) {
       const keys = []
       for (let i = 0; i < incentiveKeys.length; i++) {
         const incentiveKey = incentiveKeys[i]
-        keys.push(this._encodeIncentiveKey(poolFactoryProvider, incentiveKey))
+        keys.push(await this._encodeIncentiveKey(poolFactoryProvider, incentiveKey))
       }
-      data = defaultAbiCoder.encode([`${Staker.INCENTIVE_KEY_ABI}[]`], [keys])
+      data = keys
     } else {
-      data = defaultAbiCoder.encode([Staker.INCENTIVE_KEY_ABI], [this._encodeIncentiveKey(poolFactoryProvider, incentiveKeys[0])])
+      data = [await this._encodeIncentiveKey(poolFactoryProvider, incentiveKeys[0])]
     }
-    return data
+
+    // FIXME: RLP encode instead of JSON encode
+    return toHexString(JSON.stringify(data))
   }
+
   /**
-   *
    * @param incentiveKey An `IncentiveKey` which represents a unique staking program.
    * @returns An encoded IncentiveKey to be read
    */
-  private static _encodeIncentiveKey(poolFactoryProvider: PoolFactoryProvider, incentiveKey: IncentiveKey): {} {
+  private static async _encodeIncentiveKey(
+    poolFactoryProvider: PoolFactoryProvider,
+    incentiveKey: IncentiveKey
+  ): Promise<[string, string, string, string, string]> {
     const { token0, token1, fee } = incentiveKey.pool
     const refundee = validateAndParseAddress(incentiveKey.refundee)
-    return {
-      rewardToken: incentiveKey.rewardToken.address,
-      pool: Pool.getAddress(poolFactoryProvider, token0, token1, fee),
-      startTime: toHex(incentiveKey.startTime),
-      endTime: toHex(incentiveKey.endTime),
+    return [
+      incentiveKey.rewardToken.address,
+      await Pool.getAddress(poolFactoryProvider, token0, token1, fee),
+      toHex(incentiveKey.startTime),
+      toHex(incentiveKey.endTime),
       refundee
-    }
+    ]
   }
 }

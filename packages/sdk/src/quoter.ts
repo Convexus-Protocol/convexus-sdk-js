@@ -80,7 +80,7 @@ export abstract class SwapQuoter {
       }
     }
     return {
-      calldata,
+      calldata: [calldata],
       value: toHex(0)
     }
   }

@@ -5,9 +5,9 @@ import IconService from 'icon-sdk-js'
  * @param address the address
  */
 export function validateAndParseAddress(address: string): string {
-  if (!IconService.IconValidator.isAddress(address.trim())) {
+  if (!IconService.IconValidator.isAddress(address.trim().toLowerCase())) {
     throw new Error(`${address} is not a valid address.`)
   }
 
-  return address.trim()
+  return address.trim().toLowerCase()
 }

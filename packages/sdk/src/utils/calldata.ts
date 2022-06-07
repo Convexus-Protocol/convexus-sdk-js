@@ -28,3 +28,11 @@ export function toHex(bigintIsh: BigintIsh) {
   }
   return `0x${hex}`
 }
+
+export function toHexString(str: string) {
+  var hex = "";
+  for (var i = 0; i < str.length; i++) {
+    hex += str.charCodeAt(i).toString(16);
+  }
+  return `0x${hex}`;
+}

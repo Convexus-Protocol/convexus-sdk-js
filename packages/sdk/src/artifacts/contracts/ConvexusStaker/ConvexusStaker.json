@@ -1,709 +1,514 @@
-{
-  "contractName": "ConvexusStaker",
-  "abi": [
+[
     {
-      "inputs": [
-        {
-          "internalType": "contract IConvexusFactory",
-          "name": "_factory",
-          "type": "address"
-        },
-        {
-          "internalType": "contract INonfungiblePositionManager",
-          "name": "_nonfungiblePositionManager",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_maxIncentiveStartLeadTime",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_maxIncentiveDuration",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "oldOwner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "DepositTransferred",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "contract IIRC2Minimal",
-          "name": "rewardToken",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "contract IConvexusPool",
-          "name": "pool",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "startTime",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "endTime",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "refundee",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "reward",
-          "type": "uint256"
-        }
-      ],
-      "name": "IncentiveCreated",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "incentiveId",
-          "type": "bytes32"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "refund",
-          "type": "uint256"
-        }
-      ],
-      "name": "IncentiveEnded",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "reward",
-          "type": "uint256"
-        }
-      ],
-      "name": "RewardClaimed",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "incentiveId",
-          "type": "bytes32"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint128",
-          "name": "liquidity",
-          "type": "uint128"
-        }
-      ],
-      "name": "TokenStaked",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "incentiveId",
-          "type": "bytes32"
-        }
-      ],
-      "name": "TokenUnstaked",
-      "type": "event"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "contract IIRC2Minimal",
-          "name": "rewardToken",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amountRequested",
-          "type": "uint256"
-        }
-      ],
-      "name": "claimReward",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "reward",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "components": [
+        "inputs": [
             {
-              "internalType": "contract IIRC2Minimal",
-              "name": "rewardToken",
-              "type": "address"
+                "name": "rewardToken",
+                "type": "Address"
             },
             {
-              "internalType": "contract IConvexusPool",
-              "name": "pool",
-              "type": "address"
+                "name": "pool",
+                "type": "Address"
             },
             {
-              "internalType": "uint256",
-              "name": "startTime",
-              "type": "uint256"
+                "name": "startTime",
+                "type": "int"
             },
             {
-              "internalType": "uint256",
-              "name": "endTime",
-              "type": "uint256"
+                "name": "endTime",
+                "type": "int"
             },
             {
-              "internalType": "address",
-              "name": "refundee",
-              "type": "address"
+                "name": "refundee",
+                "type": "Address"
+            },
+            {
+                "name": "reward",
+                "type": "int"
             }
-          ],
-          "internalType": "struct IConvexusStaker.IncentiveKey",
-          "name": "key",
-          "type": "tuple"
-        },
-        {
-          "internalType": "uint256",
-          "name": "reward",
-          "type": "uint256"
-        }
-      ],
-      "name": "createIncentive",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
+        ],
+        "name": "IncentiveCreated",
+        "type": "eventlog"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "deposits",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "internalType": "uint48",
-          "name": "numberOfStakes",
-          "type": "uint48"
-        },
-        {
-          "internalType": "int24",
-          "name": "tickLower",
-          "type": "int24"
-        },
-        {
-          "internalType": "int24",
-          "name": "tickUpper",
-          "type": "int24"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "components": [
+        "inputs": [
             {
-              "internalType": "contract IIRC2Minimal",
-              "name": "rewardToken",
-              "type": "address"
+                "name": "incentiveId",
+                "type": "bytes"
             },
             {
-              "internalType": "contract IConvexusPool",
-              "name": "pool",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "startTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "endTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "refundee",
-              "type": "address"
+                "name": "refund",
+                "type": "int"
             }
-          ],
-          "internalType": "struct IConvexusStaker.IncentiveKey",
-          "name": "key",
-          "type": "tuple"
-        }
-      ],
-      "name": "endIncentive",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "refund",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
+        ],
+        "name": "IncentiveEnded",
+        "type": "eventlog"
     },
     {
-      "inputs": [],
-      "name": "factory",
-      "outputs": [
-        {
-          "internalType": "contract IConvexusFactory",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "components": [
+        "inputs": [
             {
-              "internalType": "contract IIRC2Minimal",
-              "name": "rewardToken",
-              "type": "address"
+                "name": "tokenId",
+                "type": "int"
             },
             {
-              "internalType": "contract IConvexusPool",
-              "name": "pool",
-              "type": "address"
+                "name": "oldOwner",
+                "type": "Address"
             },
             {
-              "internalType": "uint256",
-              "name": "startTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "endTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "refundee",
-              "type": "address"
+                "name": "newOwner",
+                "type": "Address"
             }
-          ],
-          "internalType": "struct IConvexusStaker.IncentiveKey",
-          "name": "key",
-          "type": "tuple"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "getRewardInfo",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "reward",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint160",
-          "name": "secondsInsideX128",
-          "type": "uint160"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
+        ],
+        "name": "DepositTransferred",
+        "type": "eventlog"
     },
     {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "name": "incentives",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "totalRewardUnclaimed",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint160",
-          "name": "totalSecondsClaimedX128",
-          "type": "uint160"
-        },
-        {
-          "internalType": "uint96",
-          "name": "numberOfStakes",
-          "type": "uint96"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "maxIncentiveDuration",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "maxIncentiveStartLeadTime",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes[]",
-          "name": "data",
-          "type": "bytes[]"
-        }
-      ],
-      "name": "multicall",
-      "outputs": [
-        {
-          "internalType": "bytes[]",
-          "name": "results",
-          "type": "bytes[]"
-        }
-      ],
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "nonfungiblePositionManager",
-      "outputs": [
-        {
-          "internalType": "contract INonfungiblePositionManager",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "from",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes",
-          "name": "data",
-          "type": "bytes"
-        }
-      ],
-      "name": "onERC721Received",
-      "outputs": [
-        {
-          "internalType": "bytes4",
-          "name": "",
-          "type": "bytes4"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "contract IIRC2Minimal",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "rewards",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "components": [
+        "inputs": [
             {
-              "internalType": "contract IIRC2Minimal",
-              "name": "rewardToken",
-              "type": "address"
+                "name": "tokenId",
+                "type": "int"
             },
             {
-              "internalType": "contract IConvexusPool",
-              "name": "pool",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "startTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "endTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "refundee",
-              "type": "address"
+                "name": "incentiveId",
+                "type": "bytes"
             }
-          ],
-          "internalType": "struct IConvexusStaker.IncentiveKey",
-          "name": "key",
-          "type": "tuple"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "stakeToken",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
+        ],
+        "name": "TokenUnstaked",
+        "type": "eventlog"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "incentiveId",
-          "type": "bytes32"
-        }
-      ],
-      "name": "stakes",
-      "outputs": [
-        {
-          "internalType": "uint160",
-          "name": "secondsPerLiquidityInsideInitialX128",
-          "type": "uint160"
-        },
-        {
-          "internalType": "uint128",
-          "name": "liquidity",
-          "type": "uint128"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        }
-      ],
-      "name": "transferDeposit",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "components": [
+        "inputs": [
             {
-              "internalType": "contract IIRC2Minimal",
-              "name": "rewardToken",
-              "type": "address"
+                "name": "to",
+                "type": "Address"
             },
             {
-              "internalType": "contract IConvexusPool",
-              "name": "pool",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "startTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "endTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "refundee",
-              "type": "address"
+                "name": "reward",
+                "type": "int"
             }
-          ],
-          "internalType": "struct IConvexusStaker.IncentiveKey",
-          "name": "key",
-          "type": "tuple"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "unstakeToken",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
+        ],
+        "name": "RewardClaimed",
+        "type": "eventlog"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "bytes",
-          "name": "data",
-          "type": "bytes"
-        }
-      ],
-      "name": "withdrawToken",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
+        "inputs": [
+            {
+                "name": "tokenId",
+                "type": "int"
+            },
+            {
+                "name": "incentiveId",
+                "type": "bytes"
+            },
+            {
+                "name": "liquidity",
+                "type": "int"
+            }
+        ],
+        "name": "TokenStaked",
+        "type": "eventlog"
+    },
+    {
+        "inputs": [
+            {
+                "fields": [
+                    {
+                        "name": "rewardToken",
+                        "type": "Address"
+                    },
+                    {
+                        "name": "pool",
+                        "type": "Address"
+                    },
+                    {
+                        "name": "startTime",
+                        "type": "int"
+                    },
+                    {
+                        "name": "endTime",
+                        "type": "int"
+                    },
+                    {
+                        "name": "refundee",
+                        "type": "Address"
+                    }
+                ],
+                "name": "key",
+                "type": "struct"
+            }
+        ],
+        "name": "endIncentive",
+        "outputs": [
+            {
+                "type": "int"
+            }
+        ],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "caller",
+                "type": "Address"
+            },
+            {
+                "name": "from",
+                "type": "Address"
+            },
+            {
+                "name": "tokenId",
+                "type": "int"
+            },
+            {
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "onIRC721Received",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "tokenId",
+                "type": "int"
+            },
+            {
+                "name": "to",
+                "type": "Address"
+            }
+        ],
+        "name": "transferDeposit",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "tokenId",
+                "type": "int"
+            },
+            {
+                "name": "to",
+                "type": "Address"
+            },
+            {
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "withdrawToken",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "fields": [
+                    {
+                        "name": "rewardToken",
+                        "type": "Address"
+                    },
+                    {
+                        "name": "pool",
+                        "type": "Address"
+                    },
+                    {
+                        "name": "startTime",
+                        "type": "int"
+                    },
+                    {
+                        "name": "endTime",
+                        "type": "int"
+                    },
+                    {
+                        "name": "refundee",
+                        "type": "Address"
+                    }
+                ],
+                "name": "key",
+                "type": "struct"
+            },
+            {
+                "name": "tokenId",
+                "type": "int"
+            }
+        ],
+        "name": "stakeToken",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "fields": [
+                    {
+                        "name": "rewardToken",
+                        "type": "Address"
+                    },
+                    {
+                        "name": "pool",
+                        "type": "Address"
+                    },
+                    {
+                        "name": "startTime",
+                        "type": "int"
+                    },
+                    {
+                        "name": "endTime",
+                        "type": "int"
+                    },
+                    {
+                        "name": "refundee",
+                        "type": "Address"
+                    }
+                ],
+                "name": "key",
+                "type": "struct"
+            },
+            {
+                "name": "tokenId",
+                "type": "int"
+            }
+        ],
+        "name": "unstakeToken",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "rewardToken",
+                "type": "Address"
+            },
+            {
+                "name": "to",
+                "type": "Address"
+            },
+            {
+                "name": "amountRequested",
+                "type": "int"
+            }
+        ],
+        "name": "claimReward",
+        "outputs": [
+            {
+                "type": "int"
+            }
+        ],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "fields": [
+                    {
+                        "name": "rewardToken",
+                        "type": "Address"
+                    },
+                    {
+                        "name": "pool",
+                        "type": "Address"
+                    },
+                    {
+                        "name": "startTime",
+                        "type": "int"
+                    },
+                    {
+                        "name": "endTime",
+                        "type": "int"
+                    },
+                    {
+                        "name": "refundee",
+                        "type": "Address"
+                    }
+                ],
+                "name": "key",
+                "type": "struct"
+            },
+            {
+                "name": "tokenId",
+                "type": "int"
+            }
+        ],
+        "name": "getRewardInfo",
+        "outputs": [
+            {
+                "type": "dict"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "pool",
+                "type": "Address"
+            },
+            {
+                "name": "startTime",
+                "type": "int"
+            },
+            {
+                "name": "endTime",
+                "type": "int"
+            },
+            {
+                "name": "refundee",
+                "type": "Address"
+            }
+        ],
+        "name": "createIncentiveIcx",
+        "outputs": [],
+        "payable": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "_from",
+                "type": "Address"
+            },
+            {
+                "name": "_value",
+                "type": "int"
+            },
+            {
+                "default": null,
+                "name": "_data",
+                "type": "bytes"
+            }
+        ],
+        "name": "tokenFallback",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "name",
+        "outputs": [
+            {
+                "type": "str"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "factory",
+        "outputs": [
+            {
+                "type": "Address"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "nonfungiblePositionManager",
+        "outputs": [
+            {
+                "type": "Address"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "maxIncentiveStartLeadTime",
+        "outputs": [
+            {
+                "type": "int"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "maxIncentiveDuration",
+        "outputs": [
+            {
+                "type": "int"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "key",
+                "type": "bytes"
+            }
+        ],
+        "name": "incentives",
+        "outputs": [
+            {
+                "type": "dict"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "tokenId",
+                "type": "int"
+            }
+        ],
+        "name": "deposits",
+        "outputs": [
+            {
+                "type": "dict"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "rewardToken",
+                "type": "Address"
+            },
+            {
+                "name": "owner",
+                "type": "Address"
+            }
+        ],
+        "name": "rewards",
+        "outputs": [
+            {
+                "type": "int"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "tokenId",
+                "type": "int"
+            },
+            {
+                "name": "incentiveId",
+                "type": "bytes"
+            }
+        ],
+        "name": "stakes",
+        "outputs": [
+            {
+                "type": "dict"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
     }
-  ]
-}
+]
