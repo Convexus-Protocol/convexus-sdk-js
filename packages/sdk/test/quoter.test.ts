@@ -53,7 +53,7 @@ describe('SwapQuoter', () => {
           trade.tradeType
         )
 
-        expect(calldata).toStrictEqual(
+        expect(calldata).toStrictEqual([
           {
             "method": "quoteExactInputSingle",
             "params": {
@@ -66,8 +66,8 @@ describe('SwapQuoter', () => {
                 }
             }
           }
-        )
-        expect(value).toBe('0x00')
+        ])
+        expect(value).toBe('0x0')
       })
 
       it('single-hop exact output', async () => {
@@ -83,7 +83,7 @@ describe('SwapQuoter', () => {
           trade.tradeType
         )
 
-        expect(calldata).toStrictEqual(
+        expect(calldata).toStrictEqual([
           {
             "method": "quoteExactOutputSingle",
             "params": {
@@ -96,8 +96,8 @@ describe('SwapQuoter', () => {
                 }
             }
           }
-        )
-        expect(value).toBe('0x00')
+        ])
+        expect(value).toBe('0x0')
       })
 
       it('multi-hop exact input', async () => {
@@ -109,7 +109,7 @@ describe('SwapQuoter', () => {
         )
         const { calldata, value } = SwapQuoter.quoteCallParameters(trade.route, trade.inputAmount, trade.tradeType)
 
-        expect(calldata).toStrictEqual(
+        expect(calldata).toStrictEqual([
           {
             "method": "quoteExactInput",
             "params": {
@@ -119,8 +119,8 @@ describe('SwapQuoter', () => {
               }
             }
           }
-        )
-        expect(value).toBe('0x00')
+        ])
+        expect(value).toBe('0x0')
       })
 
       it('multi-hop exact output', async () => {
@@ -132,7 +132,7 @@ describe('SwapQuoter', () => {
         )
         const { calldata, value } = SwapQuoter.quoteCallParameters(trade.route, trade.outputAmount, trade.tradeType)
 
-        expect(calldata).toStrictEqual(
+        expect(calldata).toStrictEqual([
           {
             "method": "quoteExactOutput",
             "params": {
@@ -142,8 +142,8 @@ describe('SwapQuoter', () => {
                 }
             }
           }
-        )
-        expect(value).toBe('0x00')
+        ])
+        expect(value).toBe('0x0')
       })
       it('sqrtPriceLimitX96', async () => {
         const trade = await Trade.fromRoute(
@@ -156,7 +156,7 @@ describe('SwapQuoter', () => {
           sqrtPriceLimitX96: JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(128))
         })
 
-        expect(calldata).toStrictEqual(
+        expect(calldata).toStrictEqual([
           {
             "method": "quoteExactInputSingle",
             "params": {
@@ -169,8 +169,8 @@ describe('SwapQuoter', () => {
                 }
             }
           }
-        )
-        expect(value).toBe('0x00')
+        ])
+        expect(value).toBe('0x0')
       })
     })
   })

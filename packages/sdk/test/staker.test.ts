@@ -55,13 +55,13 @@ describe('Staker', () => {
               "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
               "startTime": "0x64"
             },
-            "tokenId": "0x01"
+            "tokenId": "0x1"
           }
         },
         {
           "method": "claimReward",
           "params": {
-            "amountRequested": "0x01",
+            "amountRequested": "0x1",
             "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
             "to": "hx0000000000000000000000000000000000000003"
           }
@@ -76,11 +76,11 @@ describe('Staker', () => {
               "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
               "startTime": "0x64"
             },
-            "tokenId": "0x01"
+            "tokenId": "0x1"
           }
         }
       ])
-      expect(value).toEqual('0x00')
+      expect(value).toEqual('0x0')
     })
 
     it('succeeds no amount', async () => {
@@ -101,13 +101,13 @@ describe('Staker', () => {
                       "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                       "startTime": "0x64"
                   },
-                  "tokenId": "0x01"
+                  "tokenId": "0x1"
               }
           },
           {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x00",
+                  "amountRequested": "0x0",
                   "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                   "to": "hx0000000000000000000000000000000000000003"
               }
@@ -122,12 +122,12 @@ describe('Staker', () => {
                       "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                       "startTime": "0x64"
                   },
-                  "tokenId": "0x01"
+                  "tokenId": "0x1"
               }
           }
         ]
       )
-      expect(value).toEqual('0x00')
+      expect(value).toEqual('0x0')
     })
 
     it('succeeds multiple keys', async () => {
@@ -148,13 +148,13 @@ describe('Staker', () => {
                       "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                       "startTime": "0x64"
                   },
-                  "tokenId": "0x01"
+                  "tokenId": "0x1"
               }
           },
           {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x00",
+                  "amountRequested": "0x0",
                   "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                   "to": "hx0000000000000000000000000000000000000003"
               }
@@ -169,7 +169,7 @@ describe('Staker', () => {
                       "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                       "startTime": "0x64"
                   },
-                  "tokenId": "0x01"
+                  "tokenId": "0x1"
               }
           },
           {
@@ -182,13 +182,13 @@ describe('Staker', () => {
                       "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                       "startTime": "0x32"
                   },
-                  "tokenId": "0x01"
+                  "tokenId": "0x1"
               }
           },
           {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x00",
+                  "amountRequested": "0x0",
                   "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                   "to": "hx0000000000000000000000000000000000000003"
               }
@@ -203,12 +203,12 @@ describe('Staker', () => {
                       "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                       "startTime": "0x32"
                   },
-                  "tokenId": "0x01"
+                  "tokenId": "0x1"
               }
           }
         ]
       )
-      expect(value).toEqual('0x00')
+      expect(value).toEqual('0x0')
     })
   })
 
@@ -234,13 +234,13 @@ describe('Staker', () => {
                       "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                       "startTime": "0x64"
                   },
-                  "tokenId": "0x01"
+                  "tokenId": "0x1"
               }
           },
           {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x00",
+                  "amountRequested": "0x0",
                   "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                   "to": "hx0000000000000000000000000000000000000003"
               }
@@ -250,12 +250,12 @@ describe('Staker', () => {
               "params": {
                   "data": "0x0000000000000000000000000000000000000008",
                   "to": "hx0000000000000000000000000000000000000004",
-                  "tokenId": "0x01"
+                  "tokenId": "0x1"
               }
           }
         ]
       )
-      expect(value).toEqual('0x00')
+      expect(value).toEqual('0x0')
     })
 
     it('succeeds with multiple keys', async () => {
@@ -279,13 +279,13 @@ describe('Staker', () => {
                       "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                       "startTime": "0x64"
                   },
-                  "tokenId": "0x01"
+                  "tokenId": "0x1"
               }
           },
           {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x00",
+                  "amountRequested": "0x0",
                   "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                   "to": "hx0000000000000000000000000000000000000003"
               }
@@ -300,13 +300,13 @@ describe('Staker', () => {
                       "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                       "startTime": "0x32"
                   },
-                  "tokenId": "0x01"
+                  "tokenId": "0x1"
               }
           },
           {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x00",
+                  "amountRequested": "0x0",
                   "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
                   "to": "hx0000000000000000000000000000000000000003"
               }
@@ -316,12 +316,12 @@ describe('Staker', () => {
               "params": {
                   "data": "0x0000000000000000000000000000000000000008",
                   "to": "hx0000000000000000000000000000000000000004",
-                  "tokenId": "0x01"
+                  "tokenId": "0x1"
               }
           }
         ]
       )
-      expect(value).toEqual('0x00')
+      expect(value).toEqual('0x0')
     })
   })
 
@@ -363,12 +363,12 @@ describe('Staker', () => {
               "_data": "0x5b5b22637831663938343061383564356166356266316431373632663932356264616464633432303166393834222c22637834316361303235343431636130323534343163613032363034316361303235343431636130323763222c2230783634222c2230786338222c22687830303030303030303030303030303030303030303030303030303030303030303030303030303031225d5d",
               "from": "hx0000000000000000000000000000000000000004",
               "to": "hx0000000000000000000000000000000000000003",
-              "tokenId": "0x01"
+              "tokenId": "0x1"
             }
           }
         ]
       )
-      expect(value).toStrictEqual('0x00')
+      expect(value).toStrictEqual('0x0')
     })
   })
 })

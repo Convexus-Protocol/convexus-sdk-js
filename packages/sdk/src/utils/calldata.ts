@@ -22,11 +22,15 @@ export interface MethodParameters {
  */
 export function toHex(bigintIsh: BigintIsh) {
   const bigInt = JSBI.BigInt(bigintIsh)
-  let hex = bigInt.toString(16)
-  if (hex.length % 2 !== 0) {
-    hex = `0${hex}`
+  
+  if (JSBI.greaterThanOrEqual(bigInt, JSBI.BigInt(0))) {
+    let hex = bigInt.toString(16)
+    return `0x${hex}`
+  } else {
+    const neg = JSBI.multiply(bigInt, JSBI.BigInt('-1'))
+    let negHex = neg.toString(16)
+    return `-0x${negHex}`
   }
-  return `0x${hex}`
 }
 
 export function toHexString(str: string) {

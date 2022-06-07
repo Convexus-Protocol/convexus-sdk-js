@@ -40,7 +40,7 @@ describe('SwapRouter', () => {
   const slippageTolerance = new Percent(1, 100)
   const recipient = 'hx0000000000000000000000000000000000000003'
   const deadline = 123
-
+ 
   describe('#swapCallParameters', () => {
     describe('single trade input', () => {
       it('single-hop exact input', async () => {
@@ -64,16 +64,16 @@ describe('SwapRouter', () => {
                 "amountIn": "0x64",
                 "amountOutMinimum": "0x61",
                 "deadline": "0x7b",
-                "fee": "0x0bb8",
+                "fee": "0xbb8",
                 "recipient": "hx0000000000000000000000000000000000000003",
-                "sqrtPriceLimitX96": "0x00",
+                "sqrtPriceLimitX96": "0x0",
                 "tokenIn": "cx0000000000000000000000000000000000000001",
                 "tokenOut": "cx0000000000000000000000000000000000000002"
               }
             }
           }
         ])
-        expect(value).toBe('0x00')
+        expect(value).toBe('0x0')
       })
 
       it('single-hop exact output', async () => {
@@ -97,16 +97,16 @@ describe('SwapRouter', () => {
                 "amountInMaximum": "0x67",
                 "amountOut": "0x64",
                 "deadline": "0x7b",
-                "fee": "0x0bb8",
+                "fee": "0xbb8",
                 "recipient": "hx0000000000000000000000000000000000000003",
-                "sqrtPriceLimitX96": "0x00",
+                "sqrtPriceLimitX96": "0x0",
                 "tokenIn": "cx0000000000000000000000000000000000000001",
                 "tokenOut": "cx0000000000000000000000000000000000000002"
               }
             }
           }
         ])
-        expect(value).toBe('0x00')
+        expect(value).toBe('0x0')
       })
 
       it('ICX in multi-hop exact input', async () => {
@@ -165,7 +165,7 @@ describe('SwapRouter', () => {
             }
           }
         ])
-        expect(value).toBe('0x00')
+        expect(value).toBe('0x0')
       })
 
       it('ICX in multi-hop exact output', async () => {
@@ -224,7 +224,7 @@ describe('SwapRouter', () => {
             }
           }
         ])
-        expect(value).toBe('0x00')
+        expect(value).toBe('0x0')
       })
 
       it('ICX in exact input', async () => {
@@ -247,9 +247,9 @@ describe('SwapRouter', () => {
               "params": {
                 "amountOutMinimum": "0x61",
                 "deadline": "0x7b",
-                "fee": "0x0bb8",
+                "fee": "0xbb8",
                 "recipient": "hx0000000000000000000000000000000000000003",
-                "sqrtPriceLimitX96": "0x00",
+                "sqrtPriceLimitX96": "0x0",
                 "tokenOut": "cx0000000000000000000000000000000000000002"
               }
             }
@@ -278,9 +278,9 @@ describe('SwapRouter', () => {
               "params": {
                 "amountOut": "0x64",
                 "deadline": "0x7b",
-                "fee": "0x0bb8",
+                "fee": "0xbb8",
                 "recipient": "hx0000000000000000000000000000000000000003",
-                "sqrtPriceLimitX96": "0x00",
+                "sqrtPriceLimitX96": "0x0",
                 "tokenOut": "cx0000000000000000000000000000000000000002"
               }
             }
@@ -310,16 +310,16 @@ describe('SwapRouter', () => {
                 "amountIn": "0x64",
                 "amountOutMinimum": "0x61",
                 "deadline": "0x7b",
-                "fee": "0x0bb8",
+                "fee": "0xbb8",
                 "recipient": "hx0000000000000000000000000000000000000000",
-                "sqrtPriceLimitX96": "0x00",
+                "sqrtPriceLimitX96": "0x0",
                 "tokenIn": "cx0000000000000000000000000000000000000002",
                 "tokenOut": "cx1111111111111111111111111111111111111111"
               }
             }
           }
         ])
-        expect(value).toBe('0x00')
+        expect(value).toBe('0x0')
       })
 
       it('ICX out exact output', async () => {
@@ -343,16 +343,16 @@ describe('SwapRouter', () => {
                 "amountInMaximum": "0x67",
                 "amountOut": "0x64",
                 "deadline": "0x7b",
-                "fee": "0x0bb8",
+                "fee": "0xbb8",
                 "recipient": "hx0000000000000000000000000000000000000000",
-                "sqrtPriceLimitX96": "0x00",
+                "sqrtPriceLimitX96": "0x0",
                 "tokenIn": "cx0000000000000000000000000000000000000002",
                 "tokenOut": "cx1111111111111111111111111111111111111111"
               }
             }
           }
         ])
-        expect(value).toBe('0x00')
+        expect(value).toBe('0x0')
       })
 
       it('sqrtPriceLimitX96', async () => {
@@ -377,16 +377,16 @@ describe('SwapRouter', () => {
                 "amountIn": "0x64",
                 "amountOutMinimum": "0x61",
                 "deadline": "0x7b",
-                "fee": "0x0bb8",
+                "fee": "0xbb8",
                 "recipient": "hx0000000000000000000000000000000000000003",
-                "sqrtPriceLimitX96": "0x0100000000000000000000000000000000",
+                "sqrtPriceLimitX96": "0x100000000000000000000000000000000",
                 "tokenIn": "cx0000000000000000000000000000000000000001",
                 "tokenOut": "cx0000000000000000000000000000000000000002"
               }
             }
           }
         ])
-        expect(value).toBe('0x00')
+        expect(value).toBe('0x0')
       })
 
       it('fee with icx out', async () => {
@@ -414,16 +414,16 @@ describe('SwapRouter', () => {
                     "amountIn": "0x64",
                     "amountOutMinimum": "0x61",
                     "deadline": "0x7b",
-                    "fee": "0x0bb8",
+                    "fee": "0xbb8",
                     "recipient": "hx0000000000000000000000000000000000000000",
-                    "sqrtPriceLimitX96": "0x00",
+                    "sqrtPriceLimitX96": "0x0",
                     "tokenIn": "cx0000000000000000000000000000000000000002",
                     "tokenOut": "cx1111111111111111111111111111111111111111"
                 }
             }
           }
         ])
-        expect(value).toBe('0x00')
+        expect(value).toBe('0x0')
       })
 
       it('fee with icx in using exact output', async () => {
@@ -448,17 +448,17 @@ describe('SwapRouter', () => {
             "method": "exactOutputSingleIcx",
             "params": {
               "params": {
-                "amountOut": "0x0a",
+                "amountOut": "0xa",
                 "deadline": "0x7b",
-                "fee": "0x0bb8",
+                "fee": "0xbb8",
                 "recipient": "hx0000000000000000000000000000000000000000",
-                "sqrtPriceLimitX96": "0x00",
+                "sqrtPriceLimitX96": "0x0",
                 "tokenOut": "cx0000000000000000000000000000000000000002"
               }
             }
           }
         ])
-        expect(value).toBe('0x0c')
+        expect(value).toBe('0xc')
       })
 
       it('fee', async () => {
@@ -486,16 +486,16 @@ describe('SwapRouter', () => {
                 "amountIn": "0x64",
                 "amountOutMinimum": "0x61",
                 "deadline": "0x7b",
-                "fee": "0x0bb8",
+                "fee": "0xbb8",
                 "recipient": "hx0000000000000000000000000000000000000000",
-                "sqrtPriceLimitX96": "0x00",
+                "sqrtPriceLimitX96": "0x0",
                 "tokenIn": "cx0000000000000000000000000000000000000001",
                 "tokenOut": "cx0000000000000000000000000000000000000002"
               }
             }
           }
         ])
-        expect(value).toBe('0x00')
+        expect(value).toBe('0x0')
       })
     })
   })
