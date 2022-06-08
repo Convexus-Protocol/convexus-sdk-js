@@ -83,7 +83,7 @@ export class Interface {
     inputs: Array<{}>,
     values: Array<{}>,
   ): string {
-    invariant(inputs.length == values.length, "INVALID_ARGS_COUNT:" + inputs.length + " / " + values.length)
+    invariant(inputs.length == values.length, "INVALID_ARGS_COUNT")
     
     var payload: any = {
       "to": this.contractName,
