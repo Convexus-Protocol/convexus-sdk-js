@@ -29,7 +29,7 @@ export class Interface {
     
     switch (inputType) {
       case "struct": {
-        invariant (value.length === input['fields'].length, "INVALID_STRUCT_COUNT :" + value + " / "  + value.length + " / " + input['fields'].length)
+        invariant (value.length === input['fields'].length, "INVALID_STRUCT_COUNT")
         result[input['name']] = {}
         for (var i in value) {
           result[input['name']] = Object.assign(result[input['name']], this.buildParam(value[i], input['fields'][i]))

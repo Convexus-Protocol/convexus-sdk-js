@@ -82,8 +82,6 @@ export abstract class Staker {
     options: ClaimOptions
   ): Promise<string[]> {
     const calldatas: string[] = []
-    console.debug("=>", incentiveKey)
-    console.debug("=>", await this._encodeIncentiveKey(poolFactoryProvider, incentiveKey))
     calldatas.push(
       Staker.INTERFACE.encodeFunctionData('unstakeToken', [
         await this._encodeIncentiveKey(poolFactoryProvider, incentiveKey),
