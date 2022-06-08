@@ -4,7 +4,7 @@ import IPoolInitializer from './artifacts/contracts/PoolInitializer/PoolInitiali
 import { Pool } from './entities'
 
 export abstract class PoolInitializer {
-  public static INTERFACE: Interface = new Interface(IPoolInitializer)
+  public static INTERFACE: Interface = new Interface(IPoolInitializer, "PoolInitializer")
 
   /**
    * Cannot be constructed.

@@ -17,6 +17,7 @@ describe('PoolInitializer', () => {
       expect(calldata).toStrictEqual(
         [
           {
+            "to": "PoolInitializer",
             "method": "createAndInitializePoolIfNecessary",
             "params": {
               "fee": "0xbb8",

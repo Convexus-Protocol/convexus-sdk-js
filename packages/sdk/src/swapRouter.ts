@@ -43,7 +43,7 @@ export interface SwapOptions {
  * Represents the Convexus SwapRouter, and has static methods for helping execute trades.
  */
 export abstract class SwapRouter {
-  public static INTERFACE: Interface = new Interface(ISwapRouter)
+  public static INTERFACE: Interface = new Interface(ISwapRouter, "SwapRouter")
 
   /**
    * Cannot be constructed.

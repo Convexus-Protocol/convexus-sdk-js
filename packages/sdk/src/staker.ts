@@ -66,7 +66,7 @@ export interface WithdrawOptions {
 }
 
 export abstract class Staker {
-  public static INTERFACE: Interface = new Interface(IConvexusStaker)
+  public static INTERFACE: Interface = new Interface(IConvexusStaker, "ConvexusStaker")
 
   protected constructor() {}
 

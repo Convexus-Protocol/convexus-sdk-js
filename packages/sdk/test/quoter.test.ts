@@ -55,6 +55,7 @@ describe('SwapQuoter', () => {
 
         expect(calldata).toStrictEqual([
           {
+            "to": "Quoter",
             "method": "quoteExactInputSingle",
             "params": {
                 "params": {
@@ -85,6 +86,7 @@ describe('SwapQuoter', () => {
 
         expect(calldata).toStrictEqual([
           {
+            "to": "Quoter",
             "method": "quoteExactOutputSingle",
             "params": {
                 "params": {
@@ -111,6 +113,7 @@ describe('SwapQuoter', () => {
 
         expect(calldata).toStrictEqual([
           {
+            "to": "Quoter",
             "method": "quoteExactInput",
             "params": {
               "params": {
@@ -134,6 +137,7 @@ describe('SwapQuoter', () => {
 
         expect(calldata).toStrictEqual([
           {
+            "to": "Quoter",
             "method": "quoteExactOutput",
             "params": {
                 "params": {
@@ -158,6 +162,7 @@ describe('SwapQuoter', () => {
 
         expect(calldata).toStrictEqual([
           {
+            "to": "Quoter",
             "method": "quoteExactInputSingle",
             "params": {
                 "params": {

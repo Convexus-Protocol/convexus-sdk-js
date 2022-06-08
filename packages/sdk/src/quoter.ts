@@ -21,7 +21,7 @@ export interface QuoteOptions {
  * calldata needed to call the quoter contract.
  */
 export abstract class SwapQuoter {
-  public static INTERFACE: Interface = new Interface(IQuoter)
+  public static INTERFACE: Interface = new Interface(IQuoter, "Quoter")
 
   /**
    * Produces the on-chain method name of the appropriate function within QuoterV2,

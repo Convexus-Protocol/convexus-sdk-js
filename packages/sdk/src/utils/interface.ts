@@ -4,9 +4,11 @@ import { toHex } from '../utils/calldata'
 
 export class Interface {
   abi: []
+  contractName: string
 
-  public constructor (abi: any) {
+  public constructor (abi: any, contractName: string) {
     this.abi = abi
+    this.contractName = contractName
   }
 
   public getAbiObject (name: string) {
@@ -64,6 +66,7 @@ export class Interface {
 
     invariant(inputs.length == values?.length, "INVALID_ARGS_COUNT")
     var payload: any = {
+      "to": this.contractName,
       "method": fragment,
       "params": {}
     }
@@ -76,14 +79,15 @@ export class Interface {
   }
   
   encodeTokenFallbackFunctionData (
-    fragment: string,
+    method: string,
     inputs: Array<{}>,
     values: Array<{}>,
   ): string {
     invariant(inputs.length == values.length, "INVALID_ARGS_COUNT:" + inputs.length + " / " + values.length)
     
     var payload: any = {
-      "method": fragment,
+      "to": this.contractName,
+      "method": method,
       "params": {}
     }
 
