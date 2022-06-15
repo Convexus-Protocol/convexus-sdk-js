@@ -64,7 +64,11 @@ export class Interface {
     const abiObject = this.getAbiObject(method)
     const inputs: [] = abiObject['inputs']
 
-    invariant(inputs.length == values?.length, "INVALID_ARGS_COUNT")
+    if (values === undefined) {
+      values = []
+    }
+
+    invariant(inputs.length == values?.length, `INVALID_ARGS_COUNT(${inputs.length} / ${values?.length})`)
     var payload: any = {
       "to": this.contractName,
       "method": method,
