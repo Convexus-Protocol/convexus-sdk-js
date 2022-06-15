@@ -7,7 +7,6 @@
     "bootstrap": "lerna bootstrap && yarn build",
     "build": "yarn build:ts",
     "build:ts": "tsc -b tsconfig.json",
-    "demo": "npm run build && (cd packages/sdk-demo && npm run start)",
     "clean": "npx rimraf -rf coverage node_modules package-lock.json yarn.lock && npx lerna run clean --stream --parallel",
     
     "test:sdk-core": "jest  --verbose -c jest.config.js --rootDir=. packages/sdk-core/",

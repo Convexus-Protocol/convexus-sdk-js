@@ -31,7 +31,6 @@ const config = {
   moduleNameMapper: {
     // '@convexus/sdk': '<rootDir>/packages/sdk/src/index.ts',
     '@convexus/sdk-core': '<rootDir>/packages/sdk-core/src/index.ts',
-    // '@convexus/sdk-demo': '<rootDir>/packages/sdk-demo/src/index.ts'
   },
   moduleFileExtensions: ['js', 'ts', 'json'],
   globals: {
