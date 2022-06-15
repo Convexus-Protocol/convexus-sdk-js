@@ -60,14 +60,14 @@ export class Interface {
     return result
   }
 
-  public encodeFunctionData (fragment: string, values?: Array<String|number|[]|{}>): string {
-    const abiObject = this.getAbiObject(fragment)
+  public encodeFunctionData (method: string, values?: Array<String|number|[]|{}>): string {
+    const abiObject = this.getAbiObject(method)
     const inputs: [] = abiObject['inputs']
 
     invariant(inputs.length == values?.length, "INVALID_ARGS_COUNT")
     var payload: any = {
       "to": this.contractName,
-      "method": fragment,
+      "method": method,
       "params": {}
     }
 
