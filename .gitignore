@@ -11,3 +11,4 @@ tsconfig.tsbuildinfo
 coverage
 devTestOnly/
 packages/sdk-webpack-boilerplate
+*.lock
