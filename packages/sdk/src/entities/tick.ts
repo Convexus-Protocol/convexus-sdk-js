@@ -1,6 +1,6 @@
 import JSBI from 'jsbi'
 import invariant from 'tiny-invariant'
-import { BigintIsh } from '@convexus/sdk-core'
+import { BigintIsh } from '@convexus/icon-toolkit'
 import { TickMath } from '../utils'
 
 export interface TickConstructorArgs {

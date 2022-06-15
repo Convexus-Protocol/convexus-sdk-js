@@ -1,4 +1,4 @@
-import { BigintIsh } from '@convexus/sdk-core'
+import { BigintIsh } from '@convexus/icon-toolkit'
 import JSBI from 'jsbi'
 import { Q96 } from '../internalConstants'
 

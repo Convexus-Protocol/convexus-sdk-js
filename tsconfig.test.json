@@ -4,6 +4,7 @@
   "include": ["./typings/**/*.d.ts"],
   "references": [
     { "path": "packages/sdk" },
-    { "path": "packages/sdk-core" }
+    { "path": "packages/sdk-core" },
+    { "path": "packages/icon-toolkit" }
   ]
 }

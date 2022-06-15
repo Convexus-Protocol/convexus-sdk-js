@@ -13,5 +13,6 @@
   "files": [],
   "references": [
     { "path": "../sdk-core" },
+    { "path": "../icon-toolkit" },
   ]
 }

@@ -1,4 +1,4 @@
-import { BigintIsh } from '@convexus/sdk-core'
+import { BigintIsh } from '@convexus/icon-toolkit'
 import { TickList } from '../utils/tickList'
 import { Tick, TickConstructorArgs } from './tick'
 import { TickDataProvider } from './tickDataProvider'

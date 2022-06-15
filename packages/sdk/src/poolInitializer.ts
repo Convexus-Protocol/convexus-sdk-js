@@ -1,5 +1,4 @@
-import { MethodParameters, toHex } from './utils/calldata'
-import { Interface } from './utils'
+import { CallData, Interface, MethodParameters, toHex } from '@convexus/icon-toolkit'
 import IPoolInitializer from './artifacts/contracts/PoolInitializer/PoolInitializer.json'
 import { Pool } from './entities'
 
@@ -11,7 +10,7 @@ export abstract class PoolInitializer {
    */
   private constructor() {}
 
-  public static encodeCreate(pool: Pool): string {
+  public static encodeCreate(pool: Pool): CallData {
     return PoolInitializer.INTERFACE.encodeFunctionData('createAndInitializePoolIfNecessary', [
       pool.token0.address,
       pool.token1.address,

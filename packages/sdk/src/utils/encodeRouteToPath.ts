@@ -1,4 +1,5 @@
-import { Currency, Token, pack } from '@convexus/sdk-core'
+import { pack } from '@convexus/icon-toolkit'
+import { Currency, Token } from '@convexus/sdk-core'
 import { Pool } from '../entities/pool'
 import { Route } from '../entities/route'
 

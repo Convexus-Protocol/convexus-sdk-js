@@ -1,7 +1,7 @@
 {
-  "name": "@convexus/sdk-core",
+  "name": "@convexus/icon-toolkit",
   "version": "1.0.0",
-  "description": "Convexus SDK Core package",
+  "description": "ICON Toolkit",
   "main": "dist/index.js",
   "node": "dist/index.js",
   "browser": "dist/index.umd.js",
@@ -18,14 +18,9 @@
     "clean": "rimraf ./dist ./tsconfig.tsbuildinfo"
   },
   "dependencies": {
-    "@convexus/icon-toolkit": "^1.0.0",
-    "big.js": "^6.1.1",
-    "decimal.js-light": "^2.5.1",
-    "icon-sdk-js": "^1.1.3",
-    "jsbi": "^4.3.0",
     "tiny-invariant": "^1.2.0",
-    "toformat": "^2.0.0",
-    "tslib": "2.3.1"
+    "jsbi": "^4.3.0",
+    "icon-sdk-js": "^1.1.3"
   },
   "files": [
     "dist",
@@ -39,6 +34,5 @@
     "node": ">=12.0.0 <17"
   },
   "devDependencies": {
-    "@types/big.js": "^6.1.3"
   }
 }

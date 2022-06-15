@@ -1,4 +1,4 @@
-import { BigintIsh } from '@convexus/sdk-core'
+import { BigintIsh } from '@convexus/icon-toolkit'
 
 /**
  * Provides information about ticks

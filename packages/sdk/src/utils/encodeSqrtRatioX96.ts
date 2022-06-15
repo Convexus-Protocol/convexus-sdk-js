@@ -1,5 +1,6 @@
 import JSBI from 'jsbi'
-import { BigintIsh, sqrt } from '@convexus/sdk-core'
+import { BigintIsh } from '@convexus/icon-toolkit'
+import { sqrt } from '@convexus/sdk-core'
 
 /**
  * Returns the sqrt ratio as a Q64.96 corresponding to a given ratio of amount1 and amount0

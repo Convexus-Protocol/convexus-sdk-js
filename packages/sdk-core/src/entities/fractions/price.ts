@@ -1,7 +1,8 @@
 import JSBI from 'jsbi'
 import invariant from 'tiny-invariant'
 
-import { BigintIsh, Rounding } from '../../constants'
+import { BigintIsh } from '@convexus/icon-toolkit'
+import { Rounding } from '../../constants'
 import { Currency } from '../currency'
 import { Fraction } from './fraction'
 import { CurrencyAmount } from './currencyAmount'

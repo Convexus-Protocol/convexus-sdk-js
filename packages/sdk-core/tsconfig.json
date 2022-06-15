@@ -6,5 +6,6 @@
   },
   "include": ["src", "../../typings/**/*.d.ts"],
   "references": [
+    { "path": "../icon-toolkit" },
   ]
 }

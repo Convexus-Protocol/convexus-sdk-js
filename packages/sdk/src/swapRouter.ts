@@ -1,12 +1,11 @@
-import { BigintIsh, Currency, CurrencyAmount, Icx, Percent, TradeType, validateAndParseAddress } from '@convexus/sdk-core'
+import { BigintIsh, CallData, Interface, MethodParameters, toHex, validateAndParseAddress } from '@convexus/icon-toolkit'
+import { Currency, CurrencyAmount, Icx, Percent, TradeType } from '@convexus/sdk-core'
 import invariant from 'tiny-invariant'
 import { Trade } from './entities/trade'
 import { ADDRESS_ZERO } from './constants'
-import { encodeRouteToPath, Interface } from './utils'
-import { MethodParameters, toHex } from './utils/calldata'
+import { encodeRouteToPath } from './utils'
 import ISwapRouter from './artifacts/contracts/SwapRouter/SwapRouter.json'
-// import { Multicall } from './multicall'
-import { FeeOptions /*, Payments*/ } from './payments'
+import { FeeOptions } from './payments'
 import { Route } from './entities'
 
 /**
@@ -77,7 +76,7 @@ export abstract class SwapRouter {
       'TOKEN_OUT_DIFF'
     )
 
-    const calldatas: string[] = []
+    const calldatas: CallData[] = []
 
     const ZERO_IN: CurrencyAmount<Currency> = CurrencyAmount.fromRawAmount(trades[0].inputAmount.currency, 0)
 
@@ -133,7 +132,7 @@ export abstract class SwapRouter {
     deadline: string, 
     amountOut: string, 
     amountIn: string
-  ): string {
+  ): CallData {
     
     const path: string = encodeRouteToPath(route, trade.tradeType === TradeType.EXACT_OUTPUT)
 
@@ -188,7 +187,7 @@ export abstract class SwapRouter {
     deadline: string,
     amountIn: string,
     amountOut: string,
-  ): string {
+  ): CallData {
     const path: string = encodeRouteToPath(route, trade.tradeType === TradeType.EXACT_OUTPUT)
 
     if (Icx.isWrappedAddress(route.tokenPath[0].address)) {
@@ -240,7 +239,7 @@ export abstract class SwapRouter {
     amountOut: string,
     amountIn: string,
     options: SwapOptions
-  ): string {
+  ): CallData {
     if (Icx.isWrappedAddress(route.tokenPath[0].address)) {
       const exactOutputSingleParams = [[
         route.tokenPath[1].address,
@@ -297,7 +296,7 @@ export abstract class SwapRouter {
     deadline: string,
     amountOut: string,
     amountIn: string,
-    options: SwapOptions): string {
+    options: SwapOptions): CallData {
     if (Icx.isWrappedAddress(route.tokenPath[0].address)) {
       const exactInputSingleParams = [
         [

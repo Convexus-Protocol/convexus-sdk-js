@@ -1,8 +1,7 @@
-import { BigintIsh, Currency, CurrencyAmount, TradeType } from '@convexus/sdk-core'
+import { BigintIsh, CallData, Interface, MethodParameters, toHex } from '@convexus/icon-toolkit'
+import { Currency, CurrencyAmount, TradeType } from '@convexus/sdk-core'
 import { encodeRouteToPath } from './utils'
-import { MethodParameters, toHex } from './utils/calldata'
 import IQuoter from './artifacts/contracts/Quoter/Quoter.json'
-import { Interface } from './utils'
 import { Route } from './entities'
 import invariant from 'tiny-invariant'
 
@@ -41,7 +40,7 @@ export abstract class SwapQuoter {
   ): MethodParameters {
     const singleHop = route.pools.length === 1
     const quoteAmount: string = toHex(amount.quotient)
-    let calldata: string
+    let calldata: CallData
 
     if (singleHop) {
       if (tradeType === TradeType.EXACT_INPUT) {

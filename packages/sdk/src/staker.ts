@@ -1,8 +1,7 @@
-import { BigintIsh, Token, validateAndParseAddress } from '@convexus/sdk-core'
-import { MethodParameters, toHex, toHexString } from './utils/calldata'
+import { BigintIsh, CallData, Interface, MethodParameters, toHex, toHexString, validateAndParseAddress } from '@convexus/icon-toolkit'
+import { Token } from '@convexus/sdk-core'
 import IConvexusStaker from './artifacts/contracts/ConvexusStaker/ConvexusStaker.json'
 import { Pool, PoolFactoryProvider } from './entities'
-import { Interface } from './utils'
 
 export type FullWithdrawOptions = ClaimOptions & WithdrawOptions
 /**
@@ -80,8 +79,8 @@ export abstract class Staker {
     poolFactoryProvider: PoolFactoryProvider, 
     incentiveKey: IncentiveKey, 
     options: ClaimOptions
-  ): Promise<string[]> {
-    const calldatas: string[] = []
+  ): Promise<CallData[]> {
+    const calldatas: CallData[] = []
     calldatas.push(
       Staker.INTERFACE.encodeFunctionData('unstakeToken', [
         await this._encodeIncentiveKey(poolFactoryProvider, incentiveKey),
@@ -112,7 +111,7 @@ export abstract class Staker {
     options: ClaimOptions
   ): Promise<MethodParameters> {
     incentiveKeys = Array.isArray(incentiveKeys) ? incentiveKeys : [incentiveKeys]
-    let calldatas: string[] = []
+    let calldatas: CallData[] = []
 
     for (let i = 0; i < incentiveKeys.length; i++) {
       // the unique program tokenId is staked in
@@ -145,7 +144,7 @@ export abstract class Staker {
     incentiveKeys: IncentiveKey | IncentiveKey[],
     withdrawOptions: FullWithdrawOptions
   ): Promise<MethodParameters> {
-    let calldatas: string[] = []
+    let calldatas: CallData[] = []
 
     incentiveKeys = Array.isArray(incentiveKeys) ? incentiveKeys : [incentiveKeys]
 

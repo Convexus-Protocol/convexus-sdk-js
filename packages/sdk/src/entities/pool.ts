@@ -1,4 +1,5 @@
-import { BigintIsh, Price, Token, CurrencyAmount } from '@convexus/sdk-core'
+import { BigintIsh } from '@convexus/icon-toolkit'
+import { Price, Token, CurrencyAmount } from '@convexus/sdk-core'
 import { FeeAmount, TICK_SPACINGS } from '../constants'
 import JSBI from 'jsbi'
 import invariant from 'tiny-invariant'

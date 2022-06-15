@@ -1,8 +1,7 @@
+import { BigintIsh, CallData, Interface, MethodParameters, toHex, validateAndParseAddress } from '@convexus/icon-toolkit'
 import {
-  BigintIsh,
   Percent,
   CurrencyAmount,
-  validateAndParseAddress,
   Currency,
   NativeCurrency
 } from '@convexus/sdk-core'
@@ -10,10 +9,7 @@ import JSBI from 'jsbi'
 import invariant from 'tiny-invariant'
 import { Position } from './entities/position'
 import { ONE, ZERO } from './internalConstants'
-import { MethodParameters, toHex } from './utils/calldata'
-import { Interface } from './utils'
 import INonfungiblePositionManager from './artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json'
-// import { ADDRESS_ZERO } from './constants'
 
 const MaxUint128 = toHex(JSBI.subtract(JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(128)), JSBI.BigInt(1)))
 
@@ -163,7 +159,7 @@ export abstract class NonfungiblePositionManager {
   public static addCallParameters(position: Position, options: AddLiquidityOptions): MethodParameters {
     invariant(JSBI.greaterThan(position.liquidity, ZERO), 'ZERO_LIQUIDITY')
 
-    const calldatas: string[] = []
+    const calldatas: CallData[] = []
 
     // get amounts
     const { amount0: amount0Desired, amount1: amount1Desired } = position.mintAmounts
@@ -233,8 +229,8 @@ export abstract class NonfungiblePositionManager {
     }
   }
 
-  private static encodeCollect(options: CollectOptions): string[] {
-    const calldatas: string[] = []
+  private static encodeCollect(options: CollectOptions): CallData[] {
+    const calldatas: CallData[] = []
 
     const tokenId = toHex(options.tokenId)
 
@@ -274,7 +270,7 @@ export abstract class NonfungiblePositionManager {
   }
 
   public static collectCallParameters(options: CollectOptions): MethodParameters {
-    const calldatas: string[] = NonfungiblePositionManager.encodeCollect(options)
+    const calldatas: CallData[] = NonfungiblePositionManager.encodeCollect(options)
 
     return {
       calldata: calldatas,
@@ -290,7 +286,7 @@ export abstract class NonfungiblePositionManager {
    * @returns The call parameters
    */
   public static removeCallParameters(position: Position, options: RemoveLiquidityOptions): MethodParameters {
-    const calldatas: string[] = []
+    const calldatas: CallData[] = []
 
     const deadline = toHex(options.deadline)
     const tokenId = toHex(options.tokenId)
@@ -356,7 +352,7 @@ export abstract class NonfungiblePositionManager {
     const recipient = validateAndParseAddress(options.recipient)
     const sender = validateAndParseAddress(options.sender)
 
-    let calldata: string
+    let calldata: CallData
     if (options.data) {
       calldata = NonfungiblePositionManager.INTERFACE.encodeFunctionData(
         'safeTransferFrom',

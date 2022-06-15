@@ -1,16 +1,17 @@
-import { validateAndParseAddress } from '@convexus/sdk-core'
+import { validateAndParseAddress } from './validateAndParseAddress'
 import invariant from 'tiny-invariant'
-import { toHex } from '../utils/calldata'
+import { toHex } from './calldata'
+
+export type CallData = {[key: string] : any}
 
 export class Interface {
   abi: []
-  contractName: string
+  contractAddress: string
 
-  public constructor (abi: any, contractName: string) {
+  public constructor (abi: any, contractAddress: string) {
     this.abi = abi
-    this.contractName = contractName
+    this.contractAddress = contractAddress
   }
-
   public getAbiObject (name: string) {
     for (const index in this.abi) {
       const obj = this.abi[index]
@@ -60,7 +61,10 @@ export class Interface {
     return result
   }
 
-  public encodeFunctionData (method: string, values?: Array<String|number|[]|{}>): string {
+  public encodeFunctionData (
+    method: string, 
+    values?: Array<String|number|[]|{}>
+  ): CallData {
     const abiObject = this.getAbiObject(method)
     const inputs: [] = abiObject['inputs']
 
@@ -68,9 +72,9 @@ export class Interface {
       values = []
     }
 
-    invariant(inputs.length == values?.length, `INVALID_ARGS_COUNT(${inputs.length} / ${values?.length})`)
+    invariant(inputs.length == values?.length, `INVALID_ARGS_COUNT`)
     var payload: any = {
-      "to": this.contractName,
+      "to": this.contractAddress,
       "method": method,
       "params": {}
     }
@@ -86,11 +90,11 @@ export class Interface {
     method: string,
     inputs: Array<{}>,
     values: Array<{}>,
-  ): string {
+  ): CallData {
     invariant(inputs.length == values.length, "INVALID_ARGS_COUNT")
     
     var payload: any = {
-      "to": this.contractName,
+      "to": this.contractAddress,
       "method": method,
       "params": {}
     }

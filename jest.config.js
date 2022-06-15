@@ -25,12 +25,13 @@ const config = {
   moduleDirectories: [
     '<rootDir>/packages/sdk/src',
     '<rootDir>/packages/sdk-core/src',
+    '<rootDir>/packages/icon-toolkit/src',
     '<rootDir>/node_modules',
     '<rootDir>/*/node_modules',
   ],
   moduleNameMapper: {
-    // '@convexus/sdk': '<rootDir>/packages/sdk/src/index.ts',
     '@convexus/sdk-core': '<rootDir>/packages/sdk-core/src/index.ts',
+    '@convexus/icon-toolkit': '<rootDir>/packages/icon-toolkit/src/index.ts',
   },
   moduleFileExtensions: ['js', 'ts', 'json'],
   globals: {

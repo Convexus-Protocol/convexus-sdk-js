@@ -1,5 +1,6 @@
-import { BigintIsh } from '@convexus/sdk-core'
+import { BigintIsh } from './constants'
 import JSBI from 'jsbi'
+import { CallData } from './interface'
 
 /**
  * Generated method parameters for executing a call.
@@ -8,7 +9,7 @@ export interface MethodParameters {
   /**
    * The calldata to perform the given operation
    */
-  calldata: string[]
+  calldata: CallData[]
   /**
    * The amount of ICX (in loops) to send in hex.
    */
