@@ -1,4 +1,4 @@
-import { validateAndParseAddress } from '../../src/utils/validateAndParseAddress'
+import { validateAndParseAddress } from '../src/validateAndParseAddress'
 
 describe('#validateAndParseAddress', () => {
   it('returns same address', () => {
