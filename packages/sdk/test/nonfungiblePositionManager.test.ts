@@ -9,12 +9,14 @@ import { encodeSqrtRatioX96 } from '../src/utils/encodeSqrtRatioX96'
 describe('NonfungiblePositionManager', () => {
   const token0 = new Token('cx0000000000000000000000000000000000000001', 18, 't0', 'token0')
   const token1 = new Token('cx0000000000000000000000000000000000000002', 18, 't1', 'token1')
+  const token2 = new Token('cx0000000000000000000000000000000000000003', 18, 't2', 'token2')
 
   const fee = FeeAmount.MEDIUM
   const ICX = new Icx()
   const WICX = ICX.wrapped
 
   const pool_0_1 = new Pool(token0, token1, fee, encodeSqrtRatioX96(1, 1), 0, 0, [])
+  const pool_1_2 = new Pool(token1, token2, fee, encodeSqrtRatioX96(6, 10), 0, -0x13f5, [])
   const pool_1_wicx = new Pool(token1, WICX, fee, encodeSqrtRatioX96(1, 1), 0, 0, [])
 
   const recipient = 'hx0000000000000000000000000000000000000003'
@@ -81,6 +83,43 @@ describe('NonfungiblePositionManager', () => {
                 "tickUpper": "0x3c",
                 "token0": "cx0000000000000000000000000000000000000001",
                 "token1": "cx0000000000000000000000000000000000000002"
+              }
+            }
+          }
+        ]
+      )
+      expect(value).toEqual('0x0')
+    })
+
+    it('succeeds for mint pool 2', () => {
+      const { calldata, value } = NonfungiblePositionManager.addCallParameters(
+        new Position({
+          pool: pool_1_2,
+          tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
+          tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
+          liquidity: 0x10000
+        }),
+        { recipient, slippageTolerance, deadline }
+      )
+
+      expect(calldata).toStrictEqual(
+        [
+          {
+            "to": "NonfungiblePositionManager",
+            "method": "mint",
+            "params": {
+              "params": {
+                "amount0Desired": "0x18a",
+                "amount0Min": "0x18a",
+                "amount1Desired": "0x0",
+                "amount1Min": "0x0",
+                "deadline": "0x7b",
+                "fee": "0xbb8",
+                "recipient": "hx0000000000000000000000000000000000000003",
+                "tickLower": "-0x3c",
+                "tickUpper": "0x3c",
+                "token0": "cx0000000000000000000000000000000000000002",
+                "token1": "cx0000000000000000000000000000000000000003"
               }
             }
           }
