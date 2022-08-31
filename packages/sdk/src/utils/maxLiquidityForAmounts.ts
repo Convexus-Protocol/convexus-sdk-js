@@ -4,7 +4,7 @@ import { Q96 } from '../internalConstants'
 
 /**
  * Returns an imprecise maximum amount of liquidity received for a given amount of token 0.
- * This function is available to accommodate LiquidityAmounts#getLiquidityForAmount0 in the Convexus v1 periphery,
+ * This function is available to accommodate LiquidityAmounts#getLiquidityForAmount0 in the Convexus periphery,
  * which could be more precise by at least 32 bits by dividing by Q64 instead of Q96 in the intermediate step,
  * and shifting the subtracted ratio left by 32 bits. This imprecise calculation will likely be replaced in a future
  * router contract.

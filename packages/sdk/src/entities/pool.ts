@@ -29,7 +29,7 @@ interface StepComputations {
  const NO_POOL_FACTORY_PROVIDER_DEFAULT = new NoPoolFactoryProvider()
 
 /**
- * Represents a Convexus V1 pool
+ * Represents a Convexus pool
  */
 export class Pool {
   public readonly token0: Token
