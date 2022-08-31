@@ -142,12 +142,12 @@ describe('NonfungiblePositionManager', () => {
             "method": "mint",
             "params": {
               "params": {
-                "amount0Desired": "0xde5e8740bb55a8a",
-                "amount0Min": "0xd67824c75ca970c",
-                "amount1Desired": "0x5726f15f7a74a5b555",
-                "amount1Min": "0x547e5f6be63db8890e",
+                "amount0Desired": "0xde5e8740bb55a8a", // 1.0014620772700884
+                "amount0Min": "0xd67824c75ca970c", // 0.9658839099995973
+                "amount1Desired": "0x5726f15f7a74a5b555", // 1607.6728634351073
+                "amount1Min": "0x547e5f6be63db8890e", // 1558.632617799791
                 "deadline": "0x7b",
-                "fee": "0x2710",
+                "fee": "0x2710", // 1%
                 "recipient": "hx0000000000000000000000000000000000000003",
                 "tickLower": "0x10bf8",
                 "tickUpper": "0x125c0",
