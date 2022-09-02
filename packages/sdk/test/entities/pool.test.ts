@@ -28,6 +28,27 @@ describe('Pool', () => {
       }).toThrow('FEE')
     })
 
+    it('Different decimals pool price', () => {
+      const t0_18 = new Token('cx0000000000000000000000000000000000000000', 18)
+      const t1_6 = new Token('cx0000000000000000000000000000000000000001', 6)
+      
+      const poolPrice = encodeSqrtRatioX96(
+        JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(6)), 
+        JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18))
+      );
+
+      const pool = new Pool(
+        t0_18, 
+        t1_6, 
+        FeeAmount.MEDIUM,
+        poolPrice, 
+        0, 
+        TickMath.getTickAtSqrtRatio(poolPrice)
+      )
+
+      expect(pool.token0Price.toSignificant(4)).toEqual('1')
+    })
+
     it('cannot be given two of the same token', () => {
       expect(() => {
         new Pool(USDC, USDC, FeeAmount.MEDIUM, encodeSqrtRatioX96(1, 1), 0, 0, [])
