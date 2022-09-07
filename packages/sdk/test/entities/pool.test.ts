@@ -49,6 +49,41 @@ describe('Pool', () => {
       expect(pool.token0Price.toSignificant(4)).toEqual('1')
     })
 
+    it('0.5 pool price', () => {
+      const decimals0 = 18
+      const decimals1 = 6
+
+      const t0_18 = new Token('cx0000000000000000000000000000000000000000', decimals0)
+      const t1_6 = new Token('cx0000000000000000000000000000000000000001', decimals1)
+
+      // We want to encode price 0.5
+      const price = 0.5
+      const precision = 18 // limit the precision at 18 decimals precision
+      const precision_exp = 10**precision
+      const price_exp = price * precision_exp
+      const amount0 = JSBI.BigInt(precision_exp)
+      const amount1 = JSBI.BigInt(price_exp)
+
+      const decimals0_exp = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(decimals0))
+      const decimals1_exp = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(decimals1))
+
+      const poolPrice = encodeSqrtRatioX96(
+        JSBI.multiply(amount1, decimals1_exp), 
+        JSBI.multiply(amount0, decimals0_exp), 
+      );
+
+      const pool = new Pool(
+        t0_18, 
+        t1_6, 
+        FeeAmount.MEDIUM,
+        poolPrice, 
+        0, 
+        TickMath.getTickAtSqrtRatio(poolPrice)
+      )
+
+      expect(pool.token0Price.toSignificant(4)).toEqual('0.5')
+    })
+
     it('cannot be given two of the same token', () => {
       expect(() => {
         new Pool(USDC, USDC, FeeAmount.MEDIUM, encodeSqrtRatioX96(1, 1), 0, 0, [])
