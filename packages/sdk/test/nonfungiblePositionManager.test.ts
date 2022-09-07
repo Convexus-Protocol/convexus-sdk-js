@@ -8,6 +8,7 @@ import { encodeSqrtRatioX96 } from '../src/utils/encodeSqrtRatioX96'
 import { maxLiquidityForAmounts } from '../src/utils/maxLiquidityForAmounts'
 import { priceToClosestTick } from '../src/utils/priceTickConversions'
 import { nearestUsableTick } from '../src/utils/nearestUsableTick'
+import { TickMath } from '../src/utils'
 
 describe('NonfungiblePositionManager', () => {
   const token0 = new Token('cx0000000000000000000000000000000000000001', 18, 't0', 'token0')
@@ -153,6 +154,43 @@ describe('NonfungiblePositionManager', () => {
                 "tickUpper": "0x125c0",
                 "token0": "cx0000000000000000000000000000000000000002",
                 "token1": "cx0000000000000000000000000000000000000003"
+              }
+            }
+          }
+        ]
+      )
+      expect(value).toEqual('0x0')
+    })
+
+    it('succeeds for full range', () => {
+      const { calldata, value } = NonfungiblePositionManager.addCallParameters(
+        new Position({
+          pool: pool_0_1,
+          tickLower: nearestUsableTick(TickMath.MIN_TICK, TICK_SPACINGS[fee]),
+          tickUpper: nearestUsableTick(TickMath.MAX_TICK, TICK_SPACINGS[fee]),
+          liquidity: 1
+        }),
+        { recipient, slippageTolerance, deadline }
+      )
+
+      expect(calldata).toStrictEqual(
+        [
+          {
+            "to": "NonfungiblePositionManager",
+            "method": "mint",
+            "params": {
+              "params": {
+                "amount0Desired": "0x1",
+                "amount0Min": "0x1",
+                "amount1Desired": "0x1",
+                "amount1Min": "0x1",
+                "deadline": "0x7b",
+                "fee": "0xbb8",
+                "recipient": "hx0000000000000000000000000000000000000003",
+                "tickLower": "-0xd89b4",
+                "tickUpper": "0xd89b4",
+                "token0": "cx0000000000000000000000000000000000000001",
+                "token1": "cx0000000000000000000000000000000000000002"
               }
             }
           }
