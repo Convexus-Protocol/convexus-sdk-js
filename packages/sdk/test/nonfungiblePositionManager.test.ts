@@ -16,10 +16,12 @@ describe('NonfungiblePositionManager', () => {
   const token2 = new Token('cx0000000000000000000000000000000000000003', 18, 't2', 'token2')
 
   const fee = FeeAmount.MEDIUM
+  const feeHigh = FeeAmount.MEDIUM
   const ICX = new Icx()
   const WICX = ICX.wrapped
 
   const pool_0_1 = new Pool(token0, token1, fee, encodeSqrtRatioX96(1, 1), 0, 0, [])
+  const pool_0_1_fee_high = new Pool(token0, token1, feeHigh, encodeSqrtRatioX96(1, 1), 0, 0, [])
   const pool_1_wicx = new Pool(token1, WICX, fee, encodeSqrtRatioX96(1, 1), 0, 0, [])
 
   const recipient = 'hx0000000000000000000000000000000000000003'
@@ -168,6 +170,43 @@ describe('NonfungiblePositionManager', () => {
           pool: pool_0_1,
           tickLower: nearestUsableTick(TickMath.MIN_TICK, TICK_SPACINGS[fee]),
           tickUpper: nearestUsableTick(TickMath.MAX_TICK, TICK_SPACINGS[fee]),
+          liquidity: 1
+        }),
+        { recipient, slippageTolerance, deadline }
+      )
+
+      expect(calldata).toStrictEqual(
+        [
+          {
+            "to": "NonfungiblePositionManager",
+            "method": "mint",
+            "params": {
+              "params": {
+                "amount0Desired": "0x1",
+                "amount0Min": "0x1",
+                "amount1Desired": "0x1",
+                "amount1Min": "0x1",
+                "deadline": "0x7b",
+                "fee": "0xbb8",
+                "recipient": "hx0000000000000000000000000000000000000003",
+                "tickLower": "-0xd89b4",
+                "tickUpper": "0xd89b4",
+                "token0": "cx0000000000000000000000000000000000000001",
+                "token1": "cx0000000000000000000000000000000000000002"
+              }
+            }
+          }
+        ]
+      )
+      expect(value).toEqual('0x0')
+    })
+
+    it('succeeds for full range high fee', () => {
+      const { calldata, value } = NonfungiblePositionManager.addCallParameters(
+        new Position({
+          pool: pool_0_1_fee_high,
+          tickLower: nearestUsableTick(TickMath.MIN_TICK, TICK_SPACINGS[feeHigh]),
+          tickUpper: nearestUsableTick(TickMath.MAX_TICK, TICK_SPACINGS[feeHigh]),
           liquidity: 1
         }),
         { recipient, slippageTolerance, deadline }
