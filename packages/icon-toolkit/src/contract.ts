@@ -16,14 +16,14 @@ export class Contract {
   readonly [ key: string ]: ContractFunction | any;
   private iconService: IconService;
   private interface: Interface;
-  private poolAddress: string;
+  public address: string;
   private nid: number;
 
   public buildCall (method: string, ...args: any): Promise<any> {
     const data = this.interface.encodeFunctionData(method, args)
 
     const txObj = new IconService.IconBuilder.CallBuilder()
-      .to(this.poolAddress)
+      .to(this.address)
       .method(data['method'])
       .params(data['params'])
       .build()
@@ -38,7 +38,7 @@ export class Contract {
       .method(method)
       .params(data['params'])
       .from(wallet.getAddress())
-      .to(this.poolAddress)
+      .to(this.address)
       .stepLimit(IconService.IconConverter.toBigNumber('2000000'))
       .nid(IconService.IconConverter.toBigNumber(this.nid))
       .nonce(IconService.IconConverter.toBigNumber('1'))
@@ -53,7 +53,7 @@ export class Contract {
   public constructor (poolAddress: string, abi: Record<string, string>, iconService: IconService, nid: number) {
     this.iconService = iconService;
     this.nid = nid;
-    this.poolAddress = poolAddress;
+    this.address = poolAddress;
     this.interface = new Interface(abi, poolAddress);
 
     for (const index in this.interface.abi) {
