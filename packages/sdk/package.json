@@ -1,6 +1,6 @@
 {
   "name": "@convexus/sdk",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "Convexus SDK package",
   "main": "dist/index.js",
   "node": "dist/index.js",
@@ -18,7 +18,7 @@
     "clean": "rimraf ./dist ./tsconfig.tsbuildinfo"
   },
   "dependencies": {
-    "@convexus/sdk-core": "^1.0.1",
+    "@convexus/sdk-core": "^1.0.2",
     "tslib": "2.3.1"
   },
   "files": [
