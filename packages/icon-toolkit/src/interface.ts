@@ -72,7 +72,7 @@ export class Interface {
       values = []
     }
 
-    invariant(inputs.length == values?.length, `INVALID_ARGS_COUNT`)
+    invariant(inputs.length == values?.length, `INVALID_ARGS_COUNT (expected ${inputs.length}, got ${values?.length})`)
     var payload: any = {
       "to": this.contractAddress,
       "method": method,
@@ -91,7 +91,7 @@ export class Interface {
     inputs: Array<{}>,
     values: Array<{}>,
   ): CallData {
-    invariant(inputs.length == values.length, "INVALID_ARGS_COUNT")
+    invariant(inputs.length == values.length, `INVALID_ARGS_COUNT (expected ${inputs.length}, got ${values?.length})`)
     
     var payload: any = {
       "to": this.contractAddress,

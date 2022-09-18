@@ -1,6 +1,6 @@
 {
   "name": "@convexus/sdk",
-  "version": "1.0.7",
+  "version": "1.1.6",
   "description": "Convexus SDK package",
   "main": "dist/index.js",
   "node": "dist/index.js",
@@ -15,10 +15,12 @@
     "access": "public"
   },
   "scripts": {
-    "clean": "rimraf ./dist ./tsconfig.tsbuildinfo"
+    "clean": "rimraf ./dist ./tsconfig.tsbuildinfo",
+    "bump": "yarn version --patch --no-git-tag-version",
+    "pub": "yarn publish --non-interactive"
   },
   "dependencies": {
-    "@convexus/sdk-core": "^1.0.3",
+    "@convexus/sdk-core": "1.1.7",
     "tslib": "2.3.1"
   },
   "files": [

@@ -11,3 +11,4 @@ tsconfig.tsbuildinfo
 coverage
 devTestOnly/
 *.lock
+package-lock.json

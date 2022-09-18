@@ -5,6 +5,12 @@
   "license": "GPL-3.0",
   "scripts": {
     "bootstrap": "lerna bootstrap && yarn build",
+
+    "publish_icon_toolkit": "cd packages/icon-toolkit && yarn bump && yarn pub && cd ../../ && yarn install && yarn bootstrap",
+    "publish_sdk_core": "cd packages/sdk-core && yarn bump && yarn pub && cd ../../ && yarn install && yarn bootstrap && npx lernaupdate --non-interactive --dependency @convexus/icon-toolkit",
+    "publish_sdk": "cd packages/sdk && yarn bump && yarn pub && cd ../../ && yarn install && yarn bootstrap && npx lernaupdate --non-interactive --dependency @convexus/sdk-core",
+
+    "publish": "yarn run publish_icon_toolkit && yarn run publish_sdk_core || yarn run publish_sdk",
     "build": "yarn build:ts",
     "build:ts": "tsc -b tsconfig.json",
     "clean": "npx rimraf -rf coverage node_modules package-lock.json yarn.lock && npx lerna run clean --stream --parallel",
@@ -22,6 +28,7 @@
     "jest": "28.1.0",
     "jest-fetch-mock": "3.0.3",
     "lerna": "^4.0.0",
+    "lerna-update-wizard": "^1.1.2",
     "rimraf": "^2.6.2",
     "ts-jest": "28.0.4",
     "ts-loader": "8.0.4",
