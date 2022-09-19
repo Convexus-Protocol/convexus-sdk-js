@@ -1,7 +1,7 @@
 import IconService from "icon-sdk-js";
 import Wallet from "icon-sdk-js/build/Wallet";
 import { BigintIsh } from "./constants";
-import { Interface } from "./interface";
+import { CallData, Interface } from "./interface";
 
 type ContractFunction<T = any> = (...args: Array<any>) => Promise<T>;
 
@@ -47,6 +47,11 @@ export class Contract {
   
   public buildSend (method: string, wallet: Wallet, data: any): Promise<any> {
     return this.buildSendPayable(method, "0", wallet, data)
+  }
+
+  public buildSendCalldata (wallet: Wallet, calldata: CallData): Promise<any> {
+    const icxValue = 'value' in calldata ? calldata["value"] : "0"
+    return this.buildSendPayable(calldata['method'], icxValue, wallet, calldata['params'])
   }
 
   public buildSendPayable (method: string, icxAmount: BigintIsh, wallet: Wallet, data: any): Promise<any> {
