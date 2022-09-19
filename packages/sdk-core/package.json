@@ -1,6 +1,6 @@
 {
   "name": "@convexus/sdk-core",
-  "version": "1.1.35",
+  "version": "1.1.37",
   "description": "Convexus SDK Core package",
   "main": "dist/index.js",
   "node": "dist/index.js",
@@ -20,7 +20,7 @@
     "pub": "yarn publish --non-interactive"
   },
   "dependencies": {
-    "@convexus/icon-toolkit": "1.1.40",
+    "@convexus/icon-toolkit": "1.1.43",
     "big.js": "^6.1.1",
     "decimal.js-light": "^2.5.1",
     "icon-sdk-js": "^1.1.3",

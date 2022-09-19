@@ -42,14 +42,10 @@ export class Contract {
 
   public buildSendArrayPayable (method: string, icxAmount: string, wallet: Wallet, ...args: any): Promise<any> {
     const data = this.interface.encodeFunctionDataPayable(icxAmount, method, args)
-    return this.buildSend(method, wallet, data)
-  }
-  
-  public buildSend (method: string, wallet: Wallet, data: any): Promise<any> {
-    return this.buildSendPayable(method, "0", wallet, data)
+    return this.buildSend(wallet, data)
   }
 
-  public buildSendCalldata (wallet: Wallet, calldata: CallData): Promise<any> {
+  public buildSend (wallet: Wallet, calldata: CallData): Promise<any> {
     const icxValue = 'value' in calldata ? calldata["value"] : "0"
     return this.buildSendPayable(calldata['method'], icxValue, wallet, calldata['params'])
   }
