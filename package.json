@@ -5,15 +5,13 @@
   "license": "GPL-3.0",
   "scripts": {
     "bootstrap": "lerna bootstrap && yarn build",
-
     "publish_icon_toolkit": "cd packages/icon-toolkit && yarn bump && yarn pub && cd ../../ && yarn install && yarn bootstrap",
-    "publish_sdk_core": "cd packages/sdk-core && yarn bump && yarn pub && cd ../../ && yarn install && yarn bootstrap && npx lernaupdate --non-interactive --dependency @convexus/icon-toolkit",
-    "publish_sdk": "cd packages/sdk && yarn bump && yarn pub && cd ../../ && yarn install && yarn bootstrap && npx lernaupdate --non-interactive --dependency @convexus/sdk-core",
-
-    "publish": "yarn run publish_icon_toolkit && yarn run publish_sdk_core || yarn run publish_sdk",
+    "publish_sdk_core": "(npx lerna-update-wizard --non-interactive --dependency @convexus/icon-toolkit || true) && cd packages/sdk-core && yarn bump && yarn pub && cd ../../ && yarn install && yarn bootstrap",
+    "publish_sdk": "(npx lerna-update-wizard --non-interactive --dependency @convexus/sdk-core || true) && cd packages/sdk && yarn bump && yarn pub",
+    "publish": "yarn run publish_icon_toolkit && yarn run publish_sdk_core && yarn run publish_sdk",
     "build": "yarn build:ts",
     "build:ts": "tsc -b tsconfig.json",
-    "clean": "npx rimraf -rf coverage node_modules package-lock.json yarn.lock && npx lerna run clean --stream --parallel",
+    "clean": "npx lerna run clean --stream --parallel && npx rimraf -rf coverage node_modules package-lock.json yarn.lock",
     "test:sdk-core": "jest  --verbose -c jest.config.js --rootDir=. packages/sdk-core/",
     "test:sdk": "jest --verbose -c jest.config.js --rootDir=. packages/sdk/",
     "test": "jest --verbose -c jest.config.js --rootDir=."
@@ -35,5 +33,6 @@
     "ts-node": "^7.0.1",
     "typescript": "^4.4.3"
   },
-  "dependencies": {}
+  "dependencies": {
+  }
 }

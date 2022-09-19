@@ -1,6 +1,6 @@
 {
   "name": "@convexus/sdk",
-  "version": "1.1.6",
+  "version": "1.1.21",
   "description": "Convexus SDK package",
   "main": "dist/index.js",
   "node": "dist/index.js",
@@ -19,8 +19,11 @@
     "bump": "yarn version --patch --no-git-tag-version",
     "pub": "yarn publish --non-interactive"
   },
+  "devDependencies": {
+    "@types/bn.js": "^4.11.3"
+  },
   "dependencies": {
-    "@convexus/sdk-core": "1.1.7",
+    "@convexus/sdk-core": "1.1.32",
     "tslib": "2.3.1"
   },
   "files": [

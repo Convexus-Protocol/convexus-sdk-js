@@ -7,12 +7,14 @@ import { Token } from './token'
  */
 export class Icx extends NativeCurrency {
 
+  public static wrappedAddress: string = 'cx1111111111111111111111111111111111111111'
+
   public constructor() {
     super(18, 'ICX', 'ICX')
   }
 
   public get wrapped (): Token {
-    return new Token('cx1111111111111111111111111111111111111111', 18, 'wicx')
+    return new Token(Icx.wrappedAddress, 18, 'ICX', 'ICX')
   }
 
   public equals(other: Currency): boolean {
@@ -20,6 +22,6 @@ export class Icx extends NativeCurrency {
   }
 
   public static isWrappedAddress (address: string): boolean {
-    return new Icx().wrapped.address === address
+    return Icx.wrappedAddress === address
   }
 }

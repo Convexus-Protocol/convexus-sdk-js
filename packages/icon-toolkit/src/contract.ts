@@ -15,46 +15,65 @@ function defineReadOnly<T, K extends keyof T>(object: T, name: K, value: any): v
 export class Contract {
   readonly [ key: string ]: ContractFunction | any;
   private iconService: IconService;
+  private debugService: IconService;
   private interface: Interface;
   public address: string;
   private nid: number;
 
-  public buildCall (method: string, ...args: any): Promise<any> {
+  public buildCallArray (method: string, ...args: any): Promise<any> {
     const data = this.interface.encodeFunctionData(method, args)
+    return this.buildCall(method, data)
+  }
 
+  public buildCall (method: string, data: any): Promise<any> {
     const txObj = new IconService.IconBuilder.CallBuilder()
       .to(this.address)
-      .method(data['method'])
+      .method(method)
       .params(data['params'])
       .build()
 
     return this.iconService.call(txObj).execute()
   }
 
-  public buildSend (method: string, wallet: Wallet, ...args: any): Promise<any> {
+  public buildSendArray (method: string, wallet: Wallet, ...args: any): Promise<any> {
     const data = this.interface.encodeFunctionData(method, args)
-
-    const txObj = new IconService.IconBuilder.CallTransactionBuilder()
+    return this.buildSend(method, wallet, data)
+  }
+  
+  public buildSend (method: string, wallet: Wallet, data: any): Promise<any> {
+    const txObjBuilder = new IconService.IconBuilder.CallTransactionBuilder()
       .method(method)
       .params(data['params'])
       .from(wallet.getAddress())
       .to(this.address)
-      .stepLimit(IconService.IconConverter.toBigNumber('2000000'))
       .nid(IconService.IconConverter.toBigNumber(this.nid))
       .nonce(IconService.IconConverter.toBigNumber('1'))
       .version(IconService.IconConverter.toBigNumber('3'))
       .timestamp((new Date()).getTime() * 1000)
-      .build()
+    
+    const txObjEstimate = txObjBuilder.build()
 
-    const signedTx = new IconService.SignedTransaction(txObj, wallet)
-    return this.iconService.sendTransaction(signedTx).execute()
+    // estimate step
+    return this.debugService.estimateStep(txObjEstimate).execute().then(steps => {
+      const txObj = txObjBuilder.stepLimit(steps).build()
+      const signedTx = new IconService.SignedTransaction(txObj, wallet)
+      return this.iconService.sendTransaction(signedTx).execute()
+    })
+
   }
 
-  public constructor (poolAddress: string, abi: Record<string, string>, iconService: IconService, nid: number) {
+  public constructor (
+    address: string, 
+    abi: Record<string, string>, 
+    iconService: IconService, 
+    debugService: IconService, 
+    nid: number
+  ) {
     this.iconService = iconService;
+    this.debugService = debugService;
     this.nid = nid;
-    this.address = poolAddress;
-    this.interface = new Interface(abi, poolAddress);
+    this.address = address;
+    this.interface = new Interface(abi, address);
 
     for (const index in this.interface.abi) {
       const obj = this.interface.abi[index];
@@ -63,11 +82,11 @@ export class Contract {
           const name = obj['name']
           // readonly methods
           if ('readonly' in obj && parseInt(obj['readonly'], 16) === 1) {
-            const buildCall = this.buildCall.bind(this, name)
-            defineReadOnly(this, name, buildCall)
+            const buildCallArray = this.buildCallArray.bind(this, name)
+            defineReadOnly(this, name, buildCallArray)
           } else {
-            const buildSend = this.buildSend.bind(this, name)
-            defineReadOnly(this, name, buildSend)
+            const buildSendArray = this.buildSendArray.bind(this, name)
+            defineReadOnly(this, name, buildSendArray)
           }
         } break;
       }
