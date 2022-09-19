@@ -38,7 +38,7 @@ describe('Staker', () => {
 
   describe('#collectRewards', () => {
     it('succeeds with amount', async () => {
-      const { calldata, value } = await Staker.collectRewards(poolFactoryProvider, incentiveKey, {
+      const calldata = await Staker.collectRewards(poolFactoryProvider, incentiveKey, {
         tokenId: tokenId,
         recipient: recipient,
         amount: 1
@@ -83,11 +83,10 @@ describe('Staker', () => {
           }
         }
       ])
-      expect(value).toEqual('0x0')
     })
 
     it('succeeds no amount', async () => {
-      const { calldata, value } = await Staker.collectRewards(poolFactoryProvider, incentiveKey, {
+      const calldata = await Staker.collectRewards(poolFactoryProvider, incentiveKey, {
         tokenId: tokenId,
         recipient: recipient
       })
@@ -133,11 +132,10 @@ describe('Staker', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
 
     it('succeeds multiple keys', async () => {
-      const { calldata, value } = await Staker.collectRewards(poolFactoryProvider, incentiveKeys, {
+      const calldata = await Staker.collectRewards(poolFactoryProvider, incentiveKeys, {
         tokenId: tokenId,
         recipient: recipient
       })
@@ -220,13 +218,12 @@ describe('Staker', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
   })
 
   describe('#withdrawToken', () => {
     it('succeeds with one keys', async () => {
-      const { calldata, value } = await Staker.withdrawToken(poolFactoryProvider, incentiveKey, {
+      const calldata = await Staker.withdrawToken(poolFactoryProvider, incentiveKey, {
         tokenId: tokenId,
         recipient: recipient,
         amount: 0,
@@ -270,11 +267,10 @@ describe('Staker', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
 
     it('succeeds with multiple keys', async () => {
-      const { calldata, value } = await Staker.withdrawToken(poolFactoryProvider, incentiveKeys, {
+      const calldata = await Staker.withdrawToken(poolFactoryProvider, incentiveKeys, {
         tokenId: tokenId,
         recipient: recipient,
         amount: 0,
@@ -341,7 +337,6 @@ describe('Staker', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
   })
 
@@ -373,7 +368,7 @@ describe('Staker', () => {
         tokenId,
         data
       }
-      const { calldata, value } = NonfungiblePositionManager.safeTransferFromParameters(options)
+      const calldata = NonfungiblePositionManager.safeTransferFromParameters(options)
 
       expect(calldata).toStrictEqual(
         [
@@ -389,7 +384,6 @@ describe('Staker', () => {
           }
         ]
       )
-      expect(value).toStrictEqual('0x0')
     })
   })
 })

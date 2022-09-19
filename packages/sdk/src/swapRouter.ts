@@ -1,5 +1,5 @@
-import { BigintIsh, CallData, Interface, MethodParameters, toHex, validateAndParseAddress } from '@convexus/icon-toolkit'
-import { Currency, CurrencyAmount, Icx, Percent, TradeType } from '@convexus/sdk-core'
+import { BigintIsh, CallData, Interface, toHex, validateAndParseAddress } from '@convexus/icon-toolkit'
+import { Currency, Icx, Percent, TradeType } from '@convexus/sdk-core'
 import invariant from 'tiny-invariant'
 import { Trade } from './entities/trade'
 import { ADDRESS_ZERO } from './constants'
@@ -57,7 +57,7 @@ export abstract class SwapRouter {
   public static swapCallParameters(
     trades: Trade<Currency, Currency, TradeType> | Trade<Currency, Currency, TradeType>[],
     options: SwapOptions
-  ): MethodParameters {
+  ): CallData[] {
     if (!Array.isArray(trades)) {
       trades = [trades]
     }
@@ -78,17 +78,17 @@ export abstract class SwapRouter {
 
     const calldatas: CallData[] = []
 
-    const ZERO_IN: CurrencyAmount<Currency> = CurrencyAmount.fromRawAmount(trades[0].inputAmount.currency, 0)
+    // const ZERO_IN: CurrencyAmount<Currency> = CurrencyAmount.fromRawAmount(trades[0].inputAmount.currency, 0)
 
     // flag for whether a refund needs to happen
-    const inputIsNative = sampleTrade.inputAmount.currency.isNative
+    // const inputIsNative = sampleTrade.inputAmount.currency.isNative
     // flags for whether funds should be send first to the router
     const outputIsNative = sampleTrade.outputAmount.currency.isNative
     const routerMustCustody = outputIsNative || !!options.fee
 
-    const totalValue: CurrencyAmount<Currency> = inputIsNative
-      ? trades.reduce((sum, trade) => sum.add(trade.maximumAmountIn(options.slippageTolerance)), ZERO_IN)
-      : ZERO_IN
+    // const totalValue: CurrencyAmount<Currency> = inputIsNative
+    //   ? trades.reduce((sum, trade) => sum.add(trade.maximumAmountIn(options.slippageTolerance)), ZERO_IN)
+    //   : ZERO_IN
 
     const recipient: string = validateAndParseAddress(options.recipient)
     const deadline = toHex(options.deadline)
@@ -118,10 +118,7 @@ export abstract class SwapRouter {
       }
     }
 
-    return {
-      calldata: calldatas,
-      value: toHex(totalValue.quotient)
-    }
+    return calldatas
   }
 
   private static encodeExactOutput (
@@ -146,7 +143,8 @@ export abstract class SwapRouter {
         ]
       ]
 
-      return SwapRouter.INTERFACE.encodeFunctionData(
+      return SwapRouter.INTERFACE.encodeFunctionDataPayable(
+        amountIn,
         'exactOutputIcx',
         exactOutputParams
       )
@@ -172,6 +170,8 @@ export abstract class SwapRouter {
       }]
   
       return SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
+        route.tokenPath[0].address,
+        amountIn,
         'exactOutput',
         exactOutputInputs,
         exactOutputParams
@@ -198,7 +198,8 @@ export abstract class SwapRouter {
         amountOut
       ]]
 
-      return SwapRouter.INTERFACE.encodeFunctionData(
+      return SwapRouter.INTERFACE.encodeFunctionDataPayable(
+        amountIn,
         'exactInputIcx',
         exactInputParams
       )
@@ -224,6 +225,8 @@ export abstract class SwapRouter {
       }]
       
       return SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
+        route.tokenPath[0].address,
+        amountIn,
         'exactInput',
         exactInputInputs,
         exactInputParams
@@ -250,7 +253,8 @@ export abstract class SwapRouter {
         toHex(options.sqrtPriceLimitX96 ?? 0)
       ]]
 
-      return SwapRouter.INTERFACE.encodeFunctionData(
+      return SwapRouter.INTERFACE.encodeFunctionDataPayable(
+        amountIn,
         'exactOutputSingleIcx',
         exactOutputSingleParams
       )
@@ -282,6 +286,8 @@ export abstract class SwapRouter {
       }]
 
       return SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
+        route.tokenPath[0].address,
+        amountIn,
         'exactOutputSingle',
         exactOutputSingleInputs,
         exactOutputSingleParams
@@ -309,7 +315,8 @@ export abstract class SwapRouter {
         ]
       ]
 
-      return SwapRouter.INTERFACE.encodeFunctionData(
+      return SwapRouter.INTERFACE.encodeFunctionDataPayable(
+        amountIn,
         'exactInputSingleIcx',
         exactInputSingleParams
       )
@@ -343,6 +350,8 @@ export abstract class SwapRouter {
       }]
 
       return SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
+        route.tokenPath[0].address,
+        amountIn,
         'exactInputSingle',
         exactInputSingleInputs,
         exactInputSingleParams

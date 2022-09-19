@@ -1,9 +1,11 @@
-import { BigintIsh, CallData, Interface, MethodParameters, toHex, validateAndParseAddress } from '@convexus/icon-toolkit'
+import { BigintIsh, CallData, Interface, toHex, validateAndParseAddress } from '@convexus/icon-toolkit'
 import {
   Percent,
   CurrencyAmount,
   Currency,
-  NativeCurrency
+  NativeCurrency,
+  Token,
+  Icx
 } from '@convexus/sdk-core'
 import JSBI from 'jsbi'
 import invariant from 'tiny-invariant'
@@ -156,7 +158,22 @@ export abstract class NonfungiblePositionManager {
    */
   private constructor() {}
 
-  public static addCallParameters(position: Position, options: AddLiquidityOptions): MethodParameters {
+  public static encodeDeposit (token: Token, amount: BigintIsh): CallData {
+    if (Icx.isWrappedAddress(token.address)) {
+      return NonfungiblePositionManager.INTERFACE.encodeFunctionDataPayable(
+        amount,
+        'depositIcx', []
+      )
+    } else {
+      return NonfungiblePositionManager.INTERFACE.encodeTokenFallbackFunctionData(
+        token.address,
+        amount,
+        'deposit', [], []
+      )
+    }
+  }
+
+  public static addCallParameters(position: Position, options: AddLiquidityOptions): CallData[] {
     invariant(JSBI.greaterThan(position.liquidity, ZERO), 'ZERO_LIQUIDITY')
 
     const calldatas: CallData[] = []
@@ -174,6 +191,16 @@ export abstract class NonfungiblePositionManager {
     // mint
     if (isMint(options)) {
       const recipient: string = validateAndParseAddress(options.recipient)
+      const ZERO = JSBI.BigInt(0)
+
+      // deposit tokens
+      if (JSBI.greaterThan(amount0Desired, ZERO)) {
+        calldatas.push(this.encodeDeposit(position.pool.token0, amount0Desired));
+      }
+      
+      if (JSBI.greaterThan(amount1Desired, ZERO)) {
+        calldatas.push(this.encodeDeposit(position.pool.token1, amount1Desired));
+      }
 
       calldatas.push(
         NonfungiblePositionManager.INTERFACE.encodeFunctionData('mint', [
@@ -208,34 +235,18 @@ export abstract class NonfungiblePositionManager {
       )
     }
 
-    let value: string = toHex(0)
-
     if (options.useNative) {
       const wrapped = options.useNative.wrapped
       invariant(position.pool.token0.equals(wrapped) || position.pool.token1.equals(wrapped), 'NO_WICX')
-
-      // const wrappedValue = position.pool.token0.equals(wrapped) ? amount0Desired : amount1Desired
-      // we only need to refund if we're actually sending ICX
-      // if (JSBI.greaterThan(wrappedValue, ZERO)) {
-      //   calldatas.push(Payments.encodeRefundICX())
-      // }
-      // value = toHex(wrappedValue)
     }
 
-    return {
-      calldata: calldatas,
-      // calldata: Multicall.encodeMulticall(calldatas),
-      value
-    }
+    return calldatas
   }
 
   private static encodeCollect(options: CollectOptions): CallData[] {
     const calldatas: CallData[] = []
 
     const tokenId = toHex(options.tokenId)
-
-    // const involvesICX =
-    //   options.expectedCurrencyOwed0.currency.isNative || options.expectedCurrencyOwed1.currency.isNative
 
     const recipient = validateAndParseAddress(options.recipient)
 
@@ -251,32 +262,13 @@ export abstract class NonfungiblePositionManager {
       ])
     )
 
-    // if (involvesICX) {
-      // const icxAmount = options.expectedCurrencyOwed0.currency.isNative
-      //   ? options.expectedCurrencyOwed0.quotient
-      //   : options.expectedCurrencyOwed1.quotient
-      // const token = options.expectedCurrencyOwed0.currency.isNative
-      //   ? (options.expectedCurrencyOwed1.currency as Token)
-      //   : (options.expectedCurrencyOwed0.currency as Token)
-      // const tokenAmount = options.expectedCurrencyOwed0.currency.isNative
-      //   ? options.expectedCurrencyOwed1.quotient
-      //   : options.expectedCurrencyOwed0.quotient
-
-      // calldatas.push(Payments.encodeUnwrapSICX(icxAmount, recipient))
-      // calldatas.push(Payments.encodeSweepToken(token, tokenAmount, recipient))
-    // }
-
     return calldatas
   }
 
-  public static collectCallParameters(options: CollectOptions): MethodParameters {
+  public static collectCallParameters(options: CollectOptions): CallData[] {
     const calldatas: CallData[] = NonfungiblePositionManager.encodeCollect(options)
 
-    return {
-      calldata: calldatas,
-      // calldata: Multicall.encodeMulticall(calldatas),
-      value: toHex(0)
-    }
+    return calldatas
   }
 
   /**
@@ -285,7 +277,7 @@ export abstract class NonfungiblePositionManager {
    * @param options Additional information necessary for generating the calldata
    * @returns The call parameters
    */
-  public static removeCallParameters(position: Position, options: RemoveLiquidityOptions): MethodParameters {
+  public static removeCallParameters(position: Position, options: RemoveLiquidityOptions): CallData[] {
     const calldatas: CallData[] = []
 
     const deadline = toHex(options.deadline)
@@ -341,14 +333,10 @@ export abstract class NonfungiblePositionManager {
       invariant(options.burnToken !== true, 'CANNOT_BURN')
     }
 
-    return {
-      calldata: calldatas,
-      // calldata: Multicall.encodeMulticall(calldatas),
-      value: toHex(0)
-    }
+    return calldatas
   }
 
-  public static safeTransferFromParameters(options: SafeTransferOptions): MethodParameters {
+  public static safeTransferFromParameters(options: SafeTransferOptions): CallData[] {
     const recipient = validateAndParseAddress(options.recipient)
     const sender = validateAndParseAddress(options.sender)
 
@@ -366,9 +354,7 @@ export abstract class NonfungiblePositionManager {
         ''
       ])
     }
-    return {
-      calldata: [calldata],
-      value: toHex(0)
-    }
+    
+    return [calldata]
   }
 }

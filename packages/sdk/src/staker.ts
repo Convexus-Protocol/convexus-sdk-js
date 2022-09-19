@@ -1,4 +1,4 @@
-import { BigintIsh, CallData, Interface, MethodParameters, toHex, toHexString, validateAndParseAddress } from '@convexus/icon-toolkit'
+import { BigintIsh, CallData, Interface, toHex, toHexString, validateAndParseAddress } from '@convexus/icon-toolkit'
 import { Token } from '@convexus/sdk-core'
 import IConvexusStaker from './artifacts/contracts/ConvexusStaker/ConvexusStaker.json'
 import { Pool, PoolFactoryProvider } from './entities'
@@ -109,7 +109,7 @@ export abstract class Staker {
     poolFactoryProvider: PoolFactoryProvider, 
     incentiveKeys: IncentiveKey | IncentiveKey[], 
     options: ClaimOptions
-  ): Promise<MethodParameters> {
+  ): Promise<CallData[]> {
     incentiveKeys = Array.isArray(incentiveKeys) ? incentiveKeys : [incentiveKeys]
     let calldatas: CallData[] = []
 
@@ -126,11 +126,7 @@ export abstract class Staker {
         ])
       )
     }
-    return {
-      calldata: calldatas,
-      // calldata: Multicall.encodeMulticall(calldatas),
-      value: toHex(0)
-    }
+    return calldatas
   }
 
   /**
@@ -143,7 +139,7 @@ export abstract class Staker {
     poolFactoryProvider: PoolFactoryProvider,
     incentiveKeys: IncentiveKey | IncentiveKey[],
     withdrawOptions: FullWithdrawOptions
-  ): Promise<MethodParameters> {
+  ): Promise<CallData[]> {
     let calldatas: CallData[] = []
 
     incentiveKeys = Array.isArray(incentiveKeys) ? incentiveKeys : [incentiveKeys]
@@ -166,11 +162,7 @@ export abstract class Staker {
         withdrawOptions.data ? withdrawOptions.data : toHex(0)
       ])
     )
-    return {
-      calldata: calldatas,
-      // calldata: Multicall.encodeMulticall(calldatas),
-      value: toHex(0)
-    }
+    return calldatas
   }
 
   /**

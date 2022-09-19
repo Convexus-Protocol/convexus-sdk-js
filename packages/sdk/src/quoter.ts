@@ -1,4 +1,4 @@
-import { BigintIsh, CallData, Interface, MethodParameters, toHex } from '@convexus/icon-toolkit'
+import { BigintIsh, CallData, Interface, toHex } from '@convexus/icon-toolkit'
 import { Currency, CurrencyAmount, TradeType } from '@convexus/sdk-core'
 import { encodeRouteToPath } from './utils'
 import IQuoter from './artifacts/contracts/Quoter/Quoter.json'
@@ -37,7 +37,7 @@ export abstract class SwapQuoter {
     amount: CurrencyAmount<TInput | TOutput>,
     tradeType: TradeType,
     options: QuoteOptions = {}
-  ): MethodParameters {
+  ): CallData[] {
     const singleHop = route.pools.length === 1
     const quoteAmount: string = toHex(amount.quotient)
     let calldata: CallData
@@ -78,9 +78,7 @@ export abstract class SwapQuoter {
         ])
       }
     }
-    return {
-      calldata: [calldata],
-      value: toHex(0)
-    }
+    
+    return [calldata]
   }
 }

@@ -28,7 +28,7 @@ describe('PoolInitializer', () => {
   describe('Create new pool', () => {
     it('succeeds', () => {
       // Pool initializer needs a Pool instance
-      const { calldata, value } = PoolInitializer.createCallParameters(pool_0_1)
+      const calldata = PoolInitializer.createCallParameters(pool_0_1)
 
       expect(calldata).toStrictEqual(
         [
@@ -44,9 +44,6 @@ describe('PoolInitializer', () => {
           }
         ]
       )
-      
-      // No ICX needed to be sent
-      expect(value).toEqual('0x0')
     })
   })
 

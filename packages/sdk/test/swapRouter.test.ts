@@ -50,15 +50,16 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(token0, 100),
           TradeType.EXACT_INPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline
         })
 
-        expect(calldata).toStrictEqual([
+        const unhexPayload = JSON.parse(Buffer.from(calldata[0]["params"]["_data"].replace("0x", ""), "hex").toString())
+
+        expect(unhexPayload).toStrictEqual(
           {
-            "to": "SwapRouter",
             "method": "exactInputSingle",
             "params": {
               "params": {
@@ -73,8 +74,9 @@ describe('SwapRouter', () => {
               }
             }
           }
-        ])
-        expect(value).toBe('0x0')
+        )
+        
+        expect(calldata[0]["params"]["_value"]).toBe("0x64")
       })
 
       it('single-hop exact output', async () => {
@@ -84,15 +86,16 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(token1, 100),
           TradeType.EXACT_OUTPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline
         })
 
-        expect(calldata).toStrictEqual([
+        const unhexPayload = JSON.parse(Buffer.from(calldata[0]["params"]["_data"].replace("0x", ""), "hex").toString())
+
+        expect(unhexPayload).toStrictEqual(
           {
-            "to": "SwapRouter",
             "method": "exactOutputSingle",
             "params": {
               "params": {
@@ -107,8 +110,9 @@ describe('SwapRouter', () => {
               }
             }
           }
-        ])
-        expect(value).toBe('0x0')
+        )
+        
+        expect(calldata[0]["params"]["_value"]).toBe("0x67")
       })
 
       it('ICX in multi-hop exact input', async () => {
@@ -118,7 +122,7 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(ICX, 100),
           TradeType.EXACT_INPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline
@@ -128,6 +132,7 @@ describe('SwapRouter', () => {
           {
             "to": "SwapRouter",
             "method": "exactInputIcx",
+            "value": "0x64",
             "params": {
               "params": {
                 "amountOutMinimum": "0x5f",
@@ -138,38 +143,41 @@ describe('SwapRouter', () => {
             }
           }
         ])
-        expect(value).toBe('0x64')
       })
 
       it('multi-hop exact input', async () => {
+        const amountIn = CurrencyAmount.fromRawAmount(token0, 100);
         const trade = await Trade.fromRoute(
           poolFactoryProvider,
           new Route([pool_0_1, pool_1_wicx], token0, WICX),
-          CurrencyAmount.fromRawAmount(token0, 100),
+          amountIn,
           TradeType.EXACT_INPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline
         })
 
-        expect(calldata).toStrictEqual([
+        const unhexPayload = JSON.parse(Buffer.from(calldata[0]["params"]["_data"].replace("0x", ""), "hex").toString())
+
+        expect(unhexPayload).toStrictEqual(
           {
-            "to": "SwapRouter",
             "method": "exactInput",
             "params": {
               "params": {
-                "amountIn": "0x64",
-                "amountOutMinimum": "0x5f",
-                "deadline": "0x7b",
                 "path": "0x01000000000000000000000000000000000000000100000bb801000000000000000000000000000000000000000200000bb8011111111111111111111111111111111111111111",
-                "recipient": "hx0000000000000000000000000000000000000003"
+                "recipient": "hx0000000000000000000000000000000000000003",
+                "deadline": "0x7b",
+                "amountIn": "0x64",
+                "amountOutMinimum": "0x5f"
               }
             }
           }
-        ])
-        expect(value).toBe('0x0')
+        )
+
+        
+        expect(calldata[0]["params"]["_value"]).toBe("0x" + amountIn.quotient.toString(16))
       })
 
       it('ICX in multi-hop exact output', async () => {
@@ -179,7 +187,7 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(token0, 100),
           TradeType.EXACT_OUTPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline
@@ -189,6 +197,7 @@ describe('SwapRouter', () => {
           {
             "to": "SwapRouter",
             "method": "exactOutputIcx",
+            "value": "0x69",
             "params": {
               "params": {
                 "amountOut": "0x64",
@@ -199,7 +208,6 @@ describe('SwapRouter', () => {
             }
           }
         ])
-        expect(value).toBe('0x69')
       })
 
       it('multi-hop exact output', async () => {
@@ -209,15 +217,16 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(WICX, 100),
           TradeType.EXACT_OUTPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline
         })
 
-        expect(calldata).toStrictEqual([
+        const unhexPayload = JSON.parse(Buffer.from(calldata[0]["params"]["_data"].replace("0x", ""), "hex").toString())
+
+        expect(unhexPayload).toStrictEqual(
           {
-            "to": "SwapRouter",
             "method": "exactOutput",
             "params": {
               "params": {
@@ -229,8 +238,10 @@ describe('SwapRouter', () => {
               }
             }
           }
-        ])
-        expect(value).toBe('0x0')
+        )
+
+        
+        expect(calldata[0]["params"]["_value"]).toBe("0x69")
       })
 
       it('ICX in exact input', async () => {
@@ -240,7 +251,7 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(ICX, 100),
           TradeType.EXACT_INPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline
@@ -250,6 +261,7 @@ describe('SwapRouter', () => {
           {
             "to": "SwapRouter",
             "method": "exactInputSingleIcx",
+            "value": "0x64",
             "params": {
               "params": {
                 "amountOutMinimum": "0x61",
@@ -262,7 +274,6 @@ describe('SwapRouter', () => {
             }
           }
         ])
-        expect(value).toBe('0x64')
       })
 
       it('ICX in exact output', async () => {
@@ -272,7 +283,7 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(token1, 100),
           TradeType.EXACT_OUTPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline
@@ -282,6 +293,7 @@ describe('SwapRouter', () => {
           {
             "to": "SwapRouter",
             "method": "exactOutputSingleIcx",
+            "value": "0x67",
             "params": {
               "params": {
                 "amountOut": "0x64",
@@ -294,7 +306,6 @@ describe('SwapRouter', () => {
             }
           }
         ])
-        expect(value).toBe('0x67')
       })
 
       it('ICX out exact input', async () => {
@@ -304,15 +315,16 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(token1, 100),
           TradeType.EXACT_INPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline
         })
 
-        expect(calldata).toStrictEqual([
+        const unhexPayload = JSON.parse(Buffer.from(calldata[0]["params"]["_data"].replace("0x", ""), "hex").toString())
+
+        expect(unhexPayload).toStrictEqual(
           {
-            "to": "SwapRouter",
             "method": "exactInputSingle",
             "params": {
               "params": {
@@ -327,8 +339,9 @@ describe('SwapRouter', () => {
               }
             }
           }
-        ])
-        expect(value).toBe('0x0')
+        )
+        
+        expect(calldata[0]["params"]["_value"]).toBe("0x64")
       })
 
       it('ICX out exact output', async () => {
@@ -338,15 +351,16 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(ICX, 100),
           TradeType.EXACT_OUTPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline
         })
 
-        expect(calldata).toStrictEqual([
+        const unhexPayload = JSON.parse(Buffer.from(calldata[0]["params"]["_data"].replace("0x", ""), "hex").toString())
+
+        expect(unhexPayload).toStrictEqual(
           {
-            "to": "SwapRouter",
             "method": "exactOutputSingle",
             "params": {
               "params": {
@@ -361,8 +375,9 @@ describe('SwapRouter', () => {
               }
             }
           }
-        ])
-        expect(value).toBe('0x0')
+        )
+        
+        expect(calldata[0]["params"]["_value"]).toBe("0x67")
       })
 
       it('sqrtPriceLimitX96', async () => {
@@ -372,16 +387,17 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(token0, 100),
           TradeType.EXACT_INPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline,
           sqrtPriceLimitX96: JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(128))
         })
 
-        expect(calldata).toStrictEqual([
+        const unhexPayload = JSON.parse(Buffer.from(calldata[0]["params"]["_data"].replace("0x", ""), "hex").toString())
+
+        expect(unhexPayload).toStrictEqual(
           {
-            "to": "SwapRouter",
             "method": "exactInputSingle",
             "params": {
               "params": {
@@ -396,8 +412,9 @@ describe('SwapRouter', () => {
               }
             }
           }
-        ])
-        expect(value).toBe('0x0')
+        )
+        
+        expect(calldata[0]["params"]["_value"]).toBe("0x64")
       })
 
       it('fee with icx out', async () => {
@@ -407,7 +424,8 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(token1, 100),
           TradeType.EXACT_INPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline,
@@ -417,9 +435,10 @@ describe('SwapRouter', () => {
           }
         })
 
-        expect(calldata).toStrictEqual([
+        const unhexPayload = JSON.parse(Buffer.from(calldata[0]["params"]["_data"].replace("0x", ""), "hex").toString())
+
+        expect(unhexPayload).toStrictEqual(
           {
-            "to": "SwapRouter",
             "method": "exactInputSingle",
             "params": {
                 "params": {
@@ -434,8 +453,9 @@ describe('SwapRouter', () => {
                 }
             }
           }
-        ])
-        expect(value).toBe('0x0')
+        )
+        
+        expect(calldata[0]["params"]["_value"]).toBe("0x64")
       })
 
       it('fee with icx in using exact output', async () => {
@@ -445,7 +465,7 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(token1, 10),
           TradeType.EXACT_OUTPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline,
@@ -459,6 +479,7 @@ describe('SwapRouter', () => {
           {
             "to": "SwapRouter",
             "method": "exactOutputSingleIcx",
+            "value": "0xc",
             "params": {
               "params": {
                 "amountOut": "0xa",
@@ -471,7 +492,6 @@ describe('SwapRouter', () => {
             }
           }
         ])
-        expect(value).toBe('0xc')
       })
 
       it('fee', async () => {
@@ -481,7 +501,7 @@ describe('SwapRouter', () => {
           CurrencyAmount.fromRawAmount(token0, 100),
           TradeType.EXACT_INPUT
         )
-        const { calldata, value } = SwapRouter.swapCallParameters(trade, {
+        const calldata = SwapRouter.swapCallParameters(trade, {
           slippageTolerance,
           recipient,
           deadline,
@@ -491,9 +511,10 @@ describe('SwapRouter', () => {
           }
         })
 
-        expect(calldata).toStrictEqual([
+        const unhexPayload = JSON.parse(Buffer.from(calldata[0]["params"]["_data"].replace("0x", ""), "hex").toString())
+
+        expect(unhexPayload).toStrictEqual(
           {
-            "to": "SwapRouter",
             "method": "exactInputSingle",
             "params": {
               "params": {
@@ -508,8 +529,9 @@ describe('SwapRouter', () => {
               }
             }
           }
-        ])
-        expect(value).toBe('0x0')
+        )
+        
+        expect(calldata[0]["params"]["_value"]).toBe("0x64")
       })
     })
   })

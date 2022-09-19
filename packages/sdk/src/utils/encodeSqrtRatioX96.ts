@@ -1,6 +1,6 @@
 import JSBI from 'jsbi'
 import { BigintIsh } from '@convexus/icon-toolkit'
-import { sqrt } from '@convexus/sdk-core'
+import { Price, Currency, sqrt } from '@convexus/sdk-core'
 
 /**
  * Returns the sqrt ratio as a Q64.96 corresponding to a given ratio of amount1 and amount0
@@ -14,4 +14,8 @@ export function encodeSqrtRatioX96(amount1: BigintIsh, amount0: BigintIsh): JSBI
   const denominator = JSBI.BigInt(amount0)
   const ratioX192 = JSBI.divide(numerator, denominator)
   return sqrt(ratioX192)
+}
+
+export function encodeSqrtRatioX96FromPrice(price: Price<Currency, Currency>): JSBI {
+  return encodeSqrtRatioX96(price.denominator, price.numerator)
 }

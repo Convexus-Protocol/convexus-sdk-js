@@ -1,6 +1,9 @@
 import { validateAndParseAddress } from './validateAndParseAddress'
 import invariant from 'tiny-invariant'
 import { toHex } from './calldata'
+import IconService from "icon-sdk-js";
+import { BigintIsh } from './constants';
+import JSBI from 'jsbi';
 
 export type CallData = {[key: string] : any}
 
@@ -61,9 +64,10 @@ export class Interface {
     return result
   }
 
-  public encodeFunctionData (
+  public encodeFunctionDataPayable (
+    icxAmount: BigintIsh,
     method: string, 
-    values?: Array<String|number|[]|{}>
+    values: Array<String|number|[]|{}>
   ): CallData {
     const abiObject = this.getAbiObject(method)
     const inputs: [] = abiObject['inputs']
@@ -75,34 +79,61 @@ export class Interface {
     invariant(inputs.length == values?.length, `INVALID_ARGS_COUNT (expected ${inputs.length}, got ${values?.length})`)
     var payload: any = {
       "to": this.contractAddress,
-      "method": method,
-      "params": {}
+      "method": method
     }
 
-    for (const index in inputs) {
-      payload["params"] = Object.assign(payload["params"], this.buildParam(values[index], inputs[index]))
+    if (icxAmount && JSBI.greaterThan(JSBI.BigInt(icxAmount), JSBI.BigInt(0))) {
+      payload["value"] = toHex(icxAmount)
+    }
+
+    if (inputs.length > 0) {
+      payload["params"] = {}
+      for (const index in inputs) {
+        payload["params"] = Object.assign(payload["params"], this.buildParam(values[index], inputs[index]))
+      }
     }
 
     return payload
   }
   
-  encodeTokenFallbackFunctionData (
+  public encodeFunctionData (
+    method: string, 
+    values: Array<String|number|[]|{}>
+  ): CallData {
+    return this.encodeFunctionDataPayable("0", method, values);
+  }
+  
+  public encodeTokenFallbackFunctionData (
+    token: string,
+    amount: BigintIsh,
     method: string,
     inputs: Array<{}>,
     values: Array<{}>,
   ): CallData {
     invariant(inputs.length == values.length, `INVALID_ARGS_COUNT (expected ${inputs.length}, got ${values?.length})`)
     
-    var payload: any = {
-      "to": this.contractAddress,
+    var tokenFallbackPayload: any = {
       "method": method,
       "params": {}
     }
 
-    for (const index in inputs) {
-      payload["params"] = Object.assign(payload["params"], this.buildParam(values[index], inputs[index]))
+    if (inputs.length > 0) {
+      tokenFallbackPayload["params"] = {}
+      for (const index in inputs) {
+        tokenFallbackPayload["params"] = Object.assign(tokenFallbackPayload["params"], this.buildParam(values[index], inputs[index]))
+      }
     }
     
+    var payload: any = {
+      "to": token,
+      "method": "transfer",
+      "params": {
+        "_to": this.contractAddress,
+        "_value": toHex(amount),
+        "_data": IconService.IconConverter.toHex(JSON.stringify(tokenFallbackPayload))
+      }
+    }
+
     return payload
   }
 }

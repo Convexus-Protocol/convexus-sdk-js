@@ -26,7 +26,6 @@ export class Route<TInput extends Currency, TOutput extends Currency> {
     invariant(pools.length > 0, 'POOLS')
 
     const wrappedInput = input.wrapped
-    console.log(pools[0])
     invariant(pools[0].involvesToken(wrappedInput), 'INPUT')
 
     invariant(pools[pools.length - 1].involvesToken(output.wrapped), 'OUTPUT')

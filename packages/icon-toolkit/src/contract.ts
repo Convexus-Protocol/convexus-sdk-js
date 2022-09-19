@@ -1,5 +1,6 @@
 import IconService from "icon-sdk-js";
 import Wallet from "icon-sdk-js/build/Wallet";
+import { BigintIsh } from "./constants";
 import { Interface } from "./interface";
 
 type ContractFunction<T = any> = (...args: Array<any>) => Promise<T>;
@@ -36,11 +37,19 @@ export class Contract {
   }
 
   public buildSendArray (method: string, wallet: Wallet, ...args: any): Promise<any> {
-    const data = this.interface.encodeFunctionData(method, args)
+    return this.buildSendArrayPayable(method, "0", wallet, args)
+  }
+
+  public buildSendArrayPayable (method: string, icxAmount: string, wallet: Wallet, ...args: any): Promise<any> {
+    const data = this.interface.encodeFunctionDataPayable(icxAmount, method, args)
     return this.buildSend(method, wallet, data)
   }
   
   public buildSend (method: string, wallet: Wallet, data: any): Promise<any> {
+    return this.buildSendPayable(method, "0", wallet, data)
+  }
+
+  public buildSendPayable (method: string, icxAmount: BigintIsh, wallet: Wallet, data: any): Promise<any> {
     const txObjBuilder = new IconService.IconBuilder.CallTransactionBuilder()
       .method(method)
       .params(data['params'])
@@ -59,7 +68,6 @@ export class Contract {
       const signedTx = new IconService.SignedTransaction(txObj, wallet)
       return this.iconService.sendTransaction(signedTx).execute()
     })
-
   }
 
   public constructor (

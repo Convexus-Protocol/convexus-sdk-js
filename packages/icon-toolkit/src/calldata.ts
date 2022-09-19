@@ -10,10 +10,6 @@ export interface MethodParameters {
    * The calldata to perform the given operation
    */
   calldata: CallData[]
-  /**
-   * The amount of ICX (in loops) to send in hex.
-   */
-  value: string
 }
 
 /**

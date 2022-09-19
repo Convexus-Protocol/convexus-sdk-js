@@ -60,7 +60,7 @@ describe('NonfungiblePositionManager', () => {
     })
 
     it('succeeds for mint', () => {
-      const { calldata, value } = NonfungiblePositionManager.addCallParameters(
+      const calldata = NonfungiblePositionManager.addCallParameters(
         new Position({
           pool: pool_0_1,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -70,30 +70,45 @@ describe('NonfungiblePositionManager', () => {
         { recipient, slippageTolerance, deadline }
       )
 
-      expect(calldata).toStrictEqual(
-        [
-          {
-            "to": "NonfungiblePositionManager",
-            "method": "mint",
-            "params": {
-              "params": {
-                "amount0Desired": "0x1",
-                "amount0Min": "0x0",
-                "amount1Desired": "0x1",
-                "amount1Min": "0x0",
-                "deadline": "0x7b",
-                "fee": "0xbb8",
-                "recipient": "hx0000000000000000000000000000000000000003",
-                "tickLower": "-0x3c",
-                "tickUpper": "0x3c",
-                "token0": "cx0000000000000000000000000000000000000001",
-                "token1": "cx0000000000000000000000000000000000000002"
-              }
-            }
+      expect(calldata[0]).toStrictEqual({
+        "method": "transfer",
+        "params": {
+            "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+            "_to": "NonfungiblePositionManager",
+            "_value": "0x1"
+        },
+        "to": "cx0000000000000000000000000000000000000001"
+      })
+
+      expect(calldata[1]).toStrictEqual({
+          "method": "transfer",
+          "params": {
+              "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+              "_to": "NonfungiblePositionManager",
+              "_value": "0x1"
+          },
+          "to": "cx0000000000000000000000000000000000000002"
+       })
+
+      expect(calldata[2]).toStrictEqual({
+        "to": "NonfungiblePositionManager",
+        "method": "mint",
+        "params": {
+          "params": {
+            "amount0Desired": "0x1",
+            "amount0Min": "0x0",
+            "amount1Desired": "0x1",
+            "amount1Min": "0x0",
+            "deadline": "0x7b",
+            "fee": "0xbb8",
+            "recipient": "hx0000000000000000000000000000000000000003",
+            "tickLower": "-0x3c",
+            "tickUpper": "0x3c",
+            "token0": "cx0000000000000000000000000000000000000001",
+            "token1": "cx0000000000000000000000000000000000000002"
           }
-        ]
-      )
-      expect(value).toEqual('0x0')
+        }
+      })
     })
 
     it('succeeds for mint pool CRV/WETH', () => {
@@ -128,7 +143,7 @@ describe('NonfungiblePositionManager', () => {
       const tickLower = nearestUsableTick(priceToClosestTick(new Price(token1, token2, 1, lowerBoundPrice)), TICK_SPACINGS[highFee])
       const tickUpper = nearestUsableTick(priceToClosestTick(new Price(token1, token2, 1, higherBoundPrice)), TICK_SPACINGS[highFee])
 
-      const { calldata, value } = NonfungiblePositionManager.addCallParameters(
+      const calldata = NonfungiblePositionManager.addCallParameters(
         new Position({
           pool: pool_1_2,
           tickLower: tickLower,
@@ -138,34 +153,51 @@ describe('NonfungiblePositionManager', () => {
         { recipient, slippageTolerance, deadline }
       )
 
-      expect(calldata).toStrictEqual(
-        [
-          {
-            "to": "NonfungiblePositionManager",
-            "method": "mint",
+      expect(calldata[0]).toStrictEqual({
+        "method": "transfer",
+        "params": {
+            "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+            "_to": "NonfungiblePositionManager",
+            "_value": "0xde5e8740bb55a8a"
+        },
+        "to": "cx0000000000000000000000000000000000000002"
+      })
+
+      expect(calldata[1]).toStrictEqual({
+          "method": "transfer",
+          "params": {
+              "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+              "_to": "NonfungiblePositionManager",
+              "_value": "0x5726f15f7a74a5b555"
+          },
+          "to": "cx0000000000000000000000000000000000000003"
+       })
+
+      expect(calldata[2]).toStrictEqual(
+        {
+          "to": "NonfungiblePositionManager",
+          "method": "mint",
+          "params": {
             "params": {
-              "params": {
-                "amount0Desired": "0xde5e8740bb55a8a", // 1.0014620772700884
-                "amount0Min": "0xd67824c75ca970c", // 0.9658839099995973
-                "amount1Desired": "0x5726f15f7a74a5b555", // 1607.6728634351073
-                "amount1Min": "0x547e5f6be63db8890e", // 1558.632617799791
-                "deadline": "0x7b",
-                "fee": "0x2710", // 1%
-                "recipient": "hx0000000000000000000000000000000000000003",
-                "tickLower": "0x10bf8",
-                "tickUpper": "0x125c0",
-                "token0": "cx0000000000000000000000000000000000000002",
-                "token1": "cx0000000000000000000000000000000000000003"
-              }
+              "amount0Desired": "0xde5e8740bb55a8a", // 1.0014620772700884
+              "amount0Min": "0xd67824c75ca970c", // 0.9658839099995973
+              "amount1Desired": "0x5726f15f7a74a5b555", // 1607.6728634351073
+              "amount1Min": "0x547e5f6be63db8890e", // 1558.632617799791
+              "deadline": "0x7b",
+              "fee": "0x2710", // 1%
+              "recipient": "hx0000000000000000000000000000000000000003",
+              "tickLower": "0x10bf8",
+              "tickUpper": "0x125c0",
+              "token0": "cx0000000000000000000000000000000000000002",
+              "token1": "cx0000000000000000000000000000000000000003"
             }
           }
-        ]
+        }
       )
-      expect(value).toEqual('0x0')
     })
 
     it('succeeds for full range', () => {
-      const { calldata, value } = NonfungiblePositionManager.addCallParameters(
+      const calldata = NonfungiblePositionManager.addCallParameters(
         new Position({
           pool: pool_0_1,
           tickLower: nearestUsableTick(TickMath.MIN_TICK, TICK_SPACINGS[fee]),
@@ -175,34 +207,51 @@ describe('NonfungiblePositionManager', () => {
         { recipient, slippageTolerance, deadline }
       )
 
-      expect(calldata).toStrictEqual(
-        [
-          {
-            "to": "NonfungiblePositionManager",
-            "method": "mint",
+      expect(calldata[0]).toStrictEqual({
+        "method": "transfer",
+        "params": {
+            "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+            "_to": "NonfungiblePositionManager",
+            "_value": "0x1"
+        },
+        "to": "cx0000000000000000000000000000000000000001"
+      })
+
+      expect(calldata[1]).toStrictEqual({
+          "method": "transfer",
+          "params": {
+              "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+              "_to": "NonfungiblePositionManager",
+              "_value": "0x1"
+          },
+          "to": "cx0000000000000000000000000000000000000002"
+       })
+
+      expect(calldata[2]).toStrictEqual(
+        {
+          "to": "NonfungiblePositionManager",
+          "method": "mint",
+          "params": {
             "params": {
-              "params": {
-                "amount0Desired": "0x1",
-                "amount0Min": "0x1",
-                "amount1Desired": "0x1",
-                "amount1Min": "0x1",
-                "deadline": "0x7b",
-                "fee": "0xbb8",
-                "recipient": "hx0000000000000000000000000000000000000003",
-                "tickLower": "-0xd89b4",
-                "tickUpper": "0xd89b4",
-                "token0": "cx0000000000000000000000000000000000000001",
-                "token1": "cx0000000000000000000000000000000000000002"
-              }
+              "amount0Desired": "0x1",
+              "amount0Min": "0x1",
+              "amount1Desired": "0x1",
+              "amount1Min": "0x1",
+              "deadline": "0x7b",
+              "fee": "0xbb8",
+              "recipient": "hx0000000000000000000000000000000000000003",
+              "tickLower": "-0xd89b4",
+              "tickUpper": "0xd89b4",
+              "token0": "cx0000000000000000000000000000000000000001",
+              "token1": "cx0000000000000000000000000000000000000002"
             }
           }
-        ]
+        }
       )
-      expect(value).toEqual('0x0')
     })
 
     it('succeeds for full range high fee', () => {
-      const { calldata, value } = NonfungiblePositionManager.addCallParameters(
+      const calldata = NonfungiblePositionManager.addCallParameters(
         new Position({
           pool: pool_0_1_fee_high,
           tickLower: nearestUsableTick(TickMath.MIN_TICK, TICK_SPACINGS[feeHigh]),
@@ -212,34 +261,51 @@ describe('NonfungiblePositionManager', () => {
         { recipient, slippageTolerance, deadline }
       )
 
-      expect(calldata).toStrictEqual(
-        [
-          {
-            "to": "NonfungiblePositionManager",
-            "method": "mint",
+      expect(calldata[0]).toStrictEqual({
+        "method": "transfer",
+        "params": {
+            "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+            "_to": "NonfungiblePositionManager",
+            "_value": "0x1"
+        },
+        "to": "cx0000000000000000000000000000000000000001"
+      })
+
+      expect(calldata[1]).toStrictEqual({
+          "method": "transfer",
+          "params": {
+              "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+              "_to": "NonfungiblePositionManager",
+              "_value": "0x1"
+          },
+          "to": "cx0000000000000000000000000000000000000002"
+       })
+
+      expect(calldata[2]).toStrictEqual(
+        {
+          "to": "NonfungiblePositionManager",
+          "method": "mint",
+          "params": {
             "params": {
-              "params": {
-                "amount0Desired": "0x1",
-                "amount0Min": "0x1",
-                "amount1Desired": "0x1",
-                "amount1Min": "0x1",
-                "deadline": "0x7b",
-                "fee": "0xbb8",
-                "recipient": "hx0000000000000000000000000000000000000003",
-                "tickLower": "-0xd89b4",
-                "tickUpper": "0xd89b4",
-                "token0": "cx0000000000000000000000000000000000000001",
-                "token1": "cx0000000000000000000000000000000000000002"
-              }
+              "amount0Desired": "0x1",
+              "amount0Min": "0x1",
+              "amount1Desired": "0x1",
+              "amount1Min": "0x1",
+              "deadline": "0x7b",
+              "fee": "0xbb8",
+              "recipient": "hx0000000000000000000000000000000000000003",
+              "tickLower": "-0xd89b4",
+              "tickUpper": "0xd89b4",
+              "token0": "cx0000000000000000000000000000000000000001",
+              "token1": "cx0000000000000000000000000000000000000002"
             }
           }
-        ]
+        }
       )
-      expect(value).toEqual('0x0')
     })
 
     it('succeeds for increase', () => {
-      const { calldata, value } = NonfungiblePositionManager.addCallParameters(
+      const calldata = NonfungiblePositionManager.addCallParameters(
         new Position({
           pool: pool_0_1,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -267,11 +333,10 @@ describe('NonfungiblePositionManager', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
  
     it('useNative', () => {
-      const { calldata, value } = NonfungiblePositionManager.addCallParameters(
+      const calldata = NonfungiblePositionManager.addCallParameters(
         new Position({
           pool: pool_1_wicx,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -281,36 +346,49 @@ describe('NonfungiblePositionManager', () => {
         { recipient, slippageTolerance, deadline, useNative: ICX }
       )
 
-      expect(calldata).toStrictEqual(
-        [
-          {
-            "to": "NonfungiblePositionManager",
-            "method": "mint",
+      expect(calldata[0]).toStrictEqual({
+        "method": "transfer",
+        "params": {
+            "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+            "_to": "NonfungiblePositionManager",
+            "_value": "0x1"
+        },
+        "to": "cx0000000000000000000000000000000000000002"
+      })
+
+      expect(calldata[1]).toStrictEqual({
+          "to": "NonfungiblePositionManager",
+          "method": "depositIcx",
+          "value": "0x1"
+        })
+
+      expect(calldata[2]).toStrictEqual(
+        {
+          "to": "NonfungiblePositionManager",
+          "method": "mint",
+          "params": {
             "params": {
-              "params": {
-                "amount0Desired": "0x1",
-                "amount0Min": "0x0",
-                "amount1Desired": "0x1",
-                "amount1Min": "0x0",
-                "deadline": "0x7b",
-                "fee": "0xbb8",
-                "recipient": "hx0000000000000000000000000000000000000003",
-                "tickLower": "-0x3c",
-                "tickUpper": "0x3c",
-                "token0": "cx0000000000000000000000000000000000000002",
-                "token1": "cx1111111111111111111111111111111111111111"
-              }
+              "amount0Desired": "0x1",
+              "amount0Min": "0x0",
+              "amount1Desired": "0x1",
+              "amount1Min": "0x0",
+              "deadline": "0x7b",
+              "fee": "0xbb8",
+              "recipient": "hx0000000000000000000000000000000000000003",
+              "tickLower": "-0x3c",
+              "tickUpper": "0x3c",
+              "token0": "cx0000000000000000000000000000000000000002",
+              "token1": "cx1111111111111111111111111111111111111111"
             }
           }
-        ]
+        }
       )
-      expect(value).toEqual('0x0')
     })
   })
 
   describe('#collectCallParameters', () => {
     it('works', () => {
-      const { calldata, value } = NonfungiblePositionManager.collectCallParameters({
+      const calldata = NonfungiblePositionManager.collectCallParameters({
         tokenId,
         expectedCurrencyOwed0: CurrencyAmount.fromRawAmount(token0, 0),
         expectedCurrencyOwed1: CurrencyAmount.fromRawAmount(token1, 0),
@@ -333,11 +411,10 @@ describe('NonfungiblePositionManager', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
 
     it('works with ICX', () => {
-      const { calldata, value } = NonfungiblePositionManager.collectCallParameters({
+      const calldata = NonfungiblePositionManager.collectCallParameters({
         tokenId,
         expectedCurrencyOwed0: CurrencyAmount.fromRawAmount(token1, 0),
         expectedCurrencyOwed1: CurrencyAmount.fromRawAmount(ICX, 0),
@@ -360,7 +437,6 @@ describe('NonfungiblePositionManager', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
   })
 
@@ -439,7 +515,7 @@ describe('NonfungiblePositionManager', () => {
     })
 
     it('works', () => {
-      const { calldata, value } = NonfungiblePositionManager.removeCallParameters(
+      const calldata = NonfungiblePositionManager.removeCallParameters(
         new Position({
           pool: pool_0_1,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -488,11 +564,10 @@ describe('NonfungiblePositionManager', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
 
     it('works for partial', () => {
-      const { calldata, value } = NonfungiblePositionManager.removeCallParameters(
+      const calldata = NonfungiblePositionManager.removeCallParameters(
         new Position({
           pool: pool_0_1,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -541,14 +616,13 @@ describe('NonfungiblePositionManager', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
 
     it('works with ICX', () => {
       const icxAmount = CurrencyAmount.fromRawAmount(ICX, 0)
       const tokenAmount = CurrencyAmount.fromRawAmount(token1, 0)
 
-      const { calldata, value } = NonfungiblePositionManager.removeCallParameters(
+      const calldata = NonfungiblePositionManager.removeCallParameters(
         new Position({
           pool: pool_1_wicx,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -597,14 +671,13 @@ describe('NonfungiblePositionManager', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
 
     it('works for partial with ICX', () => {
       const icxAmount = CurrencyAmount.fromRawAmount(ICX, 0)
       const tokenAmount = CurrencyAmount.fromRawAmount(token1, 0)
 
-      const { calldata, value } = NonfungiblePositionManager.removeCallParameters(
+      const calldata = NonfungiblePositionManager.removeCallParameters(
         new Position({
           pool: pool_1_wicx,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -653,7 +726,6 @@ describe('NonfungiblePositionManager', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
   })
   
@@ -664,7 +736,7 @@ describe('NonfungiblePositionManager', () => {
         recipient,
         tokenId
       }
-      const { calldata, value } = NonfungiblePositionManager.safeTransferFromParameters(options)
+      const calldata = NonfungiblePositionManager.safeTransferFromParameters(options)
 
       expect(calldata).toStrictEqual(
         [
@@ -680,7 +752,6 @@ describe('NonfungiblePositionManager', () => {
           }
       ]
       )
-      expect(value).toEqual('0x0')
     })
     
     it('succeeds data param', () => {
@@ -691,7 +762,7 @@ describe('NonfungiblePositionManager', () => {
         tokenId,
         data
       }
-      const { calldata, value } = NonfungiblePositionManager.safeTransferFromParameters(options)
+      const calldata = NonfungiblePositionManager.safeTransferFromParameters(options)
 
       expect(calldata).toStrictEqual(
         [
@@ -707,7 +778,6 @@ describe('NonfungiblePositionManager', () => {
           }
         ]
       )
-      expect(value).toEqual('0x0')
     })
   })
 })
