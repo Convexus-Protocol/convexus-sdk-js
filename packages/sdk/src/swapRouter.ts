@@ -44,6 +44,10 @@ export interface SwapOptions {
 export abstract class SwapRouter {
   public static INTERFACE: Interface = new Interface(ISwapRouter, "SwapRouter")
 
+  public static setContractAddress (contractAddress: string) {
+    this.INTERFACE = new Interface(ISwapRouter, contractAddress)
+  }
+
   /**
    * Cannot be constructed.
    */

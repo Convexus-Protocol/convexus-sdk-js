@@ -153,6 +153,10 @@ export interface RemoveLiquidityOptions {
 export abstract class NonfungiblePositionManager {
   public static INTERFACE: Interface = new Interface(INonfungiblePositionManager, "NonfungiblePositionManager")
 
+  public static setContractAddress (contractAddress: string) {
+    NonfungiblePositionManager.INTERFACE = new Interface(INonfungiblePositionManager, contractAddress)
+  }
+
   /**
    * Cannot be constructed.
    */

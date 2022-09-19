@@ -67,6 +67,10 @@ export interface WithdrawOptions {
 export abstract class Staker {
   public static INTERFACE: Interface = new Interface(IConvexusStaker, "ConvexusStaker")
 
+  public static setContractAddress (contractAddress: string) {
+    this.INTERFACE = new Interface(IConvexusStaker, contractAddress)
+  }
+
   protected constructor() {}
 
   /**

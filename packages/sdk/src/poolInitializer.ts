@@ -5,6 +5,10 @@ import { Pool } from './entities'
 export abstract class PoolInitializer {
   public static INTERFACE: Interface = new Interface(IPoolInitializer, "PoolInitializer")
 
+  public static setContractAddress (contractAddress: string) {
+    this.INTERFACE = new Interface(IPoolInitializer, contractAddress)
+  }
+
   /**
    * Cannot be constructed.
    */

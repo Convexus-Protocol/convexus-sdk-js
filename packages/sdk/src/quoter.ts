@@ -22,6 +22,10 @@ export interface QuoteOptions {
 export abstract class SwapQuoter {
   public static INTERFACE: Interface = new Interface(IQuoter, "Quoter")
 
+  public static setContractAddress (contractAddress: string) {
+    this.INTERFACE = new Interface(IQuoter, contractAddress)
+  }
+
   /**
    * Produces the on-chain method name of the appropriate function within QuoterV2,
    * and the relevant hex encoded parameters.
