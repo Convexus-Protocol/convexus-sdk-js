@@ -50,10 +50,10 @@ export class Contract {
     return this.buildSendPayable(calldata['method'], icxValue, wallet, calldata['params'])
   }
 
-  public buildSendPayable (method: string, icxAmount: BigintIsh, wallet: Wallet, data: any): Promise<any> {
+  public buildSendPayable (method: string, icxAmount: BigintIsh, wallet: Wallet, params: any): Promise<any> {
     const txObjBuilder = new IconService.IconBuilder.CallTransactionBuilder()
       .method(method)
-      .params(data['params'])
+      .params(params)
       .from(wallet.getAddress())
       .to(this.address)
       .nid(IconService.IconConverter.toBigNumber(this.nid))
