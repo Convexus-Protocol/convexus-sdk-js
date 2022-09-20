@@ -1,6 +1,6 @@
 import IconService from "icon-sdk-js";
 import Wallet from "icon-sdk-js/build/Wallet";
-import { BigintIsh } from "./constants";
+import JSBI from "jsbi";
 import { CallData, Interface } from "./interface";
 
 type ContractFunction<T = any> = (...args: Array<any>) => Promise<T>;
@@ -47,28 +47,43 @@ export class Contract {
 
   public buildSend (wallet: Wallet, calldata: CallData): Promise<any> {
     const icxValue = 'value' in calldata ? calldata["value"] : "0"
-    return this.buildSendPayable(calldata['method'], icxValue, wallet, calldata['params'])
+    return this.buildSendPayable(calldata['to'], calldata['method'], icxValue, wallet, calldata['params'])
   }
 
-  public buildSendPayable (method: string, icxAmount: BigintIsh, wallet: Wallet, params: any): Promise<any> {
+  public async buildSendPayable (to: string, method: string, icxAmount: string, wallet: Wallet, params: any): Promise<any> {
     const txObjBuilder = new IconService.IconBuilder.CallTransactionBuilder()
       .method(method)
       .params(params)
       .from(wallet.getAddress())
-      .to(this.address)
+      .to(to ?? this.address)
       .nid(IconService.IconConverter.toBigNumber(this.nid))
       .nonce(IconService.IconConverter.toBigNumber('1'))
       .version(IconService.IconConverter.toBigNumber('3'))
       .timestamp((new Date()).getTime() * 1000)
+
+    if (icxAmount) {
+      txObjBuilder.value(IconService.IconConverter.toBigNumber(icxAmount))
+    }
     
     const txObjEstimate = txObjBuilder.build()
 
-    // estimate step
-    return this.debugService.estimateStep(txObjEstimate).execute().then(steps => {
-      const txObj = txObjBuilder.stepLimit(steps).build()
-      const signedTx = new IconService.SignedTransaction(txObj, wallet)
-      return this.iconService.sendTransaction(signedTx).execute()
-    })
+    // estimate steps
+    var steps
+    try {
+      steps = await this.debugService.estimateStep(txObjEstimate).execute().catch(e => {
+        return 400_000_000
+      })
+    } catch (e) {
+      // Default steps
+      steps = 400_000_000
+    }
+
+    // add some margin
+    steps = JSBI.add(JSBI.BigInt(steps), JSBI.BigInt(100_000))
+
+    const txObj = txObjBuilder.stepLimit(steps.toString()).build()
+    const signedTx = new IconService.SignedTransaction(txObj, wallet)
+    return this.iconService.sendTransaction(signedTx).execute()
   }
 
   public constructor (
