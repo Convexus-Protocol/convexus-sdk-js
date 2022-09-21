@@ -305,6 +305,13 @@ describe('NonfungiblePositionManager', () => {
     })
 
     it('succeeds for increase', () => {
+      const oldPosition = new Position({
+        pool: pool_0_1,
+        tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
+        tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
+        liquidity: 0
+      })
+
       const calldata = NonfungiblePositionManager.addCallParameters(
         new Position({
           pool: pool_0_1,
@@ -312,26 +319,44 @@ describe('NonfungiblePositionManager', () => {
           tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
           liquidity: 1
         }),
-        { tokenId, slippageTolerance, deadline }
+        { tokenId, previousPosition: oldPosition, slippageTolerance, deadline }
       )
 
-      expect(calldata).toStrictEqual(
-        [
-          {
-            "to": "NonfungiblePositionManager",
-            "method": "increaseLiquidity",
+      expect(calldata[0]).toStrictEqual({
+        "method": "transfer",
+        "params": {
+            "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+            "_to": "NonfungiblePositionManager",
+            "_value": "0x1"
+        },
+        "to": "cx0000000000000000000000000000000000000001"
+      })
+
+      expect(calldata[1]).toStrictEqual({
+          "method": "transfer",
+          "params": {
+              "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+              "_to": "NonfungiblePositionManager",
+              "_value": "0x1"
+          },
+          "to": "cx0000000000000000000000000000000000000002"
+       })
+
+      expect(calldata[2]).toStrictEqual(
+        {
+          "to": "NonfungiblePositionManager",
+          "method": "increaseLiquidity",
+          "params": {
             "params": {
-              "params": {
-                "amount0Desired": "0x1",
-                "amount0Min": "0x0",
-                "amount1Desired": "0x1",
-                "amount1Min": "0x0",
-                "deadline": "0x7b",
-                "tokenId": "0x1"
-                }
-            }
+              "amount0Desired": "0x1",
+              "amount0Min": "0x0",
+              "amount1Desired": "0x1",
+              "amount1Min": "0x0",
+              "deadline": "0x7b",
+              "tokenId": "0x1"
+              }
           }
-        ]
+        }
       )
     })
  

@@ -26,7 +26,11 @@ export interface IncreaseSpecificOptions {
   /**
    * Indicates the ID of the position to increase liquidity for.
    */
-  tokenId: BigintIsh
+  tokenId: BigintIsh,
+  /**
+   * Previous position associated with the tokenId
+   */
+  previousPosition: Position
 }
 
 /**
@@ -225,6 +229,20 @@ export abstract class NonfungiblePositionManager {
       )
     } else {
       // increase
+
+      // compute delta(new-old) amount of tokens
+      const deltaAmount0 = JSBI.subtract(amount0Desired, options.previousPosition.amount0.quotient)
+      const deltaAmount1 = JSBI.subtract(amount1Desired, options.previousPosition.amount1.quotient)
+
+      // deposit tokens
+      if (JSBI.greaterThan(deltaAmount0, ZERO)) {
+        calldatas.push(this.encodeDeposit(position.pool.token0, deltaAmount0));
+      }
+      
+      if (JSBI.greaterThan(deltaAmount1, ZERO)) {
+        calldatas.push(this.encodeDeposit(position.pool.token1, deltaAmount1));
+      }
+
       calldatas.push(
         NonfungiblePositionManager.INTERFACE.encodeFunctionData('increaseLiquidity', [
           [
