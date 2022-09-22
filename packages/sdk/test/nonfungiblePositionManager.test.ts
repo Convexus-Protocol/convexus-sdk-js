@@ -305,52 +305,56 @@ describe('NonfungiblePositionManager', () => {
     })
 
     it('succeeds for increase', () => {
+      const pool = new Pool(
+        token0, 
+        token1, 
+        FeeAmount.MEDIUM,
+        JSBI.BigInt("0x24eeafd75f26d0000000000000"),
+        JSBI.BigInt("0x131651bddb3edbbd5d"),
+        0x119f9
+      )
+
       const oldPosition = new Position({
-        pool: pool_0_1,
-        tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
-        tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
-        liquidity: 0
+        pool: pool,
+        tickLower: 0x13470,
+        tickUpper: 0x13524,
+        liquidity: JSBI.BigInt("0xfc3dd569f7f82b12e25b1")
+      })
+
+      const newPosition = new Position({
+        pool: pool,
+        tickLower: 0x13470,
+        tickUpper: 0x13524,
+        liquidity: JSBI.BigInt("19087752567891193668198803")
       })
 
       const calldata = NonfungiblePositionManager.addCallParameters(
-        new Position({
-          pool: pool_0_1,
-          tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
-          tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
-          liquidity: 1
-        }),
+        newPosition,
         { tokenId, previousPosition: oldPosition, slippageTolerance, deadline }
       )
+
+      const amount0Delta = newPosition.amount0.subtract(oldPosition.amount0)
+      const expectedValue = "0x" + amount0Delta.quotient.toString(16)
 
       expect(calldata[0]).toStrictEqual({
         "method": "transfer",
         "params": {
             "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
             "_to": "NonfungiblePositionManager",
-            "_value": "0x1"
+            "_value": expectedValue
         },
         "to": "cx0000000000000000000000000000000000000001"
       })
 
-      expect(calldata[1]).toStrictEqual({
-          "method": "transfer",
-          "params": {
-              "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
-              "_to": "NonfungiblePositionManager",
-              "_value": "0x1"
-          },
-          "to": "cx0000000000000000000000000000000000000002"
-       })
-
-      expect(calldata[2]).toStrictEqual(
+      expect(calldata[1]).toStrictEqual(
         {
           "to": "NonfungiblePositionManager",
           "method": "increaseLiquidity",
           "params": {
             "params": {
-              "amount0Desired": "0x1",
-              "amount0Min": "0x0",
-              "amount1Desired": "0x1",
+              "amount0Desired": "0x" + newPosition.amount0.quotient.toString(16),
+              "amount0Min": "0x" + newPosition.amount0.quotient.toString(16),
+              "amount1Desired": "0x0",
               "amount1Min": "0x0",
               "deadline": "0x7b",
               "tokenId": "0x1"

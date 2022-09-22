@@ -75,7 +75,7 @@ export class Position {
             TickMath.getSqrtRatioAtTick(this.tickLower),
             TickMath.getSqrtRatioAtTick(this.tickUpper),
             this.liquidity,
-            false
+            true
           )
         )
       } else if (this.pool.tickCurrent < this.tickUpper) {
@@ -85,7 +85,7 @@ export class Position {
             this.pool.sqrtRatioX96,
             TickMath.getSqrtRatioAtTick(this.tickUpper),
             this.liquidity,
-            false
+            true
           )
         )
       } else {
@@ -109,7 +109,7 @@ export class Position {
             TickMath.getSqrtRatioAtTick(this.tickLower),
             this.pool.sqrtRatioX96,
             this.liquidity,
-            false
+            true
           )
         )
       } else {
@@ -119,7 +119,7 @@ export class Position {
             TickMath.getSqrtRatioAtTick(this.tickLower),
             TickMath.getSqrtRatioAtTick(this.tickUpper),
             this.liquidity,
-            false
+            true
           )
         )
       }

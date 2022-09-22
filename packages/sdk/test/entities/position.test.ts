@@ -116,7 +116,7 @@ describe('Position', () => {
           tickLower: nearestUsableTick(POOL_TICK_CURRENT, TICK_SPACING) + TICK_SPACING,
           tickUpper: nearestUsableTick(POOL_TICK_CURRENT, TICK_SPACING) + TICK_SPACING * 2
         }).amount0.quotient.toString()
-      ).toEqual('49949961958869841')
+      ).toEqual('49949961958869842')
     })
     it('is correct for price below', () => {
       expect(
@@ -136,7 +136,7 @@ describe('Position', () => {
           tickLower: nearestUsableTick(POOL_TICK_CURRENT, TICK_SPACING) - TICK_SPACING * 2,
           tickUpper: nearestUsableTick(POOL_TICK_CURRENT, TICK_SPACING) + TICK_SPACING * 2
         }).amount0.quotient.toString()
-      ).toEqual('120054069145287995769396')
+      ).toEqual('120054069145287995769397')
     })
   })
 
@@ -159,7 +159,7 @@ describe('Position', () => {
           tickLower: nearestUsableTick(POOL_TICK_CURRENT, TICK_SPACING) - TICK_SPACING * 2,
           tickUpper: nearestUsableTick(POOL_TICK_CURRENT, TICK_SPACING) - TICK_SPACING
         }).amount1.quotient.toString()
-      ).toEqual('49970077052')
+      ).toEqual('49970077053')
     })
     it('is correct for in-range position', () => {
       expect(
@@ -169,7 +169,7 @@ describe('Position', () => {
           tickLower: nearestUsableTick(POOL_TICK_CURRENT, TICK_SPACING) - TICK_SPACING * 2,
           tickUpper: nearestUsableTick(POOL_TICK_CURRENT, TICK_SPACING) + TICK_SPACING * 2
         }).amount1.quotient.toString()
-      ).toEqual('79831926242')
+      ).toEqual('79831926243')
     })
   })
 
@@ -272,7 +272,7 @@ describe('Position', () => {
         })
 
         const { amount0, amount1 } = position.burnAmountsWithSlippage(slippageTolerance)
-        expect(amount0.toString()).toEqual('49949961958869841754181')
+        expect(amount0.toString()).toEqual('49949961958869841754182')
         expect(amount1.toString()).toEqual('0')
       })
 
@@ -294,7 +294,7 @@ describe('Position', () => {
 
         const { amount0, amount1 } = position.burnAmountsWithSlippage(slippageTolerance)
         expect(amount0.toString()).toEqual('0')
-        expect(amount1.toString()).toEqual('50045084659')
+        expect(amount1.toString()).toEqual('50045084660')
       })
     })
   })
@@ -312,7 +312,7 @@ describe('Position', () => {
         })
 
         const { amount0, amount1 } = position.burnAmountsWithSlippage(slippageTolerance)
-        expect(amount0.toString()).toEqual('49949961958869841754181')
+        expect(amount0.toString()).toEqual('49949961958869841754182')
         expect(amount1.toString()).toEqual('0')
       })
 
@@ -326,7 +326,7 @@ describe('Position', () => {
 
         const { amount0, amount1 } = position.burnAmountsWithSlippage(slippageTolerance)
         expect(amount0.toString()).toEqual('0')
-        expect(amount1.toString()).toEqual('49970077052')
+        expect(amount1.toString()).toEqual('49970077053')
       })
 
       it('is correct for positions within', () => {
@@ -338,8 +338,8 @@ describe('Position', () => {
         })
 
         const { amount0, amount1 } = position.burnAmountsWithSlippage(slippageTolerance)
-        expect(amount0.toString()).toEqual('120054069145287995769396')
-        expect(amount1.toString()).toEqual('79831926242')
+        expect(amount0.toString()).toEqual('120054069145287995769397')
+        expect(amount1.toString()).toEqual('79831926243')
       })
     })
 
@@ -354,7 +354,7 @@ describe('Position', () => {
           tickUpper: nearestUsableTick(POOL_TICK_CURRENT, TICK_SPACING) + TICK_SPACING * 2
         })
         const { amount0, amount1 } = position.burnAmountsWithSlippage(slippageTolerance)
-        expect(amount0.toString()).toEqual('49949961958869841754181')
+        expect(amount0.toString()).toEqual('49949961958869841754182')
         expect(amount1.toString()).toEqual('0')
       })
 
@@ -367,7 +367,7 @@ describe('Position', () => {
         })
         const { amount0, amount1 } = position.burnAmountsWithSlippage(slippageTolerance)
         expect(amount0.toString()).toEqual('0')
-        expect(amount1.toString()).toEqual('49970077052')
+        expect(amount1.toString()).toEqual('49970077053')
       })
 
       it('is correct for positions within', () => {
@@ -378,8 +378,8 @@ describe('Position', () => {
           tickUpper: nearestUsableTick(POOL_TICK_CURRENT, TICK_SPACING) + TICK_SPACING * 2
         })
         const { amount0, amount1 } = position.burnAmountsWithSlippage(slippageTolerance)
-        expect(amount0.toString()).toEqual('95063440240746211454822')
-        expect(amount1.toString()).toEqual('54828800460')
+        expect(amount0.toString()).toEqual('95063440240746211454823')
+        expect(amount1.toString()).toEqual('54828800461')
       })
     })
 
