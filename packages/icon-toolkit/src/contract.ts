@@ -45,12 +45,12 @@ export class Contract {
     return this.buildSend(wallet, data)
   }
 
-  public buildSend (wallet: Wallet, calldata: CallData): Promise<any> {
+  public buildSend (wallet: Wallet, calldata: CallData, waitForResult?: boolean): Promise<any> {
     const icxValue = 'value' in calldata ? calldata["value"] : "0"
-    return this.buildSendPayable(calldata['to'], calldata['method'], icxValue, wallet, calldata['params'])
+    return this.buildSendPayable(calldata['to'], calldata['method'], icxValue, wallet, calldata['params'], waitForResult)
   }
 
-  public async buildSendPayable (to: string, method: string, icxAmount: string, wallet: Wallet, params: any): Promise<any> {
+  public async buildSendPayable (to: string, method: string, icxAmount: string, wallet: Wallet, params: any, waitForResult?: boolean): Promise<any> {
     const txObjBuilder = new IconService.IconBuilder.CallTransactionBuilder()
       .method(method)
       .params(params)
@@ -83,7 +83,13 @@ export class Contract {
 
     const txObj = txObjBuilder.stepLimit(steps.toString()).build()
     const signedTx = new IconService.SignedTransaction(txObj, wallet)
-    return this.iconService.sendTransaction(signedTx).execute()
+    const txhash = await this.iconService.sendTransaction(signedTx).execute()
+
+    if (waitForResult) {
+      await this.iconService.waitTransactionResult(txhash)
+    }
+
+    return txhash
   }
 
   public constructor (
