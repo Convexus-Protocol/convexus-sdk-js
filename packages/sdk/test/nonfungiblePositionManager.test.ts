@@ -314,13 +314,6 @@ describe('NonfungiblePositionManager', () => {
         0x119f9
       )
 
-      const oldPosition = new Position({
-        pool: pool,
-        tickLower: 0x13470,
-        tickUpper: 0x13524,
-        liquidity: JSBI.BigInt("0xfc3dd569f7f82b12e25b1")
-      })
-
       const newPosition = new Position({
         pool: pool,
         tickLower: 0x13470,
@@ -330,11 +323,10 @@ describe('NonfungiblePositionManager', () => {
 
       const calldata = NonfungiblePositionManager.addCallParameters(
         newPosition,
-        { tokenId, previousPosition: oldPosition, slippageTolerance, deadline }
+        { tokenId, slippageTolerance, deadline }
       )
 
-      const amount0Delta = newPosition.amount0.subtract(oldPosition.amount0)
-      const expectedValue = "0x" + amount0Delta.quotient.toString(16)
+      const expectedValue = "0x" + newPosition.amount0.quotient.toString(16)
 
       expect(calldata[0]).toStrictEqual({
         "method": "transfer",
