@@ -1,16 +1,5 @@
 import { BigintIsh } from './constants'
 import JSBI from 'jsbi'
-import { CallData } from './interface'
-
-/**
- * Generated method parameters for executing a call.
- */
-export interface MethodParameters {
-  /**
-   * The calldata to perform the given operation
-   */
-  calldata: CallData[]
-}
 
 /**
  * Converts a big int to a hex string

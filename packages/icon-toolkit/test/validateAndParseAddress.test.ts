@@ -8,7 +8,7 @@ describe('#validateAndParseAddress', () => {
   })
 
   it('returns address if spaces', () => {
-    expect(validateAndParseAddress('hx23b9aa06f3a0413c40a91591cb8d28319e05bbb9  '.toLowerCase())).toEqual(
+    expect(validateAndParseAddress('  hx23b9aa06f3a0413c40a91591cb8d28319e05bbb9  '.toLowerCase())).toEqual(
       'hx23b9aa06f3a0413c40a91591cb8d28319e05bbb9'
     )
   })
