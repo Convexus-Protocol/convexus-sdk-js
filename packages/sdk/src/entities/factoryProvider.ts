@@ -6,8 +6,10 @@ import { FeeAmount } from '../constants'
  */
 export interface PoolFactoryProvider {
   /**
-   * Return information corresponding to a specific tick
-   * @param tick the tick to load
+   * Return the pool address given pool tokens and fees
+   * @param tokenA First token
+   * @param tokenB Second token
+   * @param fee The pool fee
    */
   getPool (
     tokenA: Token,
