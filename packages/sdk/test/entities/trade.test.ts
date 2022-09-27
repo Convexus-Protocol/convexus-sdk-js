@@ -234,7 +234,7 @@ describe('Trade', () => {
         )
       )
       .rejects
-      .toThrow("INPUT_CURRENCY_MATCH")
+      .toThrow('INPUT_CURRENCY_MATCH')
     })
     it('throws if output currency does not match route', async () => {
       await expect(async () =>

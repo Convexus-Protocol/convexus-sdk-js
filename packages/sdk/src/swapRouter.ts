@@ -82,17 +82,9 @@ export abstract class SwapRouter {
 
     const calldatas: CallData[] = []
 
-    // const ZERO_IN: CurrencyAmount<Currency> = CurrencyAmount.fromRawAmount(trades[0].inputAmount.currency, 0)
-
-    // flag for whether a refund needs to happen
-    // const inputIsNative = sampleTrade.inputAmount.currency.isNative
     // flags for whether funds should be send first to the router
     const outputIsNative = sampleTrade.outputAmount.currency.isNative
     const routerMustCustody = outputIsNative || !!options.fee
-
-    // const totalValue: CurrencyAmount<Currency> = inputIsNative
-    //   ? trades.reduce((sum, trade) => sum.add(trade.maximumAmountIn(options.slippageTolerance)), ZERO_IN)
-    //   : ZERO_IN
 
     const recipient: string = validateAndParseAddress(options.recipient)
     const deadline = toHex(options.deadline)
