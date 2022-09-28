@@ -1,6 +1,6 @@
 {
   "name": "@convexus/sdk",
-  "version": "1.1.45",
+  "version": "1.1.46",
   "description": "Convexus SDK package",
   "main": "dist/index.js",
   "node": "dist/index.js",
