@@ -42,8 +42,8 @@ export class Pool {
   public readonly sqrtRatioX96: JSBI
   public readonly liquidity: JSBI
   public readonly tickCurrent: number
-  public readonly tickDataProvider: TickDataProvider
-  public readonly poolFactoryProvider: PoolFactoryProvider
+  public tickDataProvider: TickDataProvider
+  public poolFactoryProvider: PoolFactoryProvider
 
   private _token0Price?: Price<Token, Token>
   private _token1Price?: Price<Token, Token>
