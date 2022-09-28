@@ -13,6 +13,14 @@ function defineReadOnly<T, K extends keyof T>(object: T, name: K, value: any): v
   });
 }
 
+function parseBigInt (s: string): JSBI {
+  if (s.startsWith('-0x')) {
+      return JSBI.unaryMinus(JSBI.BigInt(s.substring(1)));
+  } else {
+      return JSBI.BigInt(s);
+  }
+};
+
 type OutputTransform = ((x: string) => JSBI) | ((x: string) => Uint8Array) | null
 
 export class Contract {
@@ -129,7 +137,7 @@ export class Contract {
               const output_type = obj['outputs'][0]['type']
               switch (output_type) {
                 case "int":
-                  output_transform = (x: string) => JSBI.BigInt(x);
+                  output_transform = (x: string) => parseBigInt(x);
                 break;
 
                 case "bytes":
