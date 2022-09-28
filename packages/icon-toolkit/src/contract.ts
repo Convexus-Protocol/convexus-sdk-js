@@ -13,6 +13,8 @@ function defineReadOnly<T, K extends keyof T>(object: T, name: K, value: any): v
   });
 }
 
+type OutputTransform = ((x: string) => JSBI) | ((x: string) => Uint8Array) | null
+
 export class Contract {
   readonly [ key: string ]: ContractFunction | any;
   private iconService: IconService;
@@ -21,9 +23,14 @@ export class Contract {
   public address: string;
   private nid: number;
 
-  public buildCallArray (method: string, ...args: any): Promise<any> {
+  public buildCallArray (method: string, output_transform: OutputTransform, ...args: any): Promise<any> {
     const data = this.interface.encodeFunctionData(method, args)
-    return this.buildCall(method, data)
+    return this.buildCall(method, data).then(result => {
+      if (output_transform) {
+        result = output_transform(result);
+      }
+      return result;
+    })
   }
 
   public buildCall (method: string, data: any): Promise<any> {
@@ -36,8 +43,13 @@ export class Contract {
     return this.iconService.call(txObj).execute()
   }
 
-  public buildSendArray (method: string, wallet: Wallet, ...args: any): Promise<any> {
-    return this.buildSendArrayPayable(method, "0", wallet, args)
+  public buildSendArray (method: string, output_transform: OutputTransform, wallet: Wallet, ...args: any): Promise<any> {
+    return this.buildSendArrayPayable(method, "0", wallet, args).then(result => {
+      if (output_transform) {
+        result = output_transform(result);
+      }
+      return result;
+    })
   }
 
   public buildSendArrayPayable (method: string, icxAmount: string, wallet: Wallet, ...args: any): Promise<any> {
@@ -94,7 +106,7 @@ export class Contract {
 
   public constructor (
     address: string, 
-    abi: Record<string, string>, 
+    abi: any, 
     iconService: IconService, 
     debugService: IconService, 
     nid: number
@@ -110,12 +122,30 @@ export class Contract {
       switch (obj['type']) {
         case 'function': {
           const name = obj['name']
+          let output_transform = null
+          if ('outputs' in obj) {
+            const outputs: [] = obj['outputs'];
+            if (outputs.length > 0) {
+              const output_type = obj['outputs'][0]['type']
+              switch (output_type) {
+                case "int":
+                  output_transform = (x: string) => JSBI.BigInt(x);
+                break;
+
+                case "bytes":
+                  output_transform = (x: string) => Uint8Array.from(Buffer.from(x.substring(2), 'hex'));
+                break;
+              }
+            }
+          }
+
           // readonly methods
           if ('readonly' in obj && parseInt(obj['readonly'], 16) === 1) {
-            const buildCallArray = this.buildCallArray.bind(this, name)
+            const buildCallArray = this.buildCallArray.bind(this, name, output_transform)
             defineReadOnly(this, name, buildCallArray)
+            // write methods
           } else {
-            const buildSendArray = this.buildSendArray.bind(this, name)
+            const buildSendArray = this.buildSendArray.bind(this, name, output_transform)
             defineReadOnly(this, name, buildSendArray)
           }
         } break;
