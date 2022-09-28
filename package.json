@@ -8,7 +8,7 @@
     "publish_icon_toolkit": "cd packages/icon-toolkit && yarn bump && yarn pub && cd ../../ && yarn install && yarn bootstrap",
     "publish_sdk_core": "(npx lerna-update-wizard --non-interactive --dependency @convexus/icon-toolkit || true) && cd packages/sdk-core && yarn bump && yarn pub && cd ../../ && yarn install && yarn bootstrap",
     "publish_sdk": "(npx lerna-update-wizard --non-interactive --dependency @convexus/sdk-core || true) && cd packages/sdk && yarn bump && yarn pub",
-    "publish": "yarn run publish_icon_toolkit && yarn run publish_sdk_core && yarn run publish_sdk",
+    "publish": "yarn clean && yarn install && yarn bootstrap && yarn run publish_icon_toolkit && yarn run publish_sdk_core && yarn run publish_sdk",
     "build": "yarn build:ts",
     "build:ts": "tsc -b tsconfig.json",
     "clean": "npx lerna run clean --stream --parallel && npx rimraf -rf coverage node_modules package-lock.json yarn.lock",

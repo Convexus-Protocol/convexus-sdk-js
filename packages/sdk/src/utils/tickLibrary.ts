@@ -1,10 +1,6 @@
 import JSBI from 'jsbi'
 import { ZERO } from '../internalConstants'
-
-interface FeeGrowthOutside {
-  feeGrowthOutside0X128: JSBI
-  feeGrowthOutside1X128: JSBI
-}
+import { FeeGrowthOutside } from '../entities/tick'
 
 const Q256 = JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(256))
 
