@@ -4,7 +4,11 @@
     "rootDir": "src",
     "outDir": "dist"
   },
-  "include": ["src", "../../typings/**/*.d.ts"],
+  "include": [
+    "src", 
+    "src/artifacts/**/*.json", 
+    "../../typings/**/*.d.ts"
+  ],
   "references": [
     { "path": "../icon-toolkit" },
   ]

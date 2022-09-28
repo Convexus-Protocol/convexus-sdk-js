@@ -25,11 +25,11 @@ type OutputTransform = ((x: string) => JSBI) | ((x: string) => Uint8Array) | nul
 
 export class Contract {
   readonly [ key: string ]: ContractFunction | any;
-  private iconService: IconService;
-  private debugService: IconService;
-  private interface: Interface;
+  public iconService: IconService;
+  public debugService: IconService;
+  public interface: Interface;
   public address: string;
-  private nid: number;
+  public nid: number;
 
   public buildCallArray (method: string, output_transform: OutputTransform, ...args: any): Promise<any> {
     const data = this.interface.encodeFunctionData(method, args)

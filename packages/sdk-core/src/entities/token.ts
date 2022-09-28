@@ -1,5 +1,5 @@
 import invariant from 'tiny-invariant'
-import { validateAndParseAddress } from '@convexus/icon-toolkit'
+import { Contract, validateAndParseAddress } from '@convexus/icon-toolkit'
 import { BaseCurrency } from './baseCurrency'
 import { Currency } from './currency'
 
@@ -9,6 +9,16 @@ import { Currency } from './currency'
 export class Token extends BaseCurrency {
   public readonly isNative: false = false
   public readonly isToken: true = true
+
+  public static async fromContract (contract: Contract): Promise<Token> {
+    const [decimals, name, symbol] = await Promise.all ([
+      contract.decimals(), 
+      contract.name(),
+      contract.symbol()
+    ]);
+
+    return new Token(contract.address, decimals, symbol, name);
+  }
 
   /**
    * The contract address on the chain on which this token lives

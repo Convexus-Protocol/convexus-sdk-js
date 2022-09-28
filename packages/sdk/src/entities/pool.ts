@@ -1,8 +1,10 @@
-import { BigintIsh } from '@convexus/icon-toolkit'
-import { Price, Token, CurrencyAmount } from '@convexus/sdk-core'
-import { FeeAmount, TICK_SPACINGS } from '../constants'
 import JSBI from 'jsbi'
 import invariant from 'tiny-invariant'
+
+import { Contract, BigintIsh } from '@convexus/icon-toolkit'
+import { Price, Token, CurrencyAmount } from '@convexus/sdk-core'
+
+import { FeeAmount, TICK_SPACINGS } from '../constants'
 import { NoTickDataProvider, TickDataProvider } from './tickDataProvider'
 import { NoPoolFactoryProvider, PoolFactoryProvider } from './factoryProvider'
 import { Tick, TickConstructorArgs } from './tick'
@@ -11,6 +13,8 @@ import { TickListDataProvider } from './tickListDataProvider'
 import { NEGATIVE_ONE, ONE, Q192, ZERO } from '../internalConstants'
 import { SwapMath } from '../utils/swapMath'
 import { LiquidityMath } from '../utils/liquidityMath'
+import { Slot0 } from './slot0'
+import IIRC2 from '../artifacts/contracts/IRC2/IRC2.json'
 
 interface StepComputations {
   sqrtPriceStartX96: JSBI
@@ -46,6 +50,24 @@ export class Pool {
 
   public static getAddress(poolFactoryProvider: PoolFactoryProvider, tokenA: Token, tokenB: Token, fee: FeeAmount): Promise<string> {
     return poolFactoryProvider.getPool(tokenA, tokenB, fee)
+  }
+
+  public static async fromContract (contract: Contract): Promise<Pool> {
+    const [addr0, addr1, _slot0, fee, liquidity] = await Promise.all([
+      contract.token0(), 
+      contract.token1(), 
+      contract.slot0(),
+      contract.fee(),
+      contract.liquidity()
+    ])
+
+    const slot0 = Slot0.fromCall(_slot0)
+    const [token0, token1] = await Promise.all([
+      Token.fromContract(new Contract(addr0, IIRC2, contract.iconService, contract.debugService, contract.nid)),
+      Token.fromContract(new Contract(addr1, IIRC2, contract.iconService, contract.debugService, contract.nid))
+    ])
+
+    return new Pool(token0, token1, fee, slot0.sqrtPriceX96, liquidity, slot0.tick)
   }
 
   /**
