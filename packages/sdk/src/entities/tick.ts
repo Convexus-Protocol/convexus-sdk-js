@@ -50,9 +50,9 @@ export class Tick {
     this.initialized = initialized
   }
 
-  public static fromCall (index: number, data: any): Tick {
+  public static fromCall (data: any): Tick {
     return new Tick ({
-      index: index,
+      index: parseInt(data['index'], 16),
       liquidityGross: data['liquidityGross'],
       liquidityNet: data['liquidityNet'],
       feeGrowthOutside: {
