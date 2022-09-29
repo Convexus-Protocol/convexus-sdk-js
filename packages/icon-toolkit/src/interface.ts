@@ -57,6 +57,10 @@ export class Interface {
         result[input['name']] = value
       } break
 
+      case "bool": {
+        result[input['name']] = toHex(value ? 1 : 0)
+      } break
+
       default:
         throw new Error("INVALID_PARAM_TYPE: " + inputType)
     }
