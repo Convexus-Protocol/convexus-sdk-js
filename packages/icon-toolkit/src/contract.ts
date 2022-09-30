@@ -41,11 +41,11 @@ export class Contract {
     })
   }
 
-  public buildCall (method: string, data: any): Promise<any> {
+  public buildCall (method: string, calldata: CallData): Promise<any> {
     const txObj = new IconService.IconBuilder.CallBuilder()
       .to(this.address)
       .method(method)
-      .params(data['params'])
+      .params(calldata['params'])
       .build()
 
     return this.iconService.call(txObj).execute()
