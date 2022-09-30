@@ -33,7 +33,7 @@ export class Contract {
 
   public buildCallArray (method: string, output_transform: OutputTransform, ...args: any): Promise<any> {
     const data = this.interface.encodeFunctionData(method, args)
-    return this.buildCall(method, data).then(result => {
+    return this.buildCall(data).then(result => {
       if (output_transform) {
         result = output_transform(result);
       }
@@ -41,10 +41,10 @@ export class Contract {
     })
   }
 
-  public buildCall (method: string, calldata: CallData): Promise<any> {
+  public buildCall (calldata: CallData): Promise<any> {
     const txObj = new IconService.IconBuilder.CallBuilder()
-      .to(this.address)
-      .method(method)
+      .to(calldata['to'])
+      .method(calldata['method'])
       .params(calldata['params'])
       .build()
 
@@ -90,7 +90,7 @@ export class Contract {
     // estimate steps
     var steps
     try {
-      steps = await this.debugService.estimateStep(txObjEstimate).execute().catch(e => {
+      steps = await this.debugService.estimateStep(txObjEstimate).execute().catch(() => {
         return 400_000_000
       })
     } catch (e) {
