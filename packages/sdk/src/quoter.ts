@@ -52,8 +52,8 @@ export abstract class SwapQuoter {
           [
             route.tokenPath[0].address,
             route.tokenPath[1].address,
-            route.pools[0].fee,
             quoteAmount,
+            route.pools[0].fee,
             toHex(options?.sqrtPriceLimitX96 ?? 0)
           ]
       ])
@@ -62,8 +62,8 @@ export abstract class SwapQuoter {
           [
             route.tokenPath[0].address,
             route.tokenPath[1].address,
-            route.pools[0].fee,
             quoteAmount,
+            route.pools[0].fee,
             toHex(options?.sqrtPriceLimitX96 ?? 0)
           ]
       ])

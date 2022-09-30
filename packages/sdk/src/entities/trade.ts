@@ -349,8 +349,8 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
   }
 
   /**
-   * Creates a trade without computing the result of swapping through the route. Useful when you have simulated the trade
-   * elsewhere and do not have any tick data
+   * Creates a trade without computing the result of swapping through the route. 
+   * Useful when you have simulated the trade elsewhere and do not have any tick data
    * @template TInput The input token, either ICX or an IRC-2
    * @template TOutput The output token, either ICX or an IRC-2
    * @template TTradeType The type of the trade, either exact in or exact out
