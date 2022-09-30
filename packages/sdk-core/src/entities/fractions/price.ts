@@ -1,6 +1,5 @@
 import JSBI from 'jsbi'
 import invariant from 'tiny-invariant'
-
 import { BigintIsh } from '@convexus/icon-toolkit'
 import { Rounding } from '../../constants'
 import { Currency } from '../currency'
@@ -42,6 +41,15 @@ export class Price<TBase extends Currency, TQuote extends Currency> extends Frac
       JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(baseCurrency.decimals)),
       JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(quoteCurrency.decimals))
     )
+  }
+
+  public static fromSqrtPrice(baseCurrency: Currency, quoteCurrency: Currency, sqrtPrice: BigintIsh): Price<Currency, Currency> {
+    return new Price(baseCurrency, quoteCurrency, JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(192)), JSBI.exponentiate(JSBI.BigInt(sqrtPrice), JSBI.BigInt(2)))
+  }
+
+  public static fromAmounts(baseAmount: CurrencyAmount<Currency>, quoteAmount: CurrencyAmount<Currency>): Price<Currency, Currency> {
+    const result = quoteAmount.divide(baseAmount)
+    return new Price(baseAmount.currency, quoteAmount.currency, result.denominator, result.numerator)
   }
 
   /**
