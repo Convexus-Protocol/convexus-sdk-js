@@ -1,6 +1,7 @@
 export * from './factoryProvider'
 export * from './pool'
 export * from './position'
+export * from './results'
 export * from './route'
 export * from './tick'
 export * from './trade'
