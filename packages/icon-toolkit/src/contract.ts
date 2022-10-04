@@ -31,6 +31,12 @@ export class Contract {
   public address: string;
   public nid: number;
 
+  public static getAbi (iconService: IconService, address: string): Promise<any> {
+    return iconService.getScoreApi(address).execute().then(result => {
+      return result.getList()
+    })
+  }
+
   public buildCallArray (method: string, output_transform: OutputTransform, ...args: any): Promise<any> {
     const data = this.interface.encodeFunctionData(method, args)
     return this.buildCall(data).then(result => {
