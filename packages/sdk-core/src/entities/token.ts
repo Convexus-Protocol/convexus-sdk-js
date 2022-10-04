@@ -17,7 +17,7 @@ export class Token extends BaseCurrency {
       contract.symbol()
     ]);
 
-    return new Token(contract.address, decimals, symbol, name);
+    return new Token(contract.address, Number(decimals), symbol, name);
   }
 
   /**

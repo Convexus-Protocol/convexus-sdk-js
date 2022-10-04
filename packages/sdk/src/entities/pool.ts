@@ -61,12 +61,12 @@ export class Pool {
       contract.liquidity()
     ])
 
-    const slot0 = Slot0.fromCall(_slot0)
     const [token0, token1] = await Promise.all([
       Token.fromContract(new Contract(addr0, IIRC2, contract.iconService, contract.debugService, contract.nid)),
       Token.fromContract(new Contract(addr1, IIRC2, contract.iconService, contract.debugService, contract.nid))
     ])
-
+    
+    const slot0 = Slot0.fromCall(_slot0)
     return new Pool(token0, token1, parseFeeAmount(fee), slot0.sqrtPriceX96, liquidity, slot0.tick)
   }
 
