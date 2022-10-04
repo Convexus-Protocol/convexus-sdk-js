@@ -4,7 +4,7 @@ import invariant from 'tiny-invariant'
 import { Contract, BigintIsh } from '@convexus/icon-toolkit'
 import { Price, Token, CurrencyAmount } from '@convexus/sdk-core'
 
-import { FeeAmount, TICK_SPACINGS } from '../constants'
+import { FeeAmount, parseFeeAmount, TICK_SPACINGS } from '../constants'
 import { NoTickDataProvider, TickDataProvider } from './tickDataProvider'
 import { NoPoolFactoryProvider, PoolFactoryProvider } from './factoryProvider'
 import { Tick, TickConstructorArgs } from './tick'
@@ -67,7 +67,7 @@ export class Pool {
       Token.fromContract(new Contract(addr1, IIRC2, contract.iconService, contract.debugService, contract.nid))
     ])
 
-    return new Pool(token0, token1, fee, slot0.sqrtPriceX96, liquidity, slot0.tick)
+    return new Pool(token0, token1, parseFeeAmount(fee), slot0.sqrtPriceX96, liquidity, slot0.tick)
   }
 
   /**
