@@ -2,6 +2,7 @@ import invariant from 'tiny-invariant'
 import { Contract, validateAndParseAddress } from '@convexus/icon-toolkit'
 import { BaseCurrency } from './baseCurrency'
 import { Currency } from './currency'
+import JSBI from 'jsbi'
 
 /**
  * Represents an IRC2 token with a unique address and some metadata.
@@ -17,7 +18,16 @@ export class Token extends BaseCurrency {
       contract.symbol()
     ]);
 
-    return new Token(contract.address, Number(decimals), symbol, name);
+    return new Token(contract.address, JSBI.toNumber(decimals), symbol, name);
+  }
+
+  public static fromJson (json: any): Token {
+    return new Token (
+        json['address'], 
+        json['decimals'],
+        json['symbol'], 
+        json['name']
+    );
   }
 
   /**

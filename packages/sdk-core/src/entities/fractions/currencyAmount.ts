@@ -38,6 +38,14 @@ export class CurrencyAmount<T extends Currency> extends Fraction {
     return new CurrencyAmount(currency, numerator, denominator)
   }
 
+  public static fromJson (json: any) : CurrencyAmount<Token> {
+    return CurrencyAmount.fromFractionalAmount (
+        Token.fromJson(json['currency']),
+        json['numerator'],
+        json['denominator'],
+    )
+  }
+
   protected constructor(currency: T, numerator: BigintIsh, denominator?: BigintIsh) {
     super(numerator, denominator)
     invariant(JSBI.lessThanOrEqual(this.quotient, MaxUint256), 'AMOUNT')

@@ -1,8 +1,8 @@
-import { Currency, Fraction, Percent, Price, sortedInsert, CurrencyAmount, TradeType, Token, InsufficientInputAmountError } from '@convexus/sdk-core'
+import { Currency, Fraction, Percent, Price, sortedInsert, CurrencyAmount, TradeType, Token, InsufficientInputAmountError, parseTradeType } from '@convexus/sdk-core'
 import invariant from 'tiny-invariant'
 import { ONE, ZERO } from '../internalConstants'
 import { Pool } from './pool'
-import { Route } from './route'
+import { Route, RouteInfo } from './route'
 import { PoolFactoryProvider as PoolFactoryProvider } from './factoryProvider'
 
 /**
@@ -263,7 +263,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
     }
 
     const trade = new Trade({
-      routes: [{ inputAmount, outputAmount, route }],
+      routes: [new RouteInfo<TInput, TOutput>(route, inputAmount, outputAmount)],
       tradeType
     })
 
@@ -409,11 +409,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
   >(
     poolFactoryProvider: PoolFactoryProvider,
     constructorArguments: {
-    routes: {
-      route: Route<TInput, TOutput>
-      inputAmount: CurrencyAmount<TInput>
-      outputAmount: CurrencyAmount<TOutput>
-    }[]
+    routes: RouteInfo<TInput, TOutput>[]
     tradeType: TTradeType
     }
   ): Promise<Trade<TInput, TOutput, TTradeType>> {
@@ -431,11 +427,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
     routes,
     tradeType
   }: {
-    routes: {
-      route: Route<TInput, TOutput>
-      inputAmount: CurrencyAmount<TInput>
-      outputAmount: CurrencyAmount<TOutput>
-    }[]
+    routes: RouteInfo<TInput, TOutput>[]
     tradeType: TTradeType
   }) {
     const inputCurrency = routes[0].inputAmount.currency
@@ -518,6 +510,26 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
       this.outputAmount.currency,
       this.maximumAmountIn(slippageTolerance).quotient,
       this.minimumAmountOut(slippageTolerance).quotient
+    )
+  }
+
+  public static fromJsonMultipleRoutes (json: any, poolFactoryProvider: PoolFactoryProvider) {
+    return Trade.createUncheckedTradeWithMultipleRoutes (
+      poolFactoryProvider, {
+        routes: json['swaps'].map(RouteInfo.fromJson),
+        tradeType: parseTradeType(json['tradeType'])
+      }
+    )
+  }
+
+  public static fromJson (json: any, poolFactoryProvider: PoolFactoryProvider) {
+    return Trade.createUncheckedTrade (
+      poolFactoryProvider, {
+        route: Route.fromJson(json['route']),
+        inputAmount: CurrencyAmount.fromJson(json['inputAmount']),
+        outputAmount: CurrencyAmount.fromJson(json['outputAmount']),
+        tradeType: parseTradeType(json['tradeType'])
+      }
     )
   }
 

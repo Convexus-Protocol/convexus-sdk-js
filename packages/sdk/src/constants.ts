@@ -1,4 +1,5 @@
 import { BigintIsh } from "@convexus/icon-toolkit"
+import JSBI from 'jsbi'
 
 export const ADDRESS_ZERO = 'hx0000000000000000000000000000000000000000'
 
@@ -13,7 +14,7 @@ export enum FeeAmount {
 }
 
 export function parseFeeAmount (s: BigintIsh): FeeAmount {
-  switch (Number(s)) {
+  switch (JSBI.toNumber(JSBI.BigInt(s))) {
     case 100: return FeeAmount.LOWEST;
     case 500: return FeeAmount.LOW;
     case 3000: return FeeAmount.MEDIUM;

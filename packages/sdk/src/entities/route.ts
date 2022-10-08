@@ -1,7 +1,31 @@
 import invariant from 'tiny-invariant'
 
-import { Currency, Price, Token } from '@convexus/sdk-core'
+import { Currency, CurrencyAmount, Price, Token } from '@convexus/sdk-core'
 import { Pool } from './pool'
+
+export class RouteInfo<TInput extends Currency, TOutput extends Currency> {
+  public readonly route: Route<TInput, TOutput>;
+  public readonly inputAmount: CurrencyAmount<TInput>;
+  public readonly outputAmount: CurrencyAmount<TOutput>;
+
+  public static fromJson (json: any) {
+    return {
+        route: Route.fromJson(json['route']),
+        inputAmount: CurrencyAmount.fromJson(json['inputAmount']),
+        outputAmount: CurrencyAmount.fromJson(json['outputAmount']),
+    }
+  }
+
+  public constructor (
+    route: Route<TInput, TOutput>, 
+    inputAmount: CurrencyAmount<TInput>, 
+    outputAmount: CurrencyAmount<TOutput>
+  ) {
+    this.route = route;
+    this.inputAmount = inputAmount;
+    this.outputAmount = outputAmount;
+  }
+}
 
 /**
  * Represents a list of pools through which a swap can occur
@@ -15,6 +39,14 @@ export class Route<TInput extends Currency, TOutput extends Currency> {
   public readonly output: TOutput
 
   private _midPrice: Price<TInput, TOutput> | null = null
+
+  public static fromJson (json: any) {
+    return new Route (
+      json['pools'].map(Pool.fromJson),
+      Token.fromJson(json['input']),
+      Token.fromJson(json['output'])
+    )
+  }
 
   /**
    * Creates an instance of route.

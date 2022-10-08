@@ -70,6 +70,17 @@ export class Pool {
     return new Pool(token0, token1, parseFeeAmount(fee), slot0.sqrtPriceX96, liquidity, slot0.tick)
   }
 
+  public static fromJson (json: any): Pool {
+    return new Pool (
+        Token.fromJson(json['token0']),
+        Token.fromJson(json['token1']),
+        parseFeeAmount(json['fee']),
+        json['sqrtRatioX96'],
+        json['liquidity'],
+        json['tickCurrent'],
+    )
+  }
+
   /**
    * Construct a pool
    * @param tokenA One of the tokens in the pool
