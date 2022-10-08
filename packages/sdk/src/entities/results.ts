@@ -44,3 +44,27 @@ export class QuoteResult {
     )
   }
 }
+
+export class QuoteMultiResult {
+  public readonly amountOut: JSBI;
+  public readonly sqrtPriceX96AfterList: JSBI[];
+  public readonly initializedTicksCrossedList: number[];
+  
+  public constructor (
+    amountOut: BigintIsh,
+    sqrtPriceX96AfterList: BigintIsh[],
+    initializedTicksCrossedList: number[]
+  ) {
+    this.amountOut = JSBI.BigInt(amountOut)
+    this.sqrtPriceX96AfterList = sqrtPriceX96AfterList.map(JSBI.BigInt)
+    this.initializedTicksCrossedList = initializedTicksCrossedList
+  }
+  
+  public static fromCall (data: any): QuoteMultiResult {
+    return new QuoteMultiResult (
+      data['amountOut'],
+      data['sqrtPriceX96AfterList'],
+      data['initializedTicksCrossedList'].map((i: string) => parseInt(i, 16)),
+    )
+  }
+}
