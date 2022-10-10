@@ -1,6 +1,6 @@
 import IconService from 'icon-sdk-js'
 
-function uint32ToBytes (num: number): Uint8Array {
+export function uint32ToBytes (num: number): Uint8Array {
   const arr = new Uint8Array([
     (num & 0xff000000) >> 24,
     (num & 0x00ff0000) >> 16,
@@ -10,7 +10,7 @@ function uint32ToBytes (num: number): Uint8Array {
   return arr;
 }
 
-function addressToBytes (address: string): Uint8Array {
+export function addressToBytes (address: string): Uint8Array {
   if (!IconService.IconValidator.isAddress(address)) {
     throw new Error(`Invalid address ${address}`)
   }
@@ -24,16 +24,19 @@ function addressToBytes (address: string): Uint8Array {
   ])
 }
 
+export function stringToBytes (value: string): Uint8Array {
+  let utf8Encode = new TextEncoder();
+  return utf8Encode.encode(value);
+}
+
 function packSingle (type: string, value: any): Uint8Array {
   switch (type) {
     case "address":
       return addressToBytes(value)
     case "string":
-      let utf8Encode = new TextEncoder();
-      return utf8Encode.encode(value);
+      return stringToBytes(value)
     case "bytes":
       return value;
-
     case "uint32":
       return uint32ToBytes(value)
 
