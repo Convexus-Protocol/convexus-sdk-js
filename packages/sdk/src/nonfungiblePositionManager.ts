@@ -5,15 +5,14 @@ import {
   Currency,
   NativeCurrency,
   Token,
-  Icx
+  Icx,
+  MaxUint256
 } from '@convexus/sdk-core'
 import JSBI from 'jsbi'
 import invariant from 'tiny-invariant'
 import { Position } from './entities/position'
 import { ONE, ZERO } from './internalConstants'
 import INonfungiblePositionManager from './artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json'
-
-const MaxUint128 = toHex(JSBI.subtract(JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(128)), JSBI.BigInt(1)))
 
 export interface MintSpecificOptions {
   /**
@@ -269,8 +268,8 @@ export abstract class NonfungiblePositionManager {
         [
           tokenId,
           recipient,
-          MaxUint128,
-          MaxUint128
+          MaxUint256,
+          MaxUint256
         ]
       ])
     )
