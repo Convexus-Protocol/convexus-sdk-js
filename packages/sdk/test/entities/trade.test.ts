@@ -8,6 +8,8 @@ import { Pool } from '../../src/entities/pool'
 import { Route } from '../../src/entities/route'
 import { Trade } from '../../src/entities/trade'
 import { TestPoolFactoryProvider } from './TestPoolFactoryProvider'
+import { Tick } from '../../src/entities/tick'
+import { PoolFactoryProvider } from "../../src/entities/factoryProvider";
 
 describe('Trade', () => {
   const ICX = new Icx()
@@ -590,6 +592,158 @@ describe('Trade', () => {
       expect(result[1].swaps[0].route.tokenPath).toEqual([token0, token1, token2])
       expect(result[1].inputAmount.equalTo(CurrencyAmount.fromRawAmount(token0, JSBI.BigInt(10000)))).toBeTruthy()
       expect(result[1].outputAmount.equalTo(CurrencyAmount.fromRawAmount(token2, JSBI.BigInt(7004)))).toBeTruthy()
+    })
+
+    it('Complex routing', async () => {
+      const sICX = new Token("cx79ada8b605380c84507d42534080ada30c77602c", 18, "sICX", "sICX")
+      const USDC = new Token("cxa818e190782c7bc64c1ec12512c7f8f3171fc8cf", 18, "USDC", "USDC")
+      const ICX = new Token("cx1111111111111111111111111111111111111111", 18, "ICX", "ICX")
+      const WETH = new Token("cx1126c5dc7115daea7f55d6b6cf0eb63adeb3529f", 18, "WETH", "WETH")
+      const bnUSD = new Token("cxc8373f6f2654a9c8b689059aef58aefb9f878e12", 18, "bnUSD", "bnUSD")
+      const CRV = new Token("cxc8373f6f2654a9c8b689059aef58aefb9f878e12", 18, "CRV", "CRV")
+
+      const sICX_USDC = new Pool (
+        sICX, USDC,
+        FeeAmount.MEDIUM,
+        '61210590602354947969986',
+        '29088496039794855',
+        -281485,
+        [
+          new Tick({
+            "index":-288360,
+            "liquidityGross":29088496039794855,
+            "liquidityNet":29088496039794855,
+          }),
+          new Tick({
+            "index":-274500,
+            "liquidityGross":29088496039794855,
+            "liquidityNet":-29088496039794855,
+          })
+        ]
+      )
+
+      const ICX_USDC = new Pool (
+        ICX, USDC,
+        FeeAmount.MEDIUM,
+        '61191168163216135731103',
+        '264440873089043',
+        -281491,
+        [
+          new Tick({
+            "index":-288360,
+            "liquidityGross":264440873089043,
+            "liquidityNet":264440873089043,
+          }),
+          new Tick({
+            "index":-274500,
+            "liquidityGross":264440873089043,
+            "liquidityNet":-264440873089043,
+          })
+        ]
+      )
+
+      const WETH_CRV = new Pool (
+        WETH, CRV,
+        FeeAmount.MEDIUM,
+        '2926083861933460079174379110400',
+        '13958146132191485413231',
+        72185,
+        [
+          new Tick({
+            "index":65280,
+            "liquidityGross":13958146132191485413231,
+            "liquidityNet":13958146132191485413231,
+          }),
+          new Tick({
+            "index":79140,
+            "liquidityGross":13958146132191485413231,
+            "liquidityNet":-13958146132191485413231,
+          })
+        ]
+      )
+
+      const bnUSD_USDC = new Pool (
+        bnUSD, USDC,
+        FeeAmount.LOW,
+        '79249731195721224553149',
+        '214688025193493151',
+        -276319,
+        [
+          new Tick({
+            "index":-277380,
+            "liquidityGross":214688025193493151,
+            "liquidityNet":214688025193493151,
+          }),
+          new Tick({
+            "index":-275370,
+            "liquidityGross":214688025193493151,
+            "liquidityNet":-214688025193493151,
+          })
+        ]
+      )
+
+      const ICX_bnUSD = new Pool (
+        ICX, bnUSD,
+        FeeAmount.MEDIUM,
+        '62203837691364529249136597252',
+        '10269690441519762194883',
+        -4839,
+        [
+          new Tick({
+            "index":-6960,
+            "liquidityGross":10269690441519762194883,
+            "liquidityNet":10269690441519762194883,
+          }),
+          new Tick({
+            "index":-3540,
+            "liquidityGross":10269690441519762194883,
+            "liquidityNet":-10269690441519762194883,
+          })
+        ]
+      )
+
+      const ICX_WETH = new Pool (
+        ICX, WETH,
+        FeeAmount.LOW,
+        '78538556644749228166681187476',
+        '1707481566716281749161',
+        -175,
+        [
+          new Tick({
+            "index":-6930,
+            "liquidityGross":1707481566716281749161,
+            "liquidityNet":1707481566716281749161,
+          }),
+          new Tick({
+            "index":-6930,
+            "liquidityGross":1707481566716281749161,
+            "liquidityNet":-1707481566716281749161,
+          })
+        ]
+      )
+
+      const addresses = ["cx_sICX_USDC", "cx_ICX_USDC", "cx_WETH_CRV", "cx_bnUSD_USDC", "cx_ICX_bnUSD", "cx_ICX_WETH"]
+      const pools = [sICX_USDC, ICX_USDC, WETH_CRV, bnUSD_USDC, ICX_bnUSD, ICX_WETH]
+
+      class RoutingPoolFactoryProvider implements PoolFactoryProvider {
+        getPool (tokenA: Token, tokenB: Token, fee: FeeAmount): Promise<string> {
+          for (var i = 0; i < pools.length; i++) {
+            const pool = pools[i]
+            if (pool.token0.equals(tokenA) && pool.token1.equals(tokenB) && pool.fee == fee) {
+              return Promise.resolve(addresses[i]);
+            }
+          }
+
+          throw new Error("Pool not found")
+        }
+      }
+
+      await Trade.bestTradeExactIn(
+        new RoutingPoolFactoryProvider(), 
+        pools,
+        CurrencyAmount.fromRawAmount(ICX, 10000),
+        sICX
+      )
     })
 
     it('respects maxHops', async () => {
