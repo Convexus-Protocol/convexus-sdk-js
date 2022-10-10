@@ -1,5 +1,7 @@
 import JSBI from 'jsbi'
 import { subIn256 } from '.'
+import { SHA3 } from 'sha3';
+import { addressToBytes, uint32ToBytes } from '@convexus/icon-toolkit';
 
 const Q128 = JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(128))
 
@@ -28,5 +30,20 @@ export abstract class PositionLibrary {
     )
 
     return [tokensOwed0, tokensOwed1]
+  }
+
+  public static getKey (
+    owner: string,
+    tickLower: number,
+    tickUpper: number
+  ): string {
+    const hash = new SHA3(256);
+    const ownerBytes = addressToBytes(owner)
+    const tickLowerBytes = uint32ToBytes(tickLower)
+    const tickUpperBytes = uint32ToBytes(tickUpper)
+    hash.update(Buffer.from(ownerBytes.buffer));
+    hash.update(Buffer.from(tickLowerBytes.buffer));
+    hash.update(Buffer.from(tickUpperBytes.buffer));
+    return `0x${hash.digest('hex')}`
   }
 }
