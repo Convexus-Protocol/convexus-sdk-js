@@ -1,6 +1,6 @@
 {
   "name": "@convexus/sdk",
-  "version": "1.1.65",
+  "version": "1.1.66",
   "description": "Convexus SDK package",
   "main": "dist/index.js",
   "node": "dist/index.js",
@@ -23,7 +23,8 @@
     "@types/bn.js": "^5.1.1"
   },
   "dependencies": {
-    "@convexus/sdk-core": "1.1.77",
+    "@convexus/sdk-core": "1.1.78",
+    "sha3": "^2.1.4",
     "tslib": "2.4.0"
   },
   "files": [
