@@ -423,8 +423,8 @@ describe('NonfungiblePositionManager', () => {
               "method": "collect",
               "params": {
                   "params": {
-                    "amount0Max": "0xffffffffffffffffffffffffffffffff",
-                    "amount1Max": "0xffffffffffffffffffffffffffffffff",
+                    "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                    "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                     "recipient": "hx0000000000000000000000000000000000000003",
                     "tokenId": "0x1"
                   }
@@ -449,8 +449,8 @@ describe('NonfungiblePositionManager', () => {
             "method": "collect",
             "params": {
               "params": {
-                "amount0Max": "0xffffffffffffffffffffffffffffffff",
-                "amount1Max": "0xffffffffffffffffffffffffffffffff",
+                "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                 "recipient": "hx0000000000000000000000000000000000000003",
                 "tokenId": "0x1"
               }
@@ -576,8 +576,8 @@ describe('NonfungiblePositionManager', () => {
             "method": "collect",
             "params": {
               "params": {
-                "amount0Max": "0xffffffffffffffffffffffffffffffff",
-                "amount1Max": "0xffffffffffffffffffffffffffffffff",
+                "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                 "recipient": "hx0000000000000000000000000000000000000003",
                 "tokenId": "0x1"
               }
@@ -628,8 +628,8 @@ describe('NonfungiblePositionManager', () => {
               "method": "collect",
               "params": {
                   "params": {
-                      "amount0Max": "0xffffffffffffffffffffffffffffffff",
-                      "amount1Max": "0xffffffffffffffffffffffffffffffff",
+                      "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                      "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                       "recipient": "hx0000000000000000000000000000000000000003",
                       "tokenId": "0x1"
                   }
@@ -683,8 +683,8 @@ describe('NonfungiblePositionManager', () => {
               "method": "collect",
               "params": {
                   "params": {
-                      "amount0Max": "0xffffffffffffffffffffffffffffffff",
-                      "amount1Max": "0xffffffffffffffffffffffffffffffff",
+                      "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                      "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                       "recipient": "hx0000000000000000000000000000000000000003",
                       "tokenId": "0x1"
                   }
@@ -738,8 +738,8 @@ describe('NonfungiblePositionManager', () => {
               "method": "collect",
               "params": {
                   "params": {
-                      "amount0Max": "0xffffffffffffffffffffffffffffffff",
-                      "amount1Max": "0xffffffffffffffffffffffffffffffff",
+                      "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                      "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                       "recipient": "hx0000000000000000000000000000000000000003",
                       "tokenId": "0x1"
                   }
