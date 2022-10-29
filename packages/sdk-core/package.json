@@ -38,7 +38,7 @@
     "README.md"
   ],
   "engines": {
-    "node": ">=12.0.0 <17"
+    "node": ">=12.0.0"
   },
   "devDependencies": {
     "@types/big.js": "^6.1.6"
