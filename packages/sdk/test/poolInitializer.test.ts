@@ -78,7 +78,7 @@ describe('PoolInitializer', () => {
     const slippageTolerance = new Percent(1, 100)
     const deadline = 123
 
-    NonfungiblePositionManager.addCallParameters(
+    NonfungiblePositionManager.buildAddLiquidityTxs(
       new Position({
         pool: pool_0_1,
         tickLower: tickLower,
@@ -92,21 +92,21 @@ describe('PoolInitializer', () => {
   it('create initialize mint', () => {
     // Init price: 1 token0 = 600 token1
     const sqrtRatioX96 = encodeSqrtRatioX96(600, 1)
-    
+
     // Provide liquidity between 500 and 800
     const lowerBoundPrice = 500
     const higherBoundPrice = 800
-    
+
     const tickLower = nearestUsableTick(priceToClosestTick(new Price(token0, token1, 1, lowerBoundPrice)), TICK_SPACINGS[fee])
     const tickUpper = nearestUsableTick(priceToClosestTick(new Price(token0, token1, 1, higherBoundPrice)), TICK_SPACINGS[fee])
-    
+
     // Create a virtual pool
     const pool = new Pool(token0, token1, fee, sqrtRatioX96, 0, TickMath.getTickAtSqrtRatio(sqrtRatioX96))
-    
+
     const EXA = JSBI.BigInt(10**18)
     const amount0 = JSBI.multiply(EXA, JSBI.BigInt(5)) // 5 token0
     const amount1 = MaxUint256 // compute amount1 needed
-    
+
     // Compute the max liquidity given the amounts
     const liquidity = maxLiquidityForAmounts (
       pool.sqrtRatioX96, // Pool price
@@ -126,10 +126,10 @@ describe('PoolInitializer', () => {
     // adress that will receive the position NFT
     const recipient = 'hx0000000000000000000000000000000000000003'
     const deadline = 123
-    
+
     // Initialize the pool + mint position
     const calldatas = PoolInitializer.createAndMintCallParameters(position, recipient, deadline)
-    
+
     expect(calldatas[0]).toStrictEqual({
       "method": "transfer",
       "params": {
@@ -139,7 +139,7 @@ describe('PoolInitializer', () => {
       },
       "to": "cx0000000000000000000000000000000000000001"
     })
-    
+
     expect(calldatas[1]).toStrictEqual({
       "method": "transfer",
       "params": {
@@ -149,7 +149,7 @@ describe('PoolInitializer', () => {
       },
       "to": "cx0000000000000000000000000000000000000002"
     })
-    
+
     expect(calldatas[2]).toStrictEqual(
       {
         "to": "PoolInitializer",

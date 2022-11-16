@@ -13,6 +13,8 @@ import invariant from 'tiny-invariant'
 import { Position } from './entities/position'
 import { ONE, ZERO } from './internalConstants'
 import INonfungiblePositionManager from './artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json'
+import { IAddLiquidityTxs } from './entities/interface/IAddLiquidityTxs';
+import { IIncreaseLiquidityTxs } from './entities/interface/IIncreaseLiquidityTxs';
 
 export interface MintSpecificOptions {
   /**
@@ -176,10 +178,8 @@ export abstract class NonfungiblePositionManager {
     }
   }
 
-  public static addCallParameters(position: Position, options: AddLiquidityOptions): CallData[] {
+  public static buildAddLiquidityTxs(position: Position, options: AddLiquidityOptions): IAddLiquidityTxs {
     invariant(JSBI.greaterThan(position.liquidity, ZERO), 'ZERO_LIQUIDITY')
-
-    const calldatas: CallData[] = []
 
     // get amounts
     const { amount0: amount0Desired, amount1: amount1Desired } = position.mintAmounts
@@ -188,71 +188,110 @@ export abstract class NonfungiblePositionManager {
     const minimumAmounts = position.mintAmountsWithSlippage(options.slippageTolerance)
     const amount0Min = toHex(minimumAmounts.amount0)
     const amount1Min = toHex(minimumAmounts.amount1)
-
     const deadline = toHex(options.deadline)
 
     // mint
     if (isMint(options)) {
+      let deposit0Tx, deposit1Tx;
       const recipient: string = validateAndParseAddress(options.recipient)
       const ZERO = JSBI.BigInt(0)
 
+      // make sure at least one of amounts is > 0
+      NonfungiblePositionManager.validateAmounts(amount0Desired, amount1Desired);
+
       // deposit tokens
       if (JSBI.greaterThan(amount0Desired, ZERO)) {
-        calldatas.push(this.encodeDeposit(position.pool.token0, amount0Desired));
-      }
-      
-      if (JSBI.greaterThan(amount1Desired, ZERO)) {
-        calldatas.push(this.encodeDeposit(position.pool.token1, amount1Desired));
+        deposit0Tx = this.encodeDeposit(position.pool.token0, amount0Desired);
       }
 
-      calldatas.push(
-        NonfungiblePositionManager.INTERFACE.encodeFunctionData('mint', [
-          [
-            position.pool.token0.address,
-            position.pool.token1.address,
-            position.pool.fee,
-            position.tickLower,
-            position.tickUpper,
-            toHex(amount0Desired),
-            toHex(amount1Desired),
-            amount0Min,
-            amount1Min,
-            recipient,
-            deadline
-          ]
-        ])
-      )
+      if (JSBI.greaterThan(amount1Desired, ZERO)) {
+        deposit1Tx = this.encodeDeposit(position.pool.token1, amount1Desired);
+      }
+
+      const mintTx = NonfungiblePositionManager.INTERFACE.encodeFunctionData('mint', [
+        [
+          position.pool.token0.address,
+          position.pool.token1.address,
+          position.pool.fee,
+          position.tickLower,
+          position.tickUpper,
+          toHex(amount0Desired),
+          toHex(amount1Desired),
+          amount0Min,
+          amount1Min,
+          recipient,
+          deadline
+        ]
+      ])
+
+      if (options.useNative) {
+        const wrapped = options.useNative.wrapped
+        invariant(position.pool.token0.equals(wrapped) || position.pool.token1.equals(wrapped), 'NO_WICX')
+      }
+
+      return { deposit0Tx, deposit1Tx, mintTx };
     } else {
+      throw new Error("Options object doesn't contain required 'recipient' key." +
+        " Did you mean to increase liquidity for existing position instead?");
+    }
+  }
+
+  public static buildIncreaseLiquidityTxs(position: Position, options: AddLiquidityOptions): IIncreaseLiquidityTxs {
+    invariant(JSBI.greaterThan(position.liquidity, ZERO), 'ZERO_LIQUIDITY')
+
+    // get amounts
+    const { amount0: amount0Desired, amount1: amount1Desired } = position.mintAmounts
+
+    // adjust for slippage
+    const minimumAmounts = position.mintAmountsWithSlippage(options.slippageTolerance)
+    const amount0Min = toHex(minimumAmounts.amount0)
+    const amount1Min = toHex(minimumAmounts.amount1)
+    const deadline = toHex(options.deadline)
+
+    // increase liquidity
+    if (!isMint(options)) {
       // increase
+
+      // make sure at least one of amounts is > 0
+      NonfungiblePositionManager.validateAmounts(amount0Desired, amount1Desired);
+
+      let deposit0Tx, deposit1Tx;
+
       // deposit tokens
       if (JSBI.greaterThan(amount0Desired, ZERO)) {
-        calldatas.push(this.encodeDeposit(position.pool.token0, amount0Desired));
+        deposit0Tx = this.encodeDeposit(position.pool.token0, amount0Desired);
       }
-      
+
       if (JSBI.greaterThan(amount1Desired, ZERO)) {
-        calldatas.push(this.encodeDeposit(position.pool.token1, amount1Desired));
+        deposit1Tx = this.encodeDeposit(position.pool.token1, amount1Desired);
       }
 
-      calldatas.push(
-        NonfungiblePositionManager.INTERFACE.encodeFunctionData('increaseLiquidity', [
-          [
-            toHex(options.tokenId),
-            toHex(amount0Desired),
-            toHex(amount1Desired),
-            amount0Min,
-            amount1Min,
-            deadline
-          ]
-        ])
-      )
-    }
+      const increaseLiquidityTx = NonfungiblePositionManager.INTERFACE.encodeFunctionData('increaseLiquidity',
+        [[
+          toHex(options.tokenId),
+          toHex(amount0Desired),
+          toHex(amount1Desired),
+          amount0Min,
+          amount1Min,
+          deadline
+        ]]);
 
-    if (options.useNative) {
-      const wrapped = options.useNative.wrapped
-      invariant(position.pool.token0.equals(wrapped) || position.pool.token1.equals(wrapped), 'NO_WICX')
-    }
+      if (options.useNative) {
+        const wrapped = options.useNative.wrapped
+        invariant(position.pool.token0.equals(wrapped) || position.pool.token1.equals(wrapped), 'NO_WICX')
+      }
 
-    return calldatas
+      return { deposit0Tx, deposit1Tx, increaseLiquidityTx }
+    } else {
+      throw new Error("Options object contain 'recipient' key." +
+        " Did you mean to create and add liquidity to new position?");
+    }
+  }
+
+  private static validateAmounts(amount0Desired: JSBI, amount1Desired: JSBI): void {
+    if (!JSBI.greaterThan(amount0Desired, ZERO) && !JSBI.greaterThan(amount1Desired, ZERO)) {
+      throw new Error("At least one of amount0 or amount1 must be greater than 0!");
+    }
   }
 
   private static encodeCollect(options: CollectOptions): CallData[] {
@@ -366,7 +405,7 @@ export abstract class NonfungiblePositionManager {
         ''
       ])
     }
-    
+
     return [calldata]
   }
 }
