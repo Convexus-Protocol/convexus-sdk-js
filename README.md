@@ -20,7 +20,7 @@ $ # Run tests if you want to test the code
 $ yarn test
 $ # If you want to cleanup everything built, run this command
 $ yarn clean
-```
+``` 
 
 ## ⚙️ Commands
 
