@@ -30,10 +30,10 @@ describe('NonfungiblePositionManager', () => {
   const slippageTolerance = new Percent(1, 100)
   const deadline = 123
 
-  describe('#addCallParameters', () => {
+  describe('#buildAddLiquidityTxs', () => {
     it('throws if liquidity is 0', () => {
       expect(() =>
-        NonfungiblePositionManager.addCallParameters(
+        NonfungiblePositionManager.buildAddLiquidityTxs(
           new Position({
             pool: pool_0_1,
             tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -45,9 +45,9 @@ describe('NonfungiblePositionManager', () => {
       ).toThrow('ZERO_LIQUIDITY')
     })
 
-    it('throws if pool does not involve ICX and useNative is true', () => {
+    it('buildAddLiquidityTxs throws if pool does not involve ICX and useNative is true', () => {
       expect(() =>
-        NonfungiblePositionManager.addCallParameters(
+        NonfungiblePositionManager.buildAddLiquidityTxs(
           new Position({
             pool: pool_0_1,
             tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -60,7 +60,7 @@ describe('NonfungiblePositionManager', () => {
     })
 
     it('succeeds for mint', () => {
-      const calldata = NonfungiblePositionManager.addCallParameters(
+      const buildAddLiquidityTxs = NonfungiblePositionManager.buildAddLiquidityTxs(
         new Position({
           pool: pool_0_1,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -70,27 +70,27 @@ describe('NonfungiblePositionManager', () => {
         { recipient, slippageTolerance, deadline }
       )
 
-      expect(calldata[0]).toStrictEqual({
+      expect(buildAddLiquidityTxs.deposit0Tx).toStrictEqual({
         "method": "transfer",
         "params": {
-            "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
-            "_to": "NonfungiblePositionManager",
-            "_value": "0x1"
+          "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+          "_to": "NonfungiblePositionManager",
+          "_value": "0x1"
         },
         "to": "cx0000000000000000000000000000000000000001"
       })
 
-      expect(calldata[1]).toStrictEqual({
-          "method": "transfer",
-          "params": {
-              "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
-              "_to": "NonfungiblePositionManager",
-              "_value": "0x1"
-          },
-          "to": "cx0000000000000000000000000000000000000002"
-       })
+      expect(buildAddLiquidityTxs.deposit1Tx).toStrictEqual({
+        "method": "transfer",
+        "params": {
+          "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+          "_to": "NonfungiblePositionManager",
+          "_value": "0x1"
+        },
+        "to": "cx0000000000000000000000000000000000000002"
+      })
 
-      expect(calldata[2]).toStrictEqual({
+      expect(buildAddLiquidityTxs.mintTx).toStrictEqual({
         "to": "NonfungiblePositionManager",
         "method": "mint",
         "params": {
@@ -143,7 +143,7 @@ describe('NonfungiblePositionManager', () => {
       const tickLower = nearestUsableTick(priceToClosestTick(new Price(token1, token2, 1, lowerBoundPrice)), TICK_SPACINGS[highFee])
       const tickUpper = nearestUsableTick(priceToClosestTick(new Price(token1, token2, 1, higherBoundPrice)), TICK_SPACINGS[highFee])
 
-      const calldata = NonfungiblePositionManager.addCallParameters(
+      const buildAddLiquidityTxs = NonfungiblePositionManager.buildAddLiquidityTxs(
         new Position({
           pool: pool_1_2,
           tickLower: tickLower,
@@ -153,27 +153,27 @@ describe('NonfungiblePositionManager', () => {
         { recipient, slippageTolerance, deadline }
       )
 
-      expect(calldata[0]).toStrictEqual({
+      expect(buildAddLiquidityTxs.deposit0Tx).toStrictEqual({
         "method": "transfer",
         "params": {
-            "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
-            "_to": "NonfungiblePositionManager",
-            "_value": "0xde5e8740bb55a8a"
+          "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+          "_to": "NonfungiblePositionManager",
+          "_value": "0xde5e8740bb55a8a"
         },
         "to": "cx0000000000000000000000000000000000000002"
       })
 
-      expect(calldata[1]).toStrictEqual({
-          "method": "transfer",
-          "params": {
-              "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
-              "_to": "NonfungiblePositionManager",
-              "_value": "0x5726f15f7a74a5b555"
-          },
-          "to": "cx0000000000000000000000000000000000000003"
-       })
+      expect(buildAddLiquidityTxs.deposit1Tx).toStrictEqual({
+        "method": "transfer",
+        "params": {
+          "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+          "_to": "NonfungiblePositionManager",
+          "_value": "0x5726f15f7a74a5b555"
+        },
+        "to": "cx0000000000000000000000000000000000000003"
+      })
 
-      expect(calldata[2]).toStrictEqual(
+      expect(buildAddLiquidityTxs.mintTx).toStrictEqual(
         {
           "to": "NonfungiblePositionManager",
           "method": "mint",
@@ -197,7 +197,7 @@ describe('NonfungiblePositionManager', () => {
     })
 
     it('succeeds for full range', () => {
-      const calldata = NonfungiblePositionManager.addCallParameters(
+      const buildIncreaseLiquidityTxs = NonfungiblePositionManager.buildAddLiquidityTxs(
         new Position({
           pool: pool_0_1,
           tickLower: nearestUsableTick(TickMath.MIN_TICK, TICK_SPACINGS[fee]),
@@ -207,27 +207,27 @@ describe('NonfungiblePositionManager', () => {
         { recipient, slippageTolerance, deadline }
       )
 
-      expect(calldata[0]).toStrictEqual({
+      expect(buildIncreaseLiquidityTxs.deposit0Tx).toStrictEqual({
         "method": "transfer",
         "params": {
-            "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
-            "_to": "NonfungiblePositionManager",
-            "_value": "0x1"
+          "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+          "_to": "NonfungiblePositionManager",
+          "_value": "0x1"
         },
         "to": "cx0000000000000000000000000000000000000001"
       })
 
-      expect(calldata[1]).toStrictEqual({
-          "method": "transfer",
-          "params": {
-              "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
-              "_to": "NonfungiblePositionManager",
-              "_value": "0x1"
-          },
-          "to": "cx0000000000000000000000000000000000000002"
-       })
+      expect(buildIncreaseLiquidityTxs.deposit1Tx).toStrictEqual({
+        "method": "transfer",
+        "params": {
+          "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+          "_to": "NonfungiblePositionManager",
+          "_value": "0x1"
+        },
+        "to": "cx0000000000000000000000000000000000000002"
+      })
 
-      expect(calldata[2]).toStrictEqual(
+      expect(buildIncreaseLiquidityTxs.mintTx).toStrictEqual(
         {
           "to": "NonfungiblePositionManager",
           "method": "mint",
@@ -250,8 +250,8 @@ describe('NonfungiblePositionManager', () => {
       )
     })
 
-    it('succeeds for full range high fee', () => {
-      const calldata = NonfungiblePositionManager.addCallParameters(
+    it('buildAddLiquidityTxs for full range high fee', () => {
+      const buildAddLiquidityTxs = NonfungiblePositionManager.buildAddLiquidityTxs(
         new Position({
           pool: pool_0_1_fee_high,
           tickLower: nearestUsableTick(TickMath.MIN_TICK, TICK_SPACINGS[feeHigh]),
@@ -261,27 +261,27 @@ describe('NonfungiblePositionManager', () => {
         { recipient, slippageTolerance, deadline }
       )
 
-      expect(calldata[0]).toStrictEqual({
+      expect(buildAddLiquidityTxs.deposit0Tx).toStrictEqual({
         "method": "transfer",
         "params": {
-            "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
-            "_to": "NonfungiblePositionManager",
-            "_value": "0x1"
+          "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+          "_to": "NonfungiblePositionManager",
+          "_value": "0x1"
         },
         "to": "cx0000000000000000000000000000000000000001"
       })
 
-      expect(calldata[1]).toStrictEqual({
-          "method": "transfer",
-          "params": {
-              "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
-              "_to": "NonfungiblePositionManager",
-              "_value": "0x1"
-          },
-          "to": "cx0000000000000000000000000000000000000002"
-       })
+      expect(buildAddLiquidityTxs.deposit1Tx).toStrictEqual({
+        "method": "transfer",
+        "params": {
+          "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
+          "_to": "NonfungiblePositionManager",
+          "_value": "0x1"
+        },
+        "to": "cx0000000000000000000000000000000000000002"
+      })
 
-      expect(calldata[2]).toStrictEqual(
+      expect(buildAddLiquidityTxs.mintTx).toStrictEqual(
         {
           "to": "NonfungiblePositionManager",
           "method": "mint",
@@ -302,110 +302,140 @@ describe('NonfungiblePositionManager', () => {
           }
         }
       )
-    })
+    })})
 
-    it('succeeds for increase', () => {
-      const pool = new Pool(
-        token0, 
-        token1, 
-        FeeAmount.MEDIUM,
-        JSBI.BigInt("0x24eeafd75f26d0000000000000"),
-        JSBI.BigInt("0x131651bddb3edbbd5d"),
-        0x119f9
-      )
-
-      const newPosition = new Position({
-        pool: pool,
-        tickLower: 0x13470,
-        tickUpper: 0x13524,
-        liquidity: JSBI.BigInt("19087752567891193668198803")
+    describe('#buildIncreaseLiquidityTxs', () => {
+      it('throws if liquidity is 0', () => {
+        expect(() =>
+          NonfungiblePositionManager.buildIncreaseLiquidityTxs(
+            new Position({
+              pool: pool_0_1,
+              tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
+              tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
+              liquidity: 0
+            }),
+            { tokenId, slippageTolerance, deadline }
+          )
+        ).toThrow('ZERO_LIQUIDITY')
       })
 
-      const calldata = NonfungiblePositionManager.addCallParameters(
-        newPosition,
-        { tokenId, slippageTolerance, deadline }
-      )
 
-      const expectedValue = "0x" + newPosition.amount0.quotient.toString(16)
+    it('buildIncreaseLiquidityTxs throws if pool does not involve ICX and useNative is true', () => {
+      expect(() =>
+        NonfungiblePositionManager.buildIncreaseLiquidityTxs(
+          new Position({
+            pool: pool_0_1,
+            tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
+            tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
+            liquidity: 1
+          }),
+          { tokenId, slippageTolerance, deadline, useNative: ICX }
+        )
+      ).toThrow('NO_WICX')
+    })
 
-      expect(calldata[0]).toStrictEqual({
-        "method": "transfer",
-        "params": {
+      it('succeeds for increase', () => {
+        const pool = new Pool(
+          token0,
+          token1,
+          FeeAmount.MEDIUM,
+          JSBI.BigInt("0x24eeafd75f26d0000000000000"),
+          JSBI.BigInt("0x131651bddb3edbbd5d"),
+          0x119f9
+        )
+
+        const newPosition = new Position({
+          pool: pool,
+          tickLower: 0x13470,
+          tickUpper: 0x13524,
+          liquidity: JSBI.BigInt("19087752567891193668198803")
+        })
+
+        const buildIncreaseLiquidityTxs = NonfungiblePositionManager.buildIncreaseLiquidityTxs(
+          newPosition,
+          { tokenId, slippageTolerance, deadline }
+        )
+
+        const expectedValue = "0x" + newPosition.amount0.quotient.toString(16)
+
+        expect(buildIncreaseLiquidityTxs.deposit0Tx).toStrictEqual({
+          "method": "transfer",
+          "params": {
             "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
             "_to": "NonfungiblePositionManager",
             "_value": expectedValue
-        },
-        "to": "cx0000000000000000000000000000000000000001"
+          },
+          "to": "cx0000000000000000000000000000000000000001"
+        })
+
+        expect(buildIncreaseLiquidityTxs.increaseLiquidityTx).toStrictEqual(
+          {
+            "to": "NonfungiblePositionManager",
+            "method": "increaseLiquidity",
+            "params": {
+              "params": {
+                "amount0Desired": "0x" + newPosition.amount0.quotient.toString(16),
+                "amount0Min": "0x" + newPosition.amount0.quotient.toString(16),
+                "amount1Desired": "0x0",
+                "amount1Min": "0x0",
+                "deadline": "0x7b",
+                "tokenId": "0x1"
+              }
+            }
+          }
+        )
       })
 
-      expect(calldata[1]).toStrictEqual(
-        {
-          "to": "NonfungiblePositionManager",
-          "method": "increaseLiquidity",
-          "params": {
-            "params": {
-              "amount0Desired": "0x" + newPosition.amount0.quotient.toString(16),
-              "amount0Min": "0x" + newPosition.amount0.quotient.toString(16),
-              "amount1Desired": "0x0",
-              "amount1Min": "0x0",
-              "deadline": "0x7b",
-              "tokenId": "0x1"
-              }
-          }
-        }
-      )
-    })
- 
-    it('useNative', () => {
-      const calldata = NonfungiblePositionManager.addCallParameters(
-        new Position({
-          pool: pool_1_wicx,
-          tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
-          tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
-          liquidity: 1
-        }),
-        { recipient, slippageTolerance, deadline, useNative: ICX }
-      )
+      it('useNative', () => {
+        const buildAddLiquidityTxs = NonfungiblePositionManager.buildAddLiquidityTxs(
+          new Position({
+            pool: pool_1_wicx,
+            tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
+            tickUpper: TICK_SPACINGS[FeeAmount.MEDIUM],
+            liquidity: 1
+          }),
+          { recipient, slippageTolerance, deadline, useNative: ICX }
+        )
 
-      expect(calldata[0]).toStrictEqual({
-        "method": "transfer",
-        "params": {
+        expect(buildAddLiquidityTxs.deposit0Tx).toStrictEqual({
+          "method": "transfer",
+          "params": {
             "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
             "_to": "NonfungiblePositionManager",
             "_value": "0x1"
-        },
-        "to": "cx0000000000000000000000000000000000000002"
-      })
+          },
+          "to": "cx0000000000000000000000000000000000000002"
+        })
 
-      expect(calldata[1]).toStrictEqual({
+        expect(buildAddLiquidityTxs.deposit1Tx).toStrictEqual({
           "to": "NonfungiblePositionManager",
           "method": "depositIcx",
           "value": "0x1"
         })
 
-      expect(calldata[2]).toStrictEqual(
-        {
-          "to": "NonfungiblePositionManager",
-          "method": "mint",
-          "params": {
+        expect(buildAddLiquidityTxs.mintTx).toStrictEqual(
+          {
+            "to": "NonfungiblePositionManager",
+            "method": "mint",
             "params": {
-              "amount0Desired": "0x1",
-              "amount0Min": "0x0",
-              "amount1Desired": "0x1",
-              "amount1Min": "0x0",
-              "deadline": "0x7b",
-              "fee": "0xbb8",
-              "recipient": "hx0000000000000000000000000000000000000003",
-              "tickLower": "-0x3c",
-              "tickUpper": "0x3c",
-              "token0": "cx0000000000000000000000000000000000000002",
-              "token1": "cx1111111111111111111111111111111111111111"
+              "params": {
+                "amount0Desired": "0x1",
+                "amount0Min": "0x0",
+                "amount1Desired": "0x1",
+                "amount1Min": "0x0",
+                "deadline": "0x7b",
+                "fee": "0xbb8",
+                "recipient": "hx0000000000000000000000000000000000000003",
+                "tickLower": "-0x3c",
+                "tickUpper": "0x3c",
+                "token0": "cx0000000000000000000000000000000000000002",
+                "token1": "cx1111111111111111111111111111111111111111"
+              }
             }
           }
-        }
-      )
+        )
+      })
     })
-  })
 
   describe('#collectCallParameters', () => {
     it('works', () => {
@@ -509,7 +539,7 @@ describe('NonfungiblePositionManager', () => {
         )
       ).toThrow('ZERO_LIQUIDITY')
     })
- 
+
     it('throws for bad burn', () => {
       expect(() =>
         NonfungiblePositionManager.removeCallParameters(
@@ -749,7 +779,7 @@ describe('NonfungiblePositionManager', () => {
       )
     })
   })
-  
+
   describe('#safeTransferFromParameters', () => {
     it('succeeds no data param', () => {
       const options = {
@@ -774,7 +804,7 @@ describe('NonfungiblePositionManager', () => {
       ]
       )
     })
-    
+
     it('succeeds data param', () => {
       const data = '0x0000000000000000000000000000000000009004'
       const options = {
