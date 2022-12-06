@@ -288,6 +288,10 @@ export abstract class NonfungiblePositionManager {
     }
   }
 
+  public static buildWithdrawDepositedTx(token: Token): CallData {
+    return NonfungiblePositionManager.INTERFACE.encodeFunctionData('withdraw', [token.address])
+  }
+
   private static validateAmounts(amount0Desired: JSBI, amount1Desired: JSBI): void {
     if (!JSBI.greaterThan(amount0Desired, ZERO) && !JSBI.greaterThan(amount1Desired, ZERO)) {
       throw new Error("At least one of amount0 or amount1 must be greater than 0!");

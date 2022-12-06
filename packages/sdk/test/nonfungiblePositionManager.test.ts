@@ -780,6 +780,22 @@ describe('NonfungiblePositionManager', () => {
     })
   })
 
+  describe('#buildWithdrawDepositedTx', () => {
+    it('succeeds', () => {
+      const calldata = NonfungiblePositionManager.buildWithdrawDepositedTx(token0)
+
+      expect(calldata).toStrictEqual(
+        {
+          "to": "NonfungiblePositionManager",
+          "method": "withdraw",
+          "params": {
+            "token": token0.address
+          }
+        }
+      )
+    })
+  });
+
   describe('#safeTransferFromParameters', () => {
     it('succeeds no data param', () => {
       const options = {
