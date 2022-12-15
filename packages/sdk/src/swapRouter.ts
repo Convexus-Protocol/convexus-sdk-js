@@ -42,11 +42,7 @@ export interface SwapOptions {
  * Represents the Convexus SwapRouter, and has static methods for helping execute trades.
  */
 export abstract class SwapRouter {
-  public static INTERFACE: Interface = new Interface(ISwapRouter, "SwapRouter")
-
-  public static setContractAddress (contractAddress: string) {
-    this.INTERFACE = new Interface(ISwapRouter, contractAddress)
-  }
+  public static INTERFACE: Interface = new Interface(ISwapRouter)
 
   /**
    * Cannot be constructed.
@@ -60,7 +56,8 @@ export abstract class SwapRouter {
    */
   public static swapCallParameters(
     trades: Trade<Currency, Currency, TradeType> | Trade<Currency, Currency, TradeType>[],
-    options: SwapOptions
+    options: SwapOptions,
+    swapRouterAddress: string
   ): CallData[] {
     if (!Array.isArray(trades)) {
       trades = [trades]
@@ -99,16 +96,16 @@ export abstract class SwapRouter {
 
         if (singleHop) {
           if (trade.tradeType === TradeType.EXACT_INPUT) {
-            calldatas.push(SwapRouter.encodeExactInputSingle(route, routerMustCustody, recipient, deadline, amountOut, amountIn, options))
+            calldatas.push(SwapRouter.encodeExactInputSingle(route, routerMustCustody, recipient, deadline, amountOut, amountIn, options, swapRouterAddress))
           } else {
-            calldatas.push(SwapRouter.encodeExactOutputSingle(route, routerMustCustody, recipient, deadline, amountOut, amountIn, options))
+            calldatas.push(SwapRouter.encodeExactOutputSingle(route, routerMustCustody, recipient, deadline, amountOut, amountIn, options, swapRouterAddress))
           }
         } else {
           invariant(options.sqrtPriceLimitX96 === undefined, 'MULTIHOP_PRICE_LIMIT')
           if (trade.tradeType === TradeType.EXACT_INPUT) {
-            calldatas.push(SwapRouter.encodeExactInput(trade, route, routerMustCustody, recipient, deadline, amountIn, amountOut))
+            calldatas.push(SwapRouter.encodeExactInput(trade, route, routerMustCustody, recipient, deadline, amountIn, amountOut, swapRouterAddress))
           } else {
-            calldatas.push(SwapRouter.encodeExactOutput(trade, route, routerMustCustody, recipient, deadline, amountOut, amountIn))
+            calldatas.push(SwapRouter.encodeExactOutput(trade, route, routerMustCustody, recipient, deadline, amountOut, amountIn, swapRouterAddress))
           }
         }
       }
@@ -120,13 +117,14 @@ export abstract class SwapRouter {
   private static encodeExactOutput (
     trade: Trade<Currency, Currency, TradeType>,
     route: Route<Currency, Currency>,
-    routerMustCustody: boolean, 
-    recipient: string, 
-    deadline: string, 
-    amountOut: string, 
-    amountIn: string
+    routerMustCustody: boolean,
+    recipient: string,
+    deadline: string,
+    amountOut: string,
+    amountIn: string,
+    swapRouterAddress: string
   ): CallData {
-    
+
     const path: string = encodeRouteToPath(route, trade.tradeType === TradeType.EXACT_OUTPUT)
 
     if (Icx.isWrappedAddress(route.tokenPath[0].address)) {
@@ -142,7 +140,8 @@ export abstract class SwapRouter {
       return SwapRouter.INTERFACE.encodeFunctionDataPayable(
         amountIn,
         'exactOutputIcx',
-        exactOutputParams
+        exactOutputParams,
+        swapRouterAddress
       )
     } else {
       const exactOutputParams = [[
@@ -152,7 +151,7 @@ export abstract class SwapRouter {
         amountOut,
         amountIn
       ]]
-  
+
       const exactOutputInputs = [{
         fields: [
           { name: 'path', type: 'bytes' },
@@ -164,13 +163,14 @@ export abstract class SwapRouter {
         name: 'params',
         type: 'struct'
       }]
-  
+
       return SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
         route.tokenPath[0].address,
         amountIn,
         'exactOutput',
         exactOutputInputs,
-        exactOutputParams
+        exactOutputParams,
+        swapRouterAddress
       )
     }
   }
@@ -183,6 +183,7 @@ export abstract class SwapRouter {
     deadline: string,
     amountIn: string,
     amountOut: string,
+    swapRouterAddress: string
   ): CallData {
     const path: string = encodeRouteToPath(route, trade.tradeType === TradeType.EXACT_OUTPUT)
 
@@ -197,7 +198,8 @@ export abstract class SwapRouter {
       return SwapRouter.INTERFACE.encodeFunctionDataPayable(
         amountIn,
         'exactInputIcx',
-        exactInputParams
+        exactInputParams,
+        swapRouterAddress
       )
     } else {
       const exactInputParams = [[
@@ -219,13 +221,14 @@ export abstract class SwapRouter {
         name: 'params',
         type: 'struct'
       }]
-      
+
       return SwapRouter.INTERFACE.encodeTokenFallbackFunctionData(
         route.tokenPath[0].address,
         amountIn,
         'exactInput',
         exactInputInputs,
-        exactInputParams
+        exactInputParams,
+        swapRouterAddress
       )
     }
   }
@@ -237,7 +240,8 @@ export abstract class SwapRouter {
     deadline: string,
     amountOut: string,
     amountIn: string,
-    options: SwapOptions
+    options: SwapOptions,
+    swapRouterAddress: string
   ): CallData {
     if (Icx.isWrappedAddress(route.tokenPath[0].address)) {
       const exactOutputSingleParams = [[
@@ -252,7 +256,8 @@ export abstract class SwapRouter {
       return SwapRouter.INTERFACE.encodeFunctionDataPayable(
         amountIn,
         'exactOutputSingleIcx',
-        exactOutputSingleParams
+        exactOutputSingleParams,
+        swapRouterAddress
       )
     } else {
       const exactOutputSingleParams = [[
@@ -265,7 +270,7 @@ export abstract class SwapRouter {
         amountIn,
         toHex(options.sqrtPriceLimitX96 ?? 0)
       ]]
-  
+
       const exactOutputSingleInputs = [{
         fields: [
           { name: 'tokenIn', type: 'Address' },
@@ -286,19 +291,22 @@ export abstract class SwapRouter {
         amountIn,
         'exactOutputSingle',
         exactOutputSingleInputs,
-        exactOutputSingleParams
+        exactOutputSingleParams,
+        swapRouterAddress
       )
     }
   }
 
   private static encodeExactInputSingle (
-    route: Route<Currency, Currency>, 
-    routerMustCustody: boolean, 
+    route: Route<Currency, Currency>,
+    routerMustCustody: boolean,
     recipient: string,
     deadline: string,
     amountOut: string,
     amountIn: string,
-    options: SwapOptions): CallData {
+    options: SwapOptions,
+    swapRouterAddress: string
+  ): CallData {
     if (Icx.isWrappedAddress(route.tokenPath[0].address)) {
       const exactInputSingleParams = [
         [
@@ -314,7 +322,8 @@ export abstract class SwapRouter {
       return SwapRouter.INTERFACE.encodeFunctionDataPayable(
         amountIn,
         'exactInputSingleIcx',
-        exactInputSingleParams
+        exactInputSingleParams,
+        swapRouterAddress
       )
     } else {
       const exactInputSingleParams = [
@@ -350,7 +359,8 @@ export abstract class SwapRouter {
         amountIn,
         'exactInputSingle',
         exactInputSingleInputs,
-        exactInputSingleParams
+        exactInputSingleParams,
+        swapRouterAddress
       )
     }
   }

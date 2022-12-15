@@ -20,11 +20,7 @@ export interface QuoteOptions {
  * calldata needed to call the quoter contract.
  */
 export abstract class SwapQuoter {
-  public static INTERFACE: Interface = new Interface(IQuoter, "Quoter")
-
-  public static setContractAddress (contractAddress: string) {
-    this.INTERFACE = new Interface(IQuoter, contractAddress)
-  }
+  public static INTERFACE: Interface = new Interface(IQuoter)
 
   /**
    * Produces the on-chain method name of the appropriate function within QuoterV2,
@@ -40,7 +36,8 @@ export abstract class SwapQuoter {
     route: Route<TInput, TOutput>,
     amount: CurrencyAmount<TInput | TOutput>,
     tradeType: TradeType,
-    options: QuoteOptions = {}
+    options: QuoteOptions = {},
+    quoterAddress: string
   ): CallData[] {
     const singleHop = route.pools.length === 1
     const quoteAmount: string = toHex(amount.quotient)
@@ -56,7 +53,7 @@ export abstract class SwapQuoter {
             route.pools[0].fee,
             toHex(options?.sqrtPriceLimitX96 ?? 0)
           ]
-      ])
+      ], quoterAddress)
       } else {
         calldata = SwapQuoter.INTERFACE.encodeFunctionData(`quoteExactOutputSingle`, [
           [
@@ -66,7 +63,7 @@ export abstract class SwapQuoter {
             route.pools[0].fee,
             toHex(options?.sqrtPriceLimitX96 ?? 0)
           ]
-      ])
+      ], quoterAddress)
       }
     } else {
       invariant(options?.sqrtPriceLimitX96 === undefined, 'MULTIHOP_PRICE_LIMIT')
@@ -75,14 +72,14 @@ export abstract class SwapQuoter {
       if (tradeType === TradeType.EXACT_INPUT) {
         calldata = SwapQuoter.INTERFACE.encodeFunctionData('quoteExactInput', [
           [path, quoteAmount]
-        ])
+        ], quoterAddress)
       } else {
         calldata = SwapQuoter.INTERFACE.encodeFunctionData('quoteExactOutput', [
           [path, quoteAmount]
-        ])
+        ], quoterAddress)
       }
     }
-    
+
     return [calldata]
   }
 }

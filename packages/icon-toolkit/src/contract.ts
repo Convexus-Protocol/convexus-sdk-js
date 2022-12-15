@@ -37,8 +37,8 @@ export class Contract {
     })
   }
 
-  public buildCallArray (method: string, output_transform: OutputTransform, ...args: any): Promise<any> {
-    const data = this.interface.encodeFunctionData(method, args)
+  public buildCallArray (to: string, method: string, output_transform: OutputTransform, ...args: any): Promise<any> {
+    const data = this.interface.encodeFunctionData(method, args, to)
     return this.buildCall(data).then(result => {
       if (output_transform) {
         result = output_transform(result);
@@ -57,8 +57,8 @@ export class Contract {
     return this.iconService.call(txObj).execute()
   }
 
-  public buildSendArray (method: string, output_transform: OutputTransform, wallet: Wallet, ...args: any): Promise<any> {
-    return this.buildSendArrayPayable(method, "0", wallet, args).then(result => {
+  public buildSendArray (to: string, method: string, output_transform: OutputTransform, wallet: Wallet, ...args: any): Promise<any> {
+    return this.buildSendArrayPayable(to, method, "0", wallet, args).then(result => {
       if (output_transform) {
         result = output_transform(result);
       }
@@ -66,8 +66,8 @@ export class Contract {
     })
   }
 
-  public buildSendArrayPayable (method: string, icxAmount: string, wallet: Wallet, ...args: any): Promise<any> {
-    const data = this.interface.encodeFunctionDataPayable(icxAmount, method, args)
+  public buildSendArrayPayable (to: string, method: string, icxAmount: string, wallet: Wallet, ...args: any): Promise<any> {
+    const data = this.interface.encodeFunctionDataPayable(icxAmount, method, args, to)
     return this.buildSend(wallet, data)
   }
 
@@ -90,7 +90,7 @@ export class Contract {
     if (icxAmount) {
       txObjBuilder.value(IconService.IconConverter.toBigNumber(icxAmount))
     }
-    
+
     const txObjEstimate = txObjBuilder.build()
 
     // estimate steps
@@ -119,17 +119,17 @@ export class Contract {
   }
 
   public constructor (
-    address: string, 
-    abi: any, 
-    iconService: IconService, 
-    debugService: IconService, 
+    address: string,
+    abi: any,
+    iconService: IconService,
+    debugService: IconService,
     nid: number
   ) {
     this.iconService = iconService;
     this.debugService = debugService;
     this.nid = nid;
     this.address = address;
-    this.interface = new Interface(abi, address);
+    this.interface = new Interface(abi);
 
     for (const index in this.interface.abi) {
       const obj = this.interface.abi[index];
@@ -155,11 +155,11 @@ export class Contract {
 
           // readonly methods
           if ('readonly' in obj && parseInt(obj['readonly'], 16) === 1) {
-            const buildCallArray = this.buildCallArray.bind(this, name, output_transform)
+            const buildCallArray = this.buildCallArray.bind(this, address, name, output_transform)
             defineReadOnly(this, name, buildCallArray)
             // write methods
           } else {
-            const buildSendArray = this.buildSendArray.bind(this, name, output_transform)
+            const buildSendArray = this.buildSendArray.bind(this, address, name, output_transform)
             defineReadOnly(this, name, buildSendArray)
           }
         } break;

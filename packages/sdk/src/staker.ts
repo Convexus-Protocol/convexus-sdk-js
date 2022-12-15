@@ -65,11 +65,7 @@ export interface WithdrawOptions {
 }
 
 export abstract class Staker {
-  public static INTERFACE: Interface = new Interface(IConvexusStaker, "ConvexusStaker")
-
-  public static setContractAddress (contractAddress: string) {
-    this.INTERFACE = new Interface(IConvexusStaker, contractAddress)
-  }
+  public static INTERFACE: Interface = new Interface(IConvexusStaker)
 
   protected constructor() {}
 
@@ -80,22 +76,23 @@ export abstract class Staker {
    * @returns The calldatas for 'unstakeToken' and 'claimReward'.
    */
   private static async encodeClaim(
-    poolFactoryProvider: PoolFactoryProvider, 
-    incentiveKey: IncentiveKey, 
-    options: ClaimOptions
+    poolFactoryProvider: PoolFactoryProvider,
+    incentiveKey: IncentiveKey,
+    options: ClaimOptions,
+    stakerAddress: string
   ): Promise<CallData[]> {
     const calldatas: CallData[] = []
     calldatas.push(
       Staker.INTERFACE.encodeFunctionData('unstakeToken', [
         await this._encodeIncentiveKey(poolFactoryProvider, incentiveKey),
         toHex(options.tokenId)
-      ])
+      ], stakerAddress)
     )
 
     const recipient: string = validateAndParseAddress(options.recipient)
     const amount = options.amount ?? 0
     calldatas.push(
-      Staker.INTERFACE.encodeFunctionData('claimReward', [incentiveKey.rewardToken.address, recipient, toHex(amount)])
+      Staker.INTERFACE.encodeFunctionData('claimReward', [incentiveKey.rewardToken.address, recipient, toHex(amount)], stakerAddress)
     )
     return calldatas
   }
@@ -107,12 +104,14 @@ export abstract class Staker {
    * Input an array of IncentiveKeys to claim rewards for each program.
    * @param options ClaimOptions to specify tokenId, recipient, and amount wanting to collect.
    * Note that you can only specify one amount and one recipient across the various programs if you are collecting from multiple programs at once.
+   * @param stakerAddress Staker SCORE address
    * @returns
    */
   public static async collectRewards(
-    poolFactoryProvider: PoolFactoryProvider, 
-    incentiveKeys: IncentiveKey | IncentiveKey[], 
-    options: ClaimOptions
+    poolFactoryProvider: PoolFactoryProvider,
+    incentiveKeys: IncentiveKey | IncentiveKey[],
+    options: ClaimOptions,
+    stakerAddress: string
   ): Promise<CallData[]> {
     incentiveKeys = Array.isArray(incentiveKeys) ? incentiveKeys : [incentiveKeys]
     let calldatas: CallData[] = []
@@ -121,13 +120,13 @@ export abstract class Staker {
       // the unique program tokenId is staked in
       const incentiveKey = incentiveKeys[i]
       // unstakes and claims for the unique program
-      calldatas = calldatas.concat(await this.encodeClaim(poolFactoryProvider, incentiveKey, options))
+      calldatas = calldatas.concat(await this.encodeClaim(poolFactoryProvider, incentiveKey, options, stakerAddress))
       // re-stakes the position for the unique program
       calldatas.push(
         Staker.INTERFACE.encodeFunctionData('stakeToken', [
           await this._encodeIncentiveKey(poolFactoryProvider, incentiveKey),
           toHex(options.tokenId)
-        ])
+        ], stakerAddress)
       )
     }
     return calldatas
@@ -142,7 +141,8 @@ export abstract class Staker {
   public static async withdrawToken(
     poolFactoryProvider: PoolFactoryProvider,
     incentiveKeys: IncentiveKey | IncentiveKey[],
-    withdrawOptions: FullWithdrawOptions
+    withdrawOptions: FullWithdrawOptions,
+    stakerAddress: string
   ): Promise<CallData[]> {
     let calldatas: CallData[] = []
 
@@ -156,7 +156,7 @@ export abstract class Staker {
 
     for (let i = 0; i < incentiveKeys.length; i++) {
       const incentiveKey = incentiveKeys[i]
-      calldatas = calldatas.concat(await this.encodeClaim(poolFactoryProvider, incentiveKey, claimOptions))
+      calldatas = calldatas.concat(await this.encodeClaim(poolFactoryProvider, incentiveKey, claimOptions, stakerAddress))
     }
     const owner = validateAndParseAddress(withdrawOptions.owner)
     calldatas.push(
@@ -164,7 +164,7 @@ export abstract class Staker {
         toHex(withdrawOptions.tokenId),
         owner,
         withdrawOptions.data ? withdrawOptions.data : toHex(0)
-      ])
+      ], stakerAddress)
     )
     return calldatas
   }
@@ -174,7 +174,7 @@ export abstract class Staker {
    * @returns An IncentiveKey as a string
    */
   public static async encodeDeposit(
-    poolFactoryProvider: PoolFactoryProvider, 
+    poolFactoryProvider: PoolFactoryProvider,
     incentiveKeys: IncentiveKey | IncentiveKey[]
   ): Promise<string> {
     incentiveKeys = Array.isArray(incentiveKeys) ? incentiveKeys : [incentiveKeys]

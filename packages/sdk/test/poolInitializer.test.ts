@@ -25,16 +25,18 @@ describe('PoolInitializer', () => {
   const tickCurrent = 0
   // Create a new pool
   const pool_0_1 = new Pool(token0, token1, fee, poolPrice, liquidity, tickCurrent)
+  // Init mock SCORE address
+  const poolInitializerAddress = "cx0000000000000000000000000000000000000003"
 
   describe('Create new pool', () => {
     it('succeeds', () => {
       // Pool initializer needs a Pool instance
-      const calldata = PoolInitializer.createCallParameters(pool_0_1)
+      const calldata = PoolInitializer.createCallParameters(pool_0_1, poolInitializerAddress)
 
       expect(calldata).toStrictEqual(
         [
           {
-            "to": "PoolInitializer",
+            "to": poolInitializerAddress,
             "method": "createAndInitializePoolIfNecessary",
             "params": {
               "fee": "0xbb8",
@@ -50,7 +52,7 @@ describe('PoolInitializer', () => {
 
   it('succeeds and deposit liquidity', () => {
     // Initialize the pool
-    PoolInitializer.createCallParameters(pool_0_1)
+    PoolInitializer.createCallParameters(pool_0_1, poolInitializerAddress)
 
     // Provide liquidity between 500 and 800
     const lowerBoundPrice = 500
@@ -85,7 +87,8 @@ describe('PoolInitializer', () => {
         tickUpper: tickUpper,
         liquidity: liquidity
       }),
-      { recipient, slippageTolerance, deadline }
+      { recipient, slippageTolerance, deadline },
+      poolInitializerAddress
     )
   })
 
@@ -128,13 +131,13 @@ describe('PoolInitializer', () => {
     const deadline = 123
 
     // Initialize the pool + mint position
-    const calldatas = PoolInitializer.createAndMintCallParameters(position, recipient, deadline)
+    const calldatas = PoolInitializer.createAndMintCallParameters(position, recipient, deadline, poolInitializerAddress)
 
     expect(calldatas[0]).toStrictEqual({
       "method": "transfer",
       "params": {
           "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
-          "_to": "PoolInitializer",
+          "_to": poolInitializerAddress,
           "_value": "0x452d3f9ea92358de"
       },
       "to": "cx0000000000000000000000000000000000000001"
@@ -144,7 +147,7 @@ describe('PoolInitializer', () => {
       "method": "transfer",
       "params": {
           "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
-          "_to": "PoolInitializer",
+          "_to": poolInitializerAddress,
           "_value": "0x692a76b89ac3d067cf"
       },
       "to": "cx0000000000000000000000000000000000000002"
@@ -152,7 +155,7 @@ describe('PoolInitializer', () => {
 
     expect(calldatas[2]).toStrictEqual(
       {
-        "to": "PoolInitializer",
+        "to": poolInitializerAddress,
         "method": "createAndInitializePoolIfNecessaryAndMintPosition",
         "params": {
             "token0": "cx0000000000000000000000000000000000000001",

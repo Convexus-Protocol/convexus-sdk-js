@@ -1,4 +1,4 @@
-import { validateAndParseAddress } from './validateAndParseAddress'
+import { validateAndParseAddress} from './validateAndParseAddress';
 import invariant from 'tiny-invariant'
 import { toHex } from './calldata'
 import IconService from "icon-sdk-js";
@@ -9,17 +9,16 @@ export type CallData = {[key: string] : any}
 
 export class Interface {
   abi: []
-  contractAddress: string
 
-  public constructor (abi: any, contractAddress: string) {
+  public constructor (abi: any) {
     this.abi = abi
-    this.contractAddress = contractAddress
   }
+
   public getAbiObject (name: string) {
     for (const index in this.abi) {
       const obj = this.abi[index]
       if (obj['name'] === name) {
-        return obj 
+        return obj
       }
     }
 
@@ -30,7 +29,7 @@ export class Interface {
 
     const inputType: string = input['type']
     const result: any = {}
-    
+
     switch (inputType) {
       case "struct": {
         invariant (value.length === input['fields'].length, "INVALID_STRUCT_COUNT")
@@ -48,11 +47,11 @@ export class Interface {
       case "int": {
         result[input['name']] = toHex(value)
       } break
-    
+
       case "str": {
         result[input['name']] = value
       } break
-    
+
       case "bytes": {
         result[input['name']] = value
       } break
@@ -70,11 +69,15 @@ export class Interface {
 
   public encodeFunctionDataPayable (
     icxAmount: BigintIsh,
-    method: string, 
-    values: Array<String|number|[]|{}>
+    method: string,
+    values: Array<String|number|[]|{}>,
+    to: string
   ): CallData {
     const abiObject = this.getAbiObject(method)
     const inputs: [] = abiObject['inputs']
+
+    // make sure provided "to" string is a valid Icon address
+    to = validateAndParseAddress(to);
 
     if (values === undefined) {
       values = []
@@ -82,7 +85,7 @@ export class Interface {
 
     invariant(inputs.length == values?.length, `INVALID_ARGS_COUNT (expected ${inputs.length}, got ${values?.length})`)
     var payload: any = {
-      "to": this.contractAddress,
+      "to": to,
       "method": method
     }
 
@@ -99,23 +102,28 @@ export class Interface {
 
     return payload
   }
-  
+
   public encodeFunctionData (
-    method: string, 
-    values: Array<String|number|[]|{}>
+    method: string,
+    values: Array<String|number|[]|{}>,
+    to: string
   ): CallData {
-    return this.encodeFunctionDataPayable("0", method, values);
+    return this.encodeFunctionDataPayable("0", method, values, to);
   }
-  
+
   public encodeTokenFallbackFunctionData (
     token: string,
     amount: BigintIsh,
     method: string,
     inputs: Array<{}>,
     values: Array<{}>,
+    to: string
   ): CallData {
     invariant(inputs.length == values.length, `INVALID_ARGS_COUNT (expected ${inputs.length}, got ${values?.length})`)
-    
+
+    // make sure provided "to" string is a valid Icon address
+    to = validateAndParseAddress(to);
+
     var tokenFallbackPayload: any = {
       "method": method,
       "params": {}
@@ -127,12 +135,12 @@ export class Interface {
         tokenFallbackPayload["params"] = Object.assign(tokenFallbackPayload["params"], this.buildParam(values[index], inputs[index]))
       }
     }
-    
+
     var payload: any = {
       "to": token,
       "method": "transfer",
       "params": {
-        "_to": this.contractAddress,
+        "_to": to,
         "_value": toHex(amount),
         "_data": IconService.IconConverter.toHex(JSON.stringify(tokenFallbackPayload))
       }

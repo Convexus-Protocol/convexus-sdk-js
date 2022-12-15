@@ -152,33 +152,35 @@ export interface RemoveLiquidityOptions {
 }
 
 export abstract class NonfungiblePositionManager {
-  public static INTERFACE: Interface = new Interface(INonfungiblePositionManager, "NonfungiblePositionManager")
-
-  public static setContractAddress (contractAddress: string) {
-    NonfungiblePositionManager.INTERFACE = new Interface(INonfungiblePositionManager, contractAddress)
-  }
+  public static INTERFACE: Interface = new Interface(INonfungiblePositionManager)
 
   /**
    * Cannot be constructed.
    */
   private constructor() {}
 
-  public static encodeDeposit (token: Token, amount: BigintIsh): CallData {
+  public static encodeDeposit (token: Token, amount: BigintIsh, nonfungiblePositionManagerAddress: string): CallData {
     if (Icx.isWrappedAddress(token.address)) {
       return NonfungiblePositionManager.INTERFACE.encodeFunctionDataPayable(
         amount,
-        'depositIcx', []
+        'depositIcx', [],
+        nonfungiblePositionManagerAddress
       )
     } else {
       return NonfungiblePositionManager.INTERFACE.encodeTokenFallbackFunctionData(
         token.address,
         amount,
-        'deposit', [], []
+        'deposit', [], [],
+        nonfungiblePositionManagerAddress
       )
     }
   }
 
-  public static buildAddLiquidityTxs(position: Position, options: AddLiquidityOptions): IAddLiquidityTxs {
+  public static buildAddLiquidityTxs(
+    position: Position,
+    options: AddLiquidityOptions,
+    nonfungiblePositionManagerAddress: string
+  ): IAddLiquidityTxs {
     invariant(JSBI.greaterThan(position.liquidity, ZERO), 'ZERO_LIQUIDITY')
 
     // get amounts
@@ -201,11 +203,11 @@ export abstract class NonfungiblePositionManager {
 
       // deposit tokens
       if (JSBI.greaterThan(amount0Desired, ZERO)) {
-        deposit0Tx = this.encodeDeposit(position.pool.token0, amount0Desired);
+        deposit0Tx = this.encodeDeposit(position.pool.token0, amount0Desired, nonfungiblePositionManagerAddress);
       }
 
       if (JSBI.greaterThan(amount1Desired, ZERO)) {
-        deposit1Tx = this.encodeDeposit(position.pool.token1, amount1Desired);
+        deposit1Tx = this.encodeDeposit(position.pool.token1, amount1Desired, nonfungiblePositionManagerAddress);
       }
 
       const mintTx = NonfungiblePositionManager.INTERFACE.encodeFunctionData('mint', [
@@ -222,7 +224,8 @@ export abstract class NonfungiblePositionManager {
           recipient,
           deadline
         ]
-      ])
+      ],
+        nonfungiblePositionManagerAddress)
 
       if (options.useNative) {
         const wrapped = options.useNative.wrapped
@@ -236,7 +239,11 @@ export abstract class NonfungiblePositionManager {
     }
   }
 
-  public static buildIncreaseLiquidityTxs(position: Position, options: AddLiquidityOptions): IIncreaseLiquidityTxs {
+  public static buildIncreaseLiquidityTxs(
+    position: Position,
+    options: AddLiquidityOptions,
+    nonfungiblePositionManagerAddress: string
+  ): IIncreaseLiquidityTxs {
     invariant(JSBI.greaterThan(position.liquidity, ZERO), 'ZERO_LIQUIDITY')
 
     // get amounts
@@ -259,11 +266,11 @@ export abstract class NonfungiblePositionManager {
 
       // deposit tokens
       if (JSBI.greaterThan(amount0Desired, ZERO)) {
-        deposit0Tx = this.encodeDeposit(position.pool.token0, amount0Desired);
+        deposit0Tx = this.encodeDeposit(position.pool.token0, amount0Desired, nonfungiblePositionManagerAddress);
       }
 
       if (JSBI.greaterThan(amount1Desired, ZERO)) {
-        deposit1Tx = this.encodeDeposit(position.pool.token1, amount1Desired);
+        deposit1Tx = this.encodeDeposit(position.pool.token1, amount1Desired, nonfungiblePositionManagerAddress);
       }
 
       const increaseLiquidityTx = NonfungiblePositionManager.INTERFACE.encodeFunctionData('increaseLiquidity',
@@ -274,7 +281,8 @@ export abstract class NonfungiblePositionManager {
           amount0Min,
           amount1Min,
           deadline
-        ]]);
+        ]],
+        nonfungiblePositionManagerAddress);
 
       if (options.useNative) {
         const wrapped = options.useNative.wrapped
@@ -288,8 +296,12 @@ export abstract class NonfungiblePositionManager {
     }
   }
 
-  public static buildWithdrawDepositedTx(token: Token): CallData {
-    return NonfungiblePositionManager.INTERFACE.encodeFunctionData('withdraw', [token.address])
+  public static buildWithdrawDepositedTx(token: Token, nonfungiblePositionManagerAddress: string): CallData {
+    return NonfungiblePositionManager.INTERFACE.encodeFunctionData(
+      'withdraw',
+      [token.address],
+      nonfungiblePositionManagerAddress
+    );
   }
 
   private static validateAmounts(amount0Desired: JSBI, amount1Desired: JSBI): void {
@@ -298,7 +310,7 @@ export abstract class NonfungiblePositionManager {
     }
   }
 
-  private static encodeCollect(options: CollectOptions): CallData[] {
+  private static encodeCollect(options: CollectOptions, nonfungiblePositionManagerAddress: string): CallData[] {
     const calldatas: CallData[] = []
 
     const tokenId = toHex(options.tokenId)
@@ -314,14 +326,14 @@ export abstract class NonfungiblePositionManager {
           MaxUint256,
           MaxUint256
         ]
-      ])
+      ], nonfungiblePositionManagerAddress)
     )
 
     return calldatas
   }
 
-  public static collectCallParameters(options: CollectOptions): CallData[] {
-    const calldatas: CallData[] = NonfungiblePositionManager.encodeCollect(options)
+  public static collectCallParameters(options: CollectOptions, nonfungiblePositionManagerAddress: string): CallData[] {
+    const calldatas: CallData[] = NonfungiblePositionManager.encodeCollect(options, nonfungiblePositionManagerAddress)
 
     return calldatas
   }
@@ -330,9 +342,14 @@ export abstract class NonfungiblePositionManager {
    * Produces the calldata for completely or partially exiting a position
    * @param position The position to exit
    * @param options Additional information necessary for generating the calldata
+   * @param nonfungiblePositionManagerAddress SCORE address
    * @returns The call parameters
    */
-  public static removeCallParameters(position: Position, options: RemoveLiquidityOptions): CallData[] {
+  public static removeCallParameters(
+    position: Position,
+    options: RemoveLiquidityOptions,
+    nonfungiblePositionManagerAddress: string
+  ): CallData[] {
     const calldatas: CallData[] = []
 
     const deadline = toHex(options.deadline)
@@ -362,7 +379,7 @@ export abstract class NonfungiblePositionManager {
           toHex(amount1Min),
           deadline
         ]
-      ])
+      ], nonfungiblePositionManagerAddress)
     )
 
     const { expectedCurrencyOwed0, expectedCurrencyOwed1, ...rest } = options.collectOptions
@@ -377,12 +394,16 @@ export abstract class NonfungiblePositionManager {
           CurrencyAmount.fromRawAmount(expectedCurrencyOwed1.currency, amount1Min)
         ),
         ...rest
-      })
+      }, nonfungiblePositionManagerAddress)
     )
 
     if (options.liquidityPercentage.equalTo(ONE)) {
       if (options.burnToken) {
-        calldatas.push(NonfungiblePositionManager.INTERFACE.encodeFunctionData('burn', [tokenId]))
+        calldatas.push(NonfungiblePositionManager.INTERFACE.encodeFunctionData(
+          'burn',
+          [tokenId],
+          nonfungiblePositionManagerAddress
+        ))
       }
     } else {
       invariant(options.burnToken !== true, 'CANNOT_BURN')
@@ -391,7 +412,10 @@ export abstract class NonfungiblePositionManager {
     return calldatas
   }
 
-  public static safeTransferFromParameters(options: SafeTransferOptions): CallData[] {
+  public static safeTransferFromParameters(
+    options: SafeTransferOptions,
+    nonfungiblePositionManagerAddress: string
+  ): CallData[] {
     const recipient = validateAndParseAddress(options.recipient)
     const sender = validateAndParseAddress(options.sender)
 
@@ -399,7 +423,8 @@ export abstract class NonfungiblePositionManager {
     if (options.data) {
       calldata = NonfungiblePositionManager.INTERFACE.encodeFunctionData(
         'safeTransferFrom',
-        [sender, recipient, toHex(options.tokenId), options.data]
+        [sender, recipient, toHex(options.tokenId), options.data],
+        nonfungiblePositionManagerAddress
       )
     } else {
       calldata = NonfungiblePositionManager.INTERFACE.encodeFunctionData('safeTransferFrom', [
@@ -407,7 +432,7 @@ export abstract class NonfungiblePositionManager {
         recipient,
         toHex(options.tokenId),
         ''
-      ])
+      ], nonfungiblePositionManagerAddress)
     }
 
     return [calldata]

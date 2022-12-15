@@ -19,6 +19,7 @@ describe('SwapQuoter', () => {
   const liquidity = 1_000_000
   const ICX = new Icx()
   const WICX = ICX.wrapped
+  const quoter = "cx0000000000000000000000000000000000000003";
 
   const makePool = (token0: Token, token1: Token) => {
     return new Pool(token0, token1, feeAmount, sqrtRatioX96, liquidity, TickMath.getTickAtSqrtRatio(sqrtRatioX96), [
@@ -50,12 +51,14 @@ describe('SwapQuoter', () => {
         const calldata = SwapQuoter.quoteCallParameters(
           trade.swaps[0].route,
           trade.inputAmount,
-          trade.tradeType
+          trade.tradeType,
+          undefined,
+          quoter
         )
 
         expect(calldata).toStrictEqual([
           {
-            "to": "Quoter",
+            "to": quoter,
             "method": "quoteExactInputSingle",
             "params": {
                 "params": {
@@ -80,12 +83,14 @@ describe('SwapQuoter', () => {
         const calldata = SwapQuoter.quoteCallParameters(
           trade.swaps[0].route,
           trade.outputAmount,
-          trade.tradeType
+          trade.tradeType,
+          undefined,
+          quoter
         )
 
         expect(calldata).toStrictEqual([
           {
-            "to": "Quoter",
+            "to": quoter,
             "method": "quoteExactOutputSingle",
             "params": {
                 "params": {
@@ -107,11 +112,11 @@ describe('SwapQuoter', () => {
           CurrencyAmount.fromRawAmount(token0, 100),
           TradeType.EXACT_INPUT
         )
-        const calldata = SwapQuoter.quoteCallParameters(trade.route, trade.inputAmount, trade.tradeType)
+        const calldata = SwapQuoter.quoteCallParameters(trade.route, trade.inputAmount, trade.tradeType, undefined, quoter)
 
         expect(calldata).toStrictEqual([
           {
-            "to": "Quoter",
+            "to": quoter,
             "method": "quoteExactInput",
             "params": {
               "params": {
@@ -130,11 +135,11 @@ describe('SwapQuoter', () => {
           CurrencyAmount.fromRawAmount(WICX, 100),
           TradeType.EXACT_OUTPUT
         )
-        const calldata = SwapQuoter.quoteCallParameters(trade.route, trade.outputAmount, trade.tradeType)
+        const calldata = SwapQuoter.quoteCallParameters(trade.route, trade.outputAmount, trade.tradeType, undefined, quoter)
 
         expect(calldata).toStrictEqual([
           {
-            "to": "Quoter",
+            "to": quoter,
             "method": "quoteExactOutput",
             "params": {
                 "params": {
@@ -154,11 +159,11 @@ describe('SwapQuoter', () => {
         )
         const calldata = SwapQuoter.quoteCallParameters(trade.route, trade.inputAmount, trade.tradeType, {
           sqrtPriceLimitX96: JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(128))
-        })
+        }, quoter)
 
         expect(calldata).toStrictEqual([
           {
-            "to": "Quoter",
+            "to": quoter,
             "method": "quoteExactInputSingle",
             "params": {
                 "params": {

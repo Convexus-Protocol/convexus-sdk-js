@@ -4,45 +4,49 @@ import IPoolInitializer from './artifacts/contracts/PoolInitializer/PoolInitiali
 import { Pool, Position } from './entities'
 
 export abstract class PoolInitializer {
-  public static INTERFACE: Interface = new Interface(IPoolInitializer, "PoolInitializer")
+  public static INTERFACE: Interface = new Interface(IPoolInitializer)
 
-  public static setContractAddress (contractAddress: string) {
-    this.INTERFACE = new Interface(IPoolInitializer, contractAddress)
-  }
 
   /**
    * Cannot be constructed.
    */
   private constructor() {}
 
-  public static encodeCreate(pool: Pool): CallData {
+  public static encodeCreate(pool: Pool, poolInitializerAddress: string): CallData {
     return PoolInitializer.INTERFACE.encodeFunctionData('createAndInitializePoolIfNecessary', [
       pool.token0.address,
       pool.token1.address,
       pool.fee,
-      toHex(pool.sqrtRatioX96)
-    ])
+      toHex(pool.sqrtRatioX96),
+    ], poolInitializerAddress);
   }
-  
-  public static encodeDeposit (token: Token, amount: BigintIsh): CallData {
+
+  public static encodeDeposit (token: Token, amount: BigintIsh, poolInitializerAddress: string): CallData {
     if (Icx.isWrappedAddress(token.address)) {
       return PoolInitializer.INTERFACE.encodeFunctionDataPayable(
         amount,
-        'depositIcx', []
+        'depositIcx', [],
+        poolInitializerAddress
       )
     } else {
       return PoolInitializer.INTERFACE.encodeTokenFallbackFunctionData(
         token.address,
         amount,
-        'deposit', [], []
+        'deposit', [], [],
+        poolInitializerAddress
       )
     }
   }
-  
-  static encodeCreateAndMint (position: Position, recipient: string, deadline: number): CallData {
+
+  static encodeCreateAndMint(
+    position: Position,
+    recipient: string,
+    deadline: number,
+    poolInitializerAddress: string
+  ): CallData {
     const pool = position.pool
     const {amount0, amount1} = position.mintAmounts
-    
+
     return PoolInitializer.INTERFACE.encodeFunctionData('createAndInitializePoolIfNecessaryAndMintPosition', [
       // For the pool creation+initialization
       pool.token0.address,
@@ -59,18 +63,23 @@ export abstract class PoolInitializer {
       toHex(0),
       validateAndParseAddress(recipient),
       toHex(deadline)
-    ])
+    ], poolInitializerAddress)
   }
 
-  public static createCallParameters(pool: Pool): CallData[] {
-    return [this.encodeCreate(pool)]
+  public static createCallParameters(pool: Pool, poolInitializerAddress: string): CallData[] {
+    return [this.encodeCreate(pool, poolInitializerAddress)]
   }
 
-  public static createAndMintCallParameters (position: Position, recipient: string, deadline: number): CallData[] {
+  public static createAndMintCallParameters (
+    position: Position,
+    recipient: string,
+    deadline: number,
+    poolInitializerAddress: string
+  ): CallData[] {
     return [
-      PoolInitializer.encodeDeposit(position.pool.token0, position.amount0.quotient),
-      PoolInitializer.encodeDeposit(position.pool.token1, position.amount1.quotient),
-      PoolInitializer.encodeCreateAndMint(position, recipient, deadline)
+      PoolInitializer.encodeDeposit(position.pool.token0, position.amount0.quotient, poolInitializerAddress),
+      PoolInitializer.encodeDeposit(position.pool.token1, position.amount1.quotient, poolInitializerAddress),
+      PoolInitializer.encodeCreateAndMint(position, recipient, deadline, poolInitializerAddress)
     ]
   }
 }
