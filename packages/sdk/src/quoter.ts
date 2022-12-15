@@ -38,7 +38,7 @@ export abstract class SwapQuoter {
     tradeType: TradeType,
     options: QuoteOptions = {},
     quoterAddress: string
-  ): CallData[] {
+  ): CallData {
     const singleHop = route.pools.length === 1
     const quoteAmount: string = toHex(amount.quotient)
     let calldata: CallData
@@ -80,6 +80,6 @@ export abstract class SwapQuoter {
       }
     }
 
-    return [calldata]
+    return calldata
   }
 }

@@ -56,7 +56,7 @@ describe('SwapQuoter', () => {
           quoter
         )
 
-        expect(calldata).toStrictEqual([
+        expect(calldata).toStrictEqual(
           {
             "to": quoter,
             "method": "quoteExactInputSingle",
@@ -70,7 +70,7 @@ describe('SwapQuoter', () => {
                 }
             }
           }
-        ])
+        )
       })
 
       it('single-hop exact output', async () => {
@@ -88,7 +88,7 @@ describe('SwapQuoter', () => {
           quoter
         )
 
-        expect(calldata).toStrictEqual([
+        expect(calldata).toStrictEqual(
           {
             "to": quoter,
             "method": "quoteExactOutputSingle",
@@ -102,7 +102,7 @@ describe('SwapQuoter', () => {
                 }
             }
           }
-        ])
+        )
       })
 
       it('multi-hop exact input', async () => {
@@ -114,7 +114,7 @@ describe('SwapQuoter', () => {
         )
         const calldata = SwapQuoter.quoteCallParameters(trade.route, trade.inputAmount, trade.tradeType, undefined, quoter)
 
-        expect(calldata).toStrictEqual([
+        expect(calldata).toStrictEqual(
           {
             "to": quoter,
             "method": "quoteExactInput",
@@ -125,7 +125,7 @@ describe('SwapQuoter', () => {
               }
             }
           }
-        ])
+        )
       })
 
       it('multi-hop exact output', async () => {
@@ -137,18 +137,16 @@ describe('SwapQuoter', () => {
         )
         const calldata = SwapQuoter.quoteCallParameters(trade.route, trade.outputAmount, trade.tradeType, undefined, quoter)
 
-        expect(calldata).toStrictEqual([
-          {
-            "to": quoter,
-            "method": "quoteExactOutput",
+        expect(calldata).toStrictEqual({
+          "to": quoter,
+          "method": "quoteExactOutput",
+          "params": {
             "params": {
-                "params": {
-                    "amountOut": "0x64",
-                    "path": "0x01111111111111111111111111111111111111111100000bb801000000000000000000000000000000000000000200000bb8010000000000000000000000000000000000000001"
-                }
+              "amountOut": "0x64",
+              "path": "0x01111111111111111111111111111111111111111100000bb801000000000000000000000000000000000000000200000bb8010000000000000000000000000000000000000001"
             }
           }
-        ])
+        })
       })
       it('sqrtPriceLimitX96', async () => {
         const trade = await Trade.fromRoute(
@@ -161,7 +159,7 @@ describe('SwapQuoter', () => {
           sqrtPriceLimitX96: JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(128))
         }, quoter)
 
-        expect(calldata).toStrictEqual([
+        expect(calldata).toStrictEqual(
           {
             "to": quoter,
             "method": "quoteExactInputSingle",
@@ -175,7 +173,7 @@ describe('SwapQuoter', () => {
                 }
             }
           }
-        ])
+        )
       })
     })
   })

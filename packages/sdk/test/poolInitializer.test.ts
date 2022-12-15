@@ -34,18 +34,16 @@ describe('PoolInitializer', () => {
       const calldata = PoolInitializer.createCallParameters(pool_0_1, poolInitializerAddress)
 
       expect(calldata).toStrictEqual(
-        [
-          {
-            "to": poolInitializerAddress,
-            "method": "createAndInitializePoolIfNecessary",
-            "params": {
-              "fee": "0xbb8",
-              "sqrtPriceX96": "0x1000000000000000000000000",
-              "token0": "cx0000000000000000000000000000000000000001",
-              "token1": "cx0000000000000000000000000000000000000002"
-            }
+        {
+          "to": poolInitializerAddress,
+          "method": "createAndInitializePoolIfNecessary",
+          "params": {
+            "fee": "0xbb8",
+            "sqrtPriceX96": "0x1000000000000000000000000",
+            "token0": "cx0000000000000000000000000000000000000001",
+            "token1": "cx0000000000000000000000000000000000000002"
           }
-        ]
+        }
       )
     })
   })
@@ -133,7 +131,7 @@ describe('PoolInitializer', () => {
     // Initialize the pool + mint position
     const calldatas = PoolInitializer.createAndMintCallParameters(position, recipient, deadline, poolInitializerAddress)
 
-    expect(calldatas[0]).toStrictEqual({
+    expect(calldatas.deposit0Tx).toStrictEqual({
       "method": "transfer",
       "params": {
           "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
@@ -143,7 +141,7 @@ describe('PoolInitializer', () => {
       "to": "cx0000000000000000000000000000000000000001"
     })
 
-    expect(calldatas[1]).toStrictEqual({
+    expect(calldatas.deposit1Tx).toStrictEqual({
       "method": "transfer",
       "params": {
           "_data": "0x7b226d6574686f64223a226465706f736974222c22706172616d73223a7b7d7d",
@@ -153,7 +151,7 @@ describe('PoolInitializer', () => {
       "to": "cx0000000000000000000000000000000000000002"
     })
 
-    expect(calldatas[2]).toStrictEqual(
+    expect(calldatas.createAndMintTx).toStrictEqual(
       {
         "to": poolInitializerAddress,
         "method": "createAndInitializePoolIfNecessaryAndMintPosition",

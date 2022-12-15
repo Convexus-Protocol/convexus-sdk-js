@@ -48,30 +48,31 @@ describe('Staker', () => {
 
       expect(calldata).toStrictEqual([
         {
-          "to": stakerAddress,
-          "method": "unstakeToken",
-          "params": {
-            "key": {
-              "endTime": "0xc8",
-              "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
-              "refundee": "hx0000000000000000000000000000000000000001",
+          "claimRewardTx": {
+            "method": "claimReward",
+            "params": {
+              "amountRequested": "0x1",
               "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-              "startTime": "0x64"
+              "to": "hx0000000000000000000000000000000000000003"
             },
-            "tokenId": "0x1"
+            "to": "cx0000000000000000000000000000000000000003"
+          },
+          "unstakeTokenTx": {
+            "method": "unstakeToken",
+            "params": {
+              "key": {
+                "endTime": "0xc8",
+                "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
+                "refundee": "hx0000000000000000000000000000000000000001",
+                "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                "startTime": "0x64"
+              },
+              "tokenId": "0x1"
+            },
+            "to": "cx0000000000000000000000000000000000000003"
           }
         },
         {
-          "to": stakerAddress,
-          "method": "claimReward",
-          "params": {
-            "amountRequested": "0x1",
-            "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-            "to": "hx0000000000000000000000000000000000000003"
-          }
-        },
-        {
-          "to": stakerAddress,
           "method": "stakeToken",
           "params": {
             "key": {
@@ -82,7 +83,8 @@ describe('Staker', () => {
               "startTime": "0x64"
             },
             "tokenId": "0x1"
-          }
+          },
+          "to": "cx0000000000000000000000000000000000000003"
         }
       ])
     })
@@ -96,41 +98,43 @@ describe('Staker', () => {
       expect(calldata).toStrictEqual(
         [
           {
-              "to": stakerAddress,
-              "method": "unstakeToken",
-              "params": {
-                  "key": {
-                      "endTime": "0xc8",
-                      "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
-                      "refundee": "hx0000000000000000000000000000000000000001",
-                      "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                      "startTime": "0x64"
-                  },
-                  "tokenId": "0x1"
-              }
-          },
-          {
-              "to": stakerAddress,
+            "claimRewardTx": {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x0",
+                "amountRequested": "0x0",
+                "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                "to": "hx0000000000000000000000000000000000000003"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            },
+            "unstakeTokenTx": {
+              "method": "unstakeToken",
+              "params": {
+                "key": {
+                  "endTime": "0xc8",
+                  "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
+                  "refundee": "hx0000000000000000000000000000000000000001",
                   "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                  "to": "hx0000000000000000000000000000000000000003"
-              }
+                  "startTime": "0x64"
+                },
+                "tokenId": "0x1"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            }
           },
           {
-              "to": stakerAddress,
-              "method": "stakeToken",
-              "params": {
-                  "key": {
-                      "endTime": "0xc8",
-                      "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
-                      "refundee": "hx0000000000000000000000000000000000000001",
-                      "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                      "startTime": "0x64"
-                  },
-                  "tokenId": "0x1"
-              }
+            "method": "stakeToken",
+            "params": {
+              "key": {
+                "endTime": "0xc8",
+                "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
+                "refundee": "hx0000000000000000000000000000000000000001",
+                "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                "startTime": "0x64"
+              },
+              "tokenId": "0x1"
+            },
+            "to": "cx0000000000000000000000000000000000000003"
           }
         ]
       )
@@ -145,78 +149,82 @@ describe('Staker', () => {
       expect(calldata).toStrictEqual(
         [
           {
-              "to": stakerAddress,
-              "method": "unstakeToken",
-              "params": {
-                  "key": {
-                      "endTime": "0xc8",
-                      "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
-                      "refundee": "hx0000000000000000000000000000000000000001",
-                      "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                      "startTime": "0x64"
-                  },
-                  "tokenId": "0x1"
-              }
-          },
-          {
-              "to": stakerAddress,
+            "claimRewardTx": {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x0",
-                  "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                  "to": "hx0000000000000000000000000000000000000003"
-              }
-          },
-          {
-              "to": stakerAddress,
-              "method": "stakeToken",
-              "params": {
-                  "key": {
-                      "endTime": "0xc8",
-                      "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
-                      "refundee": "hx0000000000000000000000000000000000000001",
-                      "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                      "startTime": "0x64"
-                  },
-                  "tokenId": "0x1"
-              }
-          },
-          {
-              "to": stakerAddress,
+                "amountRequested": "0x0",
+                "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                "to": "hx0000000000000000000000000000000000000003"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            },
+            "unstakeTokenTx": {
               "method": "unstakeToken",
               "params": {
-                  "key": {
-                      "endTime": "0x64",
-                      "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
-                      "refundee": "hx0000000000000000000000000000000000000089",
-                      "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                      "startTime": "0x32"
-                  },
-                  "tokenId": "0x1"
-              }
+                "key": {
+                  "endTime": "0xc8",
+                  "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
+                  "refundee": "hx0000000000000000000000000000000000000001",
+                  "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                  "startTime": "0x64"
+                },
+                "tokenId": "0x1"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            }
           },
           {
-              "to": stakerAddress,
+            "method": "stakeToken",
+            "params": {
+              "key": {
+                "endTime": "0xc8",
+                "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
+                "refundee": "hx0000000000000000000000000000000000000001",
+                "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                "startTime": "0x64"
+              },
+              "tokenId": "0x1"
+            },
+            "to": "cx0000000000000000000000000000000000000003"
+          },
+          {
+            "claimRewardTx": {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x0",
+                "amountRequested": "0x0",
+                "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                "to": "hx0000000000000000000000000000000000000003"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            },
+            "unstakeTokenTx": {
+              "method": "unstakeToken",
+              "params": {
+                "key": {
+                  "endTime": "0x64",
+                  "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
+                  "refundee": "hx0000000000000000000000000000000000000089",
                   "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                  "to": "hx0000000000000000000000000000000000000003"
-              }
+                  "startTime": "0x32"
+                },
+                "tokenId": "0x1"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            }
           },
           {
-              "to": stakerAddress,
-              "method": "stakeToken",
-              "params": {
-                  "key": {
-                      "endTime": "0x64",
-                      "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
-                      "refundee": "hx0000000000000000000000000000000000000089",
-                      "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                      "startTime": "0x32"
-                  },
-                  "tokenId": "0x1"
-              }
+            "method": "stakeToken",
+            "params": {
+              "key": {
+                "endTime": "0x64",
+                "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
+                "refundee": "hx0000000000000000000000000000000000000089",
+                "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                "startTime": "0x32"
+              },
+              "tokenId": "0x1"
+            },
+            "to": "cx0000000000000000000000000000000000000003"
           }
         ]
       )
@@ -236,36 +244,38 @@ describe('Staker', () => {
       expect(calldata).toStrictEqual(
         [
           {
-              "to": stakerAddress,
-              "method": "unstakeToken",
-              "params": {
-                  "key": {
-                      "endTime": "0xc8",
-                      "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
-                      "refundee": "hx0000000000000000000000000000000000000001",
-                      "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                      "startTime": "0x64"
-                  },
-                  "tokenId": "0x1"
-              }
-          },
-          {
-              "to": stakerAddress,
+            "claimRewardTx": {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x0",
+                "amountRequested": "0x0",
+                "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                "to": "hx0000000000000000000000000000000000000003"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            },
+            "unstakeTokenTx": {
+              "method": "unstakeToken",
+              "params": {
+                "key": {
+                  "endTime": "0xc8",
+                  "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
+                  "refundee": "hx0000000000000000000000000000000000000001",
                   "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                  "to": "hx0000000000000000000000000000000000000003"
-              }
+                  "startTime": "0x64"
+                },
+                "tokenId": "0x1"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            }
           },
           {
-              "to": stakerAddress,
-              "method": "withdrawToken",
-              "params": {
-                  "data": "0x0000000000000000000000000000000000000008",
-                  "to": "hx0000000000000000000000000000000000000004",
-                  "tokenId": "0x1"
-              }
+            "method": "withdrawToken",
+            "params": {
+              "data": "0x0000000000000000000000000000000000000008",
+              "to": "hx0000000000000000000000000000000000000004",
+              "tokenId": "0x1"
+            },
+            "to": "cx0000000000000000000000000000000000000003"
           }
         ]
       )
@@ -283,59 +293,63 @@ describe('Staker', () => {
       expect(calldata).toStrictEqual(
         [
           {
-              "to": stakerAddress,
-              "method": "unstakeToken",
-              "params": {
-                  "key": {
-                      "endTime": "0xc8",
-                      "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
-                      "refundee": "hx0000000000000000000000000000000000000001",
-                      "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                      "startTime": "0x64"
-                  },
-                  "tokenId": "0x1"
-              }
-          },
-          {
-              "to": stakerAddress,
+            "claimRewardTx": {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x0",
-                  "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                  "to": "hx0000000000000000000000000000000000000003"
-              }
-          },
-          {
-              "to": stakerAddress,
+                "amountRequested": "0x0",
+                "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                "to": "hx0000000000000000000000000000000000000003"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            },
+            "unstakeTokenTx": {
               "method": "unstakeToken",
               "params": {
-                  "key": {
-                      "endTime": "0x64",
-                      "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
-                      "refundee": "hx0000000000000000000000000000000000000089",
-                      "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                      "startTime": "0x32"
-                  },
-                  "tokenId": "0x1"
-              }
+                "key": {
+                  "endTime": "0xc8",
+                  "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
+                  "refundee": "hx0000000000000000000000000000000000000001",
+                  "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                  "startTime": "0x64"
+                },
+                "tokenId": "0x1"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            }
           },
           {
-              "to": stakerAddress,
+            "claimRewardTx": {
               "method": "claimReward",
               "params": {
-                  "amountRequested": "0x0",
+                "amountRequested": "0x0",
+                "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                "to": "hx0000000000000000000000000000000000000003"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            },
+            "unstakeTokenTx": {
+              "method": "unstakeToken",
+              "params": {
+                "key": {
+                  "endTime": "0x64",
+                  "pool": "cx41ca025441ca025441ca026041ca025441ca027c",
+                  "refundee": "hx0000000000000000000000000000000000000089",
                   "rewardToken": "cx1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                  "to": "hx0000000000000000000000000000000000000003"
-              }
+                  "startTime": "0x32"
+                },
+                "tokenId": "0x1"
+              },
+              "to": "cx0000000000000000000000000000000000000003"
+            }
           },
           {
-              "to": stakerAddress,
-              "method": "withdrawToken",
-              "params": {
-                  "data": "0x0000000000000000000000000000000000000008",
-                  "to": "hx0000000000000000000000000000000000000004",
-                  "tokenId": "0x1"
-              }
+            "method": "withdrawToken",
+            "params": {
+              "data": "0x0000000000000000000000000000000000000008",
+              "to": "hx0000000000000000000000000000000000000004",
+              "tokenId": "0x1"
+            },
+            "to": "cx0000000000000000000000000000000000000003"
           }
         ]
       )
@@ -373,18 +387,16 @@ describe('Staker', () => {
       const calldata = NonfungiblePositionManager.safeTransferFromParameters(options, nonfungiblePositionManagerAddress)
 
       expect(calldata).toStrictEqual(
-        [
-          {
-            "to": nonfungiblePositionManagerAddress,
-            "method": "safeTransferFrom",
-            "params": {
-              "_data": "0x5b5b22637831663938343061383564356166356266316431373632663932356264616464633432303166393834222c22637834316361303235343431636130323534343163613032363034316361303235343431636130323763222c2230783634222c2230786338222c22687830303030303030303030303030303030303030303030303030303030303030303030303030303031225d5d",
-              "from": "hx0000000000000000000000000000000000000004",
-              "to": "hx0000000000000000000000000000000000000003",
-              "tokenId": "0x1"
-            }
+        {
+          "to": nonfungiblePositionManagerAddress,
+          "method": "safeTransferFrom",
+          "params": {
+            "_data": "0x5b5b22637831663938343061383564356166356266316431373632663932356264616464633432303166393834222c22637834316361303235343431636130323534343163613032363034316361303235343431636130323763222c2230783634222c2230786338222c22687830303030303030303030303030303030303030303030303030303030303030303030303030303031225d5d",
+            "from": "hx0000000000000000000000000000000000000004",
+            "to": "hx0000000000000000000000000000000000000003",
+            "tokenId": "0x1"
           }
-        ]
+        }
       )
     })
   })

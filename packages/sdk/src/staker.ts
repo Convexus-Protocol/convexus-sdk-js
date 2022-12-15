@@ -2,6 +2,7 @@ import { BigintIsh, CallData, Interface, toHex, toHexString, validateAndParseAdd
 import { Token } from '@convexus/sdk-core'
 import IConvexusStaker from './artifacts/contracts/ConvexusStaker/ConvexusStaker.json'
 import { Pool, PoolFactoryProvider } from './entities'
+import { IClaimTxs } from './entities/interface/IClaimTxs';
 
 export type FullWithdrawOptions = ClaimOptions & WithdrawOptions
 /**
@@ -71,8 +72,10 @@ export abstract class Staker {
 
   /**
    *  To claim rewards, must unstake and then claim.
+   * @param poolFactoryProvider
    * @param incentiveKey The unique identifier of a staking program.
    * @param options Options for producing the calldata to claim. Can't claim unless you unstake.
+   * @param stakerAddress Score address
    * @returns The calldatas for 'unstakeToken' and 'claimReward'.
    */
   private static async encodeClaim(
@@ -80,21 +83,19 @@ export abstract class Staker {
     incentiveKey: IncentiveKey,
     options: ClaimOptions,
     stakerAddress: string
-  ): Promise<CallData[]> {
-    const calldatas: CallData[] = []
-    calldatas.push(
-      Staker.INTERFACE.encodeFunctionData('unstakeToken', [
-        await this._encodeIncentiveKey(poolFactoryProvider, incentiveKey),
-        toHex(options.tokenId)
-      ], stakerAddress)
-    )
+  ): Promise<IClaimTxs> {
+    const unstakeTokenTx = Staker.INTERFACE.encodeFunctionData('unstakeToken', [
+      await this._encodeIncentiveKey(poolFactoryProvider, incentiveKey),
+      toHex(options.tokenId)
+    ], stakerAddress)
 
     const recipient: string = validateAndParseAddress(options.recipient)
     const amount = options.amount ?? 0
-    calldatas.push(
-      Staker.INTERFACE.encodeFunctionData('claimReward', [incentiveKey.rewardToken.address, recipient, toHex(amount)], stakerAddress)
-    )
-    return calldatas
+
+    const claimRewardTx = Staker.INTERFACE.encodeFunctionData('claimReward',
+      [incentiveKey.rewardToken.address, recipient, toHex(amount)], stakerAddress)
+
+    return { unstakeTokenTx, claimRewardTx }
   }
 
   /**

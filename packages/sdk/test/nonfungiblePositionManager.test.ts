@@ -458,20 +458,18 @@ describe('NonfungiblePositionManager', () => {
       }, nonfungiblePositionManagerAddress)
 
       expect(calldata).toStrictEqual(
-        [
-          {
-              "to": nonfungiblePositionManagerAddress,
-              "method": "collect",
-              "params": {
-                  "params": {
-                    "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                    "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                    "recipient": "hx0000000000000000000000000000000000000003",
-                    "tokenId": "0x1"
-                  }
-              }
+        {
+          "to": nonfungiblePositionManagerAddress,
+          "method": "collect",
+          "params": {
+            "params": {
+              "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "recipient": "hx0000000000000000000000000000000000000003",
+              "tokenId": "0x1"
+            }
           }
-        ]
+        }
       )
     })
 
@@ -484,20 +482,18 @@ describe('NonfungiblePositionManager', () => {
       }, nonfungiblePositionManagerAddress)
 
       expect(calldata).toStrictEqual(
-        [
-          {
-            "to": nonfungiblePositionManagerAddress,
-            "method": "collect",
+        {
+          "to": nonfungiblePositionManagerAddress,
+          "method": "collect",
+          "params": {
             "params": {
-              "params": {
-                "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                "recipient": "hx0000000000000000000000000000000000000003",
-                "tokenId": "0x1"
-              }
+              "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "recipient": "hx0000000000000000000000000000000000000003",
+              "tokenId": "0x1"
             }
           }
-        ]
+        }
       )
     })
   })
@@ -505,7 +501,7 @@ describe('NonfungiblePositionManager', () => {
   describe('#removeCallParameters', () => {
     it('throws for 0 liquidity', () => {
       expect(() =>
-        NonfungiblePositionManager.removeCallParameters(
+        NonfungiblePositionManager.buildRemoveLiquidityTxs(
           new Position({
             pool: pool_0_1,
             tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -530,7 +526,7 @@ describe('NonfungiblePositionManager', () => {
 
     it('throws for 0 liquidity from small percentage', () => {
       expect(() =>
-        NonfungiblePositionManager.removeCallParameters(
+        NonfungiblePositionManager.buildRemoveLiquidityTxs(
           new Position({
             pool: pool_0_1,
             tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -555,7 +551,7 @@ describe('NonfungiblePositionManager', () => {
 
     it('throws for bad burn', () => {
       expect(() =>
-        NonfungiblePositionManager.removeCallParameters(
+        NonfungiblePositionManager.buildRemoveLiquidityTxs(
           new Position({
             pool: pool_0_1,
             tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -580,7 +576,7 @@ describe('NonfungiblePositionManager', () => {
     })
 
     it('works', () => {
-      const calldata = NonfungiblePositionManager.removeCallParameters(
+      const calldata = NonfungiblePositionManager.buildRemoveLiquidityTxs(
         new Position({
           pool: pool_0_1,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -602,9 +598,21 @@ describe('NonfungiblePositionManager', () => {
       )
 
       expect(calldata).toStrictEqual(
-        [
-          {
-            "to": nonfungiblePositionManagerAddress,
+        {
+          "burnTx": undefined,
+          "collectTx": {
+            "method": "collect",
+            "params": {
+              "params": {
+                "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                "recipient": "hx0000000000000000000000000000000000000003",
+                "tokenId": "0x1"
+              }
+            },
+            "to": "cx0000000000000000000000000000000000000004"
+          },
+          "decreaseLiquidityTx": {
             "method": "decreaseLiquidity",
             "params": {
               "params": {
@@ -614,26 +622,15 @@ describe('NonfungiblePositionManager', () => {
                 "liquidity": "0x64",
                 "tokenId": "0x1"
               }
-            }
-          },
-          {
-            "to": nonfungiblePositionManagerAddress,
-            "method": "collect",
-            "params": {
-              "params": {
-                "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                "recipient": "hx0000000000000000000000000000000000000003",
-                "tokenId": "0x1"
-              }
-            }
+            },
+            "to": "cx0000000000000000000000000000000000000004"
           }
-        ]
+        }
       )
     })
 
     it('works for partial', () => {
-      const calldata = NonfungiblePositionManager.removeCallParameters(
+      const calldata = NonfungiblePositionManager.buildRemoveLiquidityTxs(
         new Position({
           pool: pool_0_1,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -655,33 +652,34 @@ describe('NonfungiblePositionManager', () => {
       )
 
       expect(calldata).toStrictEqual(
-        [
-          {
-              "to": nonfungiblePositionManagerAddress,
-              "method": "decreaseLiquidity",
+        {
+          "burnTx": undefined,
+          "collectTx": {
+            "method": "collect",
+            "params": {
               "params": {
-                  "params": {
-                      "amount0Min": "0x0",
-                      "amount1Min": "0x0",
-                      "deadline": "0x7b",
-                      "liquidity": "0x32",
-                      "tokenId": "0x1"
-                  }
+                "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                "recipient": "hx0000000000000000000000000000000000000003",
+                "tokenId": "0x1"
               }
+            },
+            "to": "cx0000000000000000000000000000000000000004"
           },
-          {
-              "to": nonfungiblePositionManagerAddress,
-              "method": "collect",
+          "decreaseLiquidityTx": {
+            "method": "decreaseLiquidity",
+            "params": {
               "params": {
-                  "params": {
-                      "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                      "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                      "recipient": "hx0000000000000000000000000000000000000003",
-                      "tokenId": "0x1"
-                  }
+                "amount0Min": "0x0",
+                "amount1Min": "0x0",
+                "deadline": "0x7b",
+                "liquidity": "0x32",
+                "tokenId": "0x1"
               }
+            },
+            "to": "cx0000000000000000000000000000000000000004"
           }
-        ]
+        }
       )
     })
 
@@ -689,7 +687,7 @@ describe('NonfungiblePositionManager', () => {
       const icxAmount = CurrencyAmount.fromRawAmount(ICX, 0)
       const tokenAmount = CurrencyAmount.fromRawAmount(token1, 0)
 
-      const calldata = NonfungiblePositionManager.removeCallParameters(
+      const calldata = NonfungiblePositionManager.buildRemoveLiquidityTxs(
         new Position({
           pool: pool_1_wicx,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -710,42 +708,41 @@ describe('NonfungiblePositionManager', () => {
         nonfungiblePositionManagerAddress
       )
 
-      expect(calldata).toStrictEqual(
-        [
-          {
-              "to": nonfungiblePositionManagerAddress,
-              "method": "decreaseLiquidity",
-              "params": {
-                  "params": {
-                      "amount0Min": "0x0",
-                      "amount1Min": "0x0",
-                      "deadline": "0x7b",
-                      "liquidity": "0x64",
-                      "tokenId": "0x1"
-                  }
-              }
+      expect(calldata).toStrictEqual({
+        "burnTx": undefined,
+        "collectTx": {
+          "method": "collect",
+          "params": {
+            "params": {
+              "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "recipient": "hx0000000000000000000000000000000000000003",
+              "tokenId": "0x1"
+            }
           },
-          {
-              "to": nonfungiblePositionManagerAddress,
-              "method": "collect",
-              "params": {
-                  "params": {
-                      "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                      "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                      "recipient": "hx0000000000000000000000000000000000000003",
-                      "tokenId": "0x1"
-                  }
-              }
-          }
-        ]
-      )
+          "to": "cx0000000000000000000000000000000000000004"
+        },
+        "decreaseLiquidityTx": {
+          "method": "decreaseLiquidity",
+          "params": {
+            "params": {
+              "amount0Min": "0x0",
+              "amount1Min": "0x0",
+              "deadline": "0x7b",
+              "liquidity": "0x64",
+              "tokenId": "0x1"
+            }
+          },
+          "to": "cx0000000000000000000000000000000000000004"
+        }
+      })
     })
 
     it('works for partial with ICX', () => {
       const icxAmount = CurrencyAmount.fromRawAmount(ICX, 0)
       const tokenAmount = CurrencyAmount.fromRawAmount(token1, 0)
 
-      const calldata = NonfungiblePositionManager.removeCallParameters(
+      const calldata = NonfungiblePositionManager.buildRemoveLiquidityTxs(
         new Position({
           pool: pool_1_wicx,
           tickLower: -TICK_SPACINGS[FeeAmount.MEDIUM],
@@ -766,35 +763,34 @@ describe('NonfungiblePositionManager', () => {
         nonfungiblePositionManagerAddress
       )
 
-      expect(calldata).toStrictEqual(
-        [
-          {
-              "to": nonfungiblePositionManagerAddress,
-              "method": "decreaseLiquidity",
-              "params": {
-                  "params": {
-                      "amount0Min": "0x0",
-                      "amount1Min": "0x0",
-                      "deadline": "0x7b",
-                      "liquidity": "0x32",
-                      "tokenId": "0x1"
-                  }
-              }
+      expect(calldata).toStrictEqual({
+        "burnTx": undefined,
+        "collectTx": {
+          "method": "collect",
+          "params": {
+            "params": {
+              "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "recipient": "hx0000000000000000000000000000000000000003",
+              "tokenId": "0x1"
+            }
           },
-          {
-              "to": nonfungiblePositionManagerAddress,
-              "method": "collect",
-              "params": {
-                  "params": {
-                      "amount0Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                      "amount1Max": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                      "recipient": "hx0000000000000000000000000000000000000003",
-                      "tokenId": "0x1"
-                  }
-              }
-          }
-        ]
-      )
+          "to": "cx0000000000000000000000000000000000000004"
+        },
+        "decreaseLiquidityTx": {
+          "method": "decreaseLiquidity",
+          "params": {
+            "params": {
+              "amount0Min": "0x0",
+              "amount1Min": "0x0",
+              "deadline": "0x7b",
+              "liquidity": "0x32",
+              "tokenId": "0x1"
+            }
+          },
+          "to": "cx0000000000000000000000000000000000000004"
+        }
+      })
     })
   })
 
@@ -824,7 +820,6 @@ describe('NonfungiblePositionManager', () => {
       const calldata = NonfungiblePositionManager.safeTransferFromParameters(options, nonfungiblePositionManagerAddress)
 
       expect(calldata).toStrictEqual(
-        [
           {
               "to": nonfungiblePositionManagerAddress,
               "method": "safeTransferFrom",
@@ -835,7 +830,6 @@ describe('NonfungiblePositionManager', () => {
                   "tokenId": "0x1"
               }
           }
-      ]
       )
     })
 
@@ -850,7 +844,6 @@ describe('NonfungiblePositionManager', () => {
       const calldata = NonfungiblePositionManager.safeTransferFromParameters(options, nonfungiblePositionManagerAddress)
 
       expect(calldata).toStrictEqual(
-        [
           {
               "to": nonfungiblePositionManagerAddress,
               "method": "safeTransferFrom",
@@ -861,7 +854,6 @@ describe('NonfungiblePositionManager', () => {
                   "tokenId": "0x1"
               }
           }
-        ]
       )
     })
   })

@@ -2,6 +2,7 @@ import { BigintIsh, CallData, Interface, toHex, validateAndParseAddress } from '
 import { Icx, Token } from '@convexus/sdk-core'
 import IPoolInitializer from './artifacts/contracts/PoolInitializer/PoolInitializer.json'
 import { Pool, Position } from './entities'
+import { ICreateAndMintTxs } from './entities/interface/ICreateAndMintTxs';
 
 export abstract class PoolInitializer {
   public static INTERFACE: Interface = new Interface(IPoolInitializer)
@@ -66,8 +67,8 @@ export abstract class PoolInitializer {
     ], poolInitializerAddress)
   }
 
-  public static createCallParameters(pool: Pool, poolInitializerAddress: string): CallData[] {
-    return [this.encodeCreate(pool, poolInitializerAddress)]
+  public static createCallParameters(pool: Pool, poolInitializerAddress: string): CallData {
+    return this.encodeCreate(pool, poolInitializerAddress)
   }
 
   public static createAndMintCallParameters (
@@ -75,11 +76,11 @@ export abstract class PoolInitializer {
     recipient: string,
     deadline: number,
     poolInitializerAddress: string
-  ): CallData[] {
-    return [
-      PoolInitializer.encodeDeposit(position.pool.token0, position.amount0.quotient, poolInitializerAddress),
-      PoolInitializer.encodeDeposit(position.pool.token1, position.amount1.quotient, poolInitializerAddress),
-      PoolInitializer.encodeCreateAndMint(position, recipient, deadline, poolInitializerAddress)
-    ]
+  ): ICreateAndMintTxs {
+    return {
+      deposit0Tx: PoolInitializer.encodeDeposit(position.pool.token0, position.amount0.quotient, poolInitializerAddress),
+      deposit1Tx: PoolInitializer.encodeDeposit(position.pool.token1, position.amount1.quotient, poolInitializerAddress),
+      createAndMintTx: PoolInitializer.encodeCreateAndMint(position, recipient, deadline, poolInitializerAddress)
+    }
   }
 }

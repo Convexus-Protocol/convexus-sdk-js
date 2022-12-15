@@ -15,6 +15,7 @@ import { ONE, ZERO } from './internalConstants'
 import INonfungiblePositionManager from './artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json'
 import { IAddLiquidityTxs } from './entities/interface/IAddLiquidityTxs';
 import { IIncreaseLiquidityTxs } from './entities/interface/IIncreaseLiquidityTxs';
+import { IRemoveCallTxs } from './entities/interface/IRemoveCallTxs';
 
 export interface MintSpecificOptions {
   /**
@@ -310,32 +311,23 @@ export abstract class NonfungiblePositionManager {
     }
   }
 
-  private static encodeCollect(options: CollectOptions, nonfungiblePositionManagerAddress: string): CallData[] {
-    const calldatas: CallData[] = []
-
+  private static buildCollectTx(options: CollectOptions, nonfungiblePositionManagerAddress: string): CallData {
     const tokenId = toHex(options.tokenId)
 
     const recipient = validateAndParseAddress(options.recipient)
 
-    // collect
-    calldatas.push(
-      NonfungiblePositionManager.INTERFACE.encodeFunctionData('collect', [
-        [
-          tokenId,
-          recipient,
-          MaxUint256,
-          MaxUint256
-        ]
-      ], nonfungiblePositionManagerAddress)
-    )
-
-    return calldatas
+    return NonfungiblePositionManager.INTERFACE.encodeFunctionData('collect', [
+      [
+        tokenId,
+        recipient,
+        MaxUint256,
+        MaxUint256
+      ]
+    ], nonfungiblePositionManagerAddress)
   }
 
-  public static collectCallParameters(options: CollectOptions, nonfungiblePositionManagerAddress: string): CallData[] {
-    const calldatas: CallData[] = NonfungiblePositionManager.encodeCollect(options, nonfungiblePositionManagerAddress)
-
-    return calldatas
+  public static collectCallParameters(options: CollectOptions, nonfungiblePositionManagerAddress: string): CallData {
+    return NonfungiblePositionManager.buildCollectTx(options, nonfungiblePositionManagerAddress)
   }
 
   /**
@@ -345,13 +337,11 @@ export abstract class NonfungiblePositionManager {
    * @param nonfungiblePositionManagerAddress SCORE address
    * @returns The call parameters
    */
-  public static removeCallParameters(
+  public static buildRemoveLiquidityTxs(
     position: Position,
     options: RemoveLiquidityOptions,
     nonfungiblePositionManagerAddress: string
-  ): CallData[] {
-    const calldatas: CallData[] = []
-
+  ): IRemoveCallTxs {
     const deadline = toHex(options.deadline)
     const tokenId = toHex(options.tokenId)
 
@@ -370,52 +360,49 @@ export abstract class NonfungiblePositionManager {
     )
 
     // remove liquidity
-    calldatas.push(
-      NonfungiblePositionManager.INTERFACE.encodeFunctionData('decreaseLiquidity', [
-        [
-          tokenId,
-          toHex(partialPosition.liquidity),
-          toHex(amount0Min),
-          toHex(amount1Min),
-          deadline
-        ]
-      ], nonfungiblePositionManagerAddress)
-    )
+    const decreaseLiquidityTx = NonfungiblePositionManager.INTERFACE.encodeFunctionData('decreaseLiquidity', [
+      [
+        tokenId,
+        toHex(partialPosition.liquidity),
+        toHex(amount0Min),
+        toHex(amount1Min),
+        deadline
+      ]
+    ], nonfungiblePositionManagerAddress)
 
     const { expectedCurrencyOwed0, expectedCurrencyOwed1, ...rest } = options.collectOptions
-    calldatas.push(
-      ...NonfungiblePositionManager.encodeCollect({
-        tokenId: toHex(options.tokenId),
-        // add the underlying value to the expected currency already owed
-        expectedCurrencyOwed0: expectedCurrencyOwed0.add(
-          CurrencyAmount.fromRawAmount(expectedCurrencyOwed0.currency, amount0Min)
-        ),
-        expectedCurrencyOwed1: expectedCurrencyOwed1.add(
-          CurrencyAmount.fromRawAmount(expectedCurrencyOwed1.currency, amount1Min)
-        ),
-        ...rest
-      }, nonfungiblePositionManagerAddress)
-    )
+    const collectTx = NonfungiblePositionManager.buildCollectTx({
+      tokenId: toHex(options.tokenId),
+      // add the underlying value to the expected currency already owed
+      expectedCurrencyOwed0: expectedCurrencyOwed0.add(
+        CurrencyAmount.fromRawAmount(expectedCurrencyOwed0.currency, amount0Min)
+      ),
+      expectedCurrencyOwed1: expectedCurrencyOwed1.add(
+        CurrencyAmount.fromRawAmount(expectedCurrencyOwed1.currency, amount1Min)
+      ),
+      ...rest
+    }, nonfungiblePositionManagerAddress);
 
+    let burnTx = undefined;
     if (options.liquidityPercentage.equalTo(ONE)) {
       if (options.burnToken) {
-        calldatas.push(NonfungiblePositionManager.INTERFACE.encodeFunctionData(
+        burnTx = NonfungiblePositionManager.INTERFACE.encodeFunctionData(
           'burn',
           [tokenId],
           nonfungiblePositionManagerAddress
-        ))
+        )
       }
     } else {
       invariant(options.burnToken !== true, 'CANNOT_BURN')
     }
 
-    return calldatas
+    return { decreaseLiquidityTx, collectTx, burnTx }
   }
 
   public static safeTransferFromParameters(
     options: SafeTransferOptions,
     nonfungiblePositionManagerAddress: string
-  ): CallData[] {
+  ): CallData {
     const recipient = validateAndParseAddress(options.recipient)
     const sender = validateAndParseAddress(options.sender)
 
@@ -435,6 +422,6 @@ export abstract class NonfungiblePositionManager {
       ], nonfungiblePositionManagerAddress)
     }
 
-    return [calldata]
+    return calldata
   }
 }
