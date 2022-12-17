@@ -7,3 +7,6 @@ export * from './poolInitializer'
 export * from './quoter'
 export * from './staker'
 export * from './swapRouter'
+
+import ConvexusService from './ConvexusService';
+export { ConvexusService as default};
