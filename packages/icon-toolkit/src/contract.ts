@@ -1,4 +1,5 @@
 import IconService from "icon-sdk-js";
+const { IconConverter } = IconService;
 import Wallet from "icon-sdk-js/build/Wallet";
 import JSBI from "jsbi";
 import { CallData, Interface } from "./interface";
@@ -37,9 +38,16 @@ export class Contract {
     })
   }
 
-  public buildCallArray (to: string, method: string, output_transform: OutputTransform, ...args: any): Promise<any> {
+  /**
+   * @description Build and execute call array and return promised result
+   * @param to - Address
+   * @param method - Contract method
+   * @param output_transform - Transform function for result
+   * @param args
+   */
+  public buildAndExecuteCallArray (to: string, method: string, output_transform: OutputTransform, ...args: any): Promise<any> {
     const data = this.interface.encodeFunctionData(method, args, to)
-    return this.buildCall(data).then(result => {
+    return this.buildAndExecuteCall(data).then(result => {
       if (output_transform) {
         result = output_transform(result);
       }
@@ -47,7 +55,11 @@ export class Contract {
     })
   }
 
-  public buildCall (calldata: CallData): Promise<any> {
+  /**
+   * @description Build and execute call transaction and return Promise of result
+   * @param calldata - Call data parameters to be used in call
+   */
+  public buildAndExecuteCall (calldata: CallData): Promise<any> {
     const txObj = new IconService.IconBuilder.CallBuilder()
       .to(calldata['to'])
       .method(calldata['method'])
@@ -57,8 +69,28 @@ export class Contract {
     return this.iconService.call(txObj).execute()
   }
 
-  public buildSendArray (to: string, method: string, output_transform: OutputTransform, wallet: Wallet, ...args: any): Promise<any> {
-    return this.buildSendArrayPayable(to, method, "0", wallet, args).then(result => {
+  /**
+   * @description Build call transaction and return raw tx object
+   * @param calldata - Call data parameters to be used in call
+   */
+  public buildCall (calldata: CallData): any {
+    return new IconService.IconBuilder.CallBuilder()
+      .to(calldata['to'])
+      .method(calldata['method'])
+      .params(calldata['params'])
+      .build()
+  }
+
+  /**
+   * @description Build and execute Icon send array (payable)
+   * @param to - Address
+   * @param method - Contract method
+   * @param output_transform - Transform function for result
+   * @param wallet - Wallet used to sign the transaction
+   * @param args
+   */
+  public buildAndExecuteSendArray (to: string, method: string, output_transform: OutputTransform, wallet: Wallet, ...args: any): Promise<any> {
+    return this.buildAndExecuteSendArrayPayable(to, method, "0", wallet, args).then(result => {
       if (output_transform) {
         result = output_transform(result);
       }
@@ -66,21 +98,49 @@ export class Contract {
     })
   }
 
-  public buildSendArrayPayable (to: string, method: string, icxAmount: string, wallet: Wallet, ...args: any): Promise<any> {
+  /**
+   * @description Build and execute Icon send array (payable)
+   * @param to - Address
+   * @param method - Contract method
+   * @param icxAmount - Amount of ICX to send as payable
+   * @param wallet - Wallet used to sign the transaction
+   * @param args
+   */
+  public buildAndExecuteSendArrayPayable (to: string, method: string, icxAmount: string, wallet: Wallet, ...args: any): Promise<any> {
     const data = this.interface.encodeFunctionDataPayable(icxAmount, method, args, to)
-    return this.buildSend(wallet, data)
+    return this.buildAndExecuteSend(wallet, data)
   }
 
-  public buildSend (wallet: Wallet, calldata: CallData, waitForResult?: boolean): Promise<any> {
-    const icxValue = 'value' in calldata ? calldata["value"] : "0"
-    return this.buildSendPayable(calldata['to'], calldata['method'], icxValue, wallet, calldata['params'], waitForResult)
+  /**
+   * @description Build Icon send transaction for given calldata
+   * @param from - Address
+   * @param calldata - Transaction data payload
+   */
+  public buildSend (from: string, calldata: CallData): Promise<any> {
+    const icxValue = 'value' in calldata ? calldata["value"] : "0";
+    return this.buildSendPayable(from, calldata['to'], calldata['method'], icxValue, calldata['params']);
   }
 
-  public async buildSendPayable (to: string, method: string, icxAmount: string, wallet: Wallet, params: any, waitForResult?: boolean): Promise<any> {
+  /**
+   * @description
+   * @param wallet - Wallet used to sign the transaction
+   * @param calldata - Transaction data payload
+   * @param waitForResult - Boolean flag indicating whether to wait for tx result or not
+   */
+  public buildAndExecuteSend (wallet: Wallet, calldata: CallData, waitForResult?: boolean): Promise<any> {
+    const icxValue = 'value' in calldata ? calldata["value"] : "0";
+    return this.buildAndExecuteSendPayable(calldata['to'], calldata['method'], icxValue, wallet, calldata['params'], waitForResult);
+  }
+
+  /**
+   * @description Build send transaction (payable option) object.
+   *              **NOTE** step limit must be set on the returned object
+   */
+  public buildSendPayable (from: string, to: string, method: string, icxAmount: string, params: any): any {
     const txObjBuilder = new IconService.IconBuilder.CallTransactionBuilder()
       .method(method)
       .params(params)
-      .from(wallet.getAddress())
+      .from(from)
       .to(to ?? this.address)
       .nid(IconService.IconConverter.toBigNumber(this.nid))
       .nonce(IconService.IconConverter.toBigNumber('1'))
@@ -91,12 +151,26 @@ export class Contract {
       txObjBuilder.value(IconService.IconConverter.toBigNumber(icxAmount))
     }
 
-    const txObjEstimate = txObjBuilder.build()
+    return txObjBuilder.build();
+  }
+
+  /**
+   * @description Build and execute send transactions (payable option)
+   */
+  public async buildAndExecuteSendPayable (to: string, method: string, icxAmount: string, wallet: Wallet, params: any, waitForResult?: boolean): Promise<any> {
+    // build tx
+    const tx = this.buildSendPayable(wallet.getAddress(), to, method, icxAmount, params);
+
+    // convert tx to raw transaction
+    const estimateTx = IconConverter.toRawTransaction(tx);
+
+    // make sure there is no stepLimit already in place
+    delete estimateTx.stepLimit;
 
     // estimate steps
     var steps
     try {
-      steps = await this.debugService.estimateStep(txObjEstimate).execute().catch(() => {
+      steps = await this.debugService.estimateStep(tx).execute().catch(() => {
         return 400_000_000
       })
     } catch (e) {
@@ -105,11 +179,11 @@ export class Contract {
     }
 
     // add some margin
-    steps = JSBI.add(JSBI.BigInt(steps), JSBI.BigInt(100_000))
+    steps = JSBI.add(JSBI.BigInt(steps), JSBI.BigInt(100_000));
 
-    const txObj = txObjBuilder.stepLimit(steps.toString()).build()
-    const signedTx = new IconService.SignedTransaction(txObj, wallet)
-    const txhash = await this.iconService.sendTransaction(signedTx).execute()
+    tx.stepLimit = steps;
+    const signedTx = new IconService.SignedTransaction(tx, wallet);
+    const txhash = await this.iconService.sendTransaction(signedTx).execute();
 
     if (waitForResult) {
       await this.iconService.waitTransactionResult(txhash)
@@ -155,11 +229,11 @@ export class Contract {
 
           // readonly methods
           if ('readonly' in obj && parseInt(obj['readonly'], 16) === 1) {
-            const buildCallArray = this.buildCallArray.bind(this, address, name, output_transform)
+            const buildCallArray = this.buildAndExecuteCallArray.bind(this, address, name, output_transform)
             defineReadOnly(this, name, buildCallArray)
             // write methods
           } else {
-            const buildSendArray = this.buildSendArray.bind(this, address, name, output_transform)
+            const buildSendArray = this.buildAndExecuteSendArray.bind(this, address, name, output_transform)
             defineReadOnly(this, name, buildSendArray)
           }
         } break;
