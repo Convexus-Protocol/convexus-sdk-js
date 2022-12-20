@@ -4,6 +4,7 @@ import * as IPool from '../artifacts/contracts/ConvexusPool/ConvexusPool.json';
 import { Pool } from '../entities';
 import { Token } from '@convexus/sdk-core';
 import { TokenService } from './TokenService';
+import JSBI from 'jsbi';
 
 export class PoolService {
 
@@ -68,8 +69,8 @@ export class PoolService {
       factory,
       token0,
       token1,
-      fee: parseInt(fee),
-      tickSpacing: parseInt(tickSpacing),
+      fee: JSBI.toNumber(fee),
+      tickSpacing: tickSpacing,
       maxLiquidityPerTick,
     };
 

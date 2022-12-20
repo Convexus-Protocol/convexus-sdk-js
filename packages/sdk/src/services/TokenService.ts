@@ -50,9 +50,9 @@ export class TokenService {
         this.debugService,
         this.nid,
       );
-      return contract["balanceOf"](address).then((balance: string) => {
-        return CurrencyAmount.fromRawAmount(token, balance);
-      });
+
+      const balance = await contract["balanceOf"](address);
+      return CurrencyAmount.fromRawAmount(token, balance);
     } else {
       const balance = await this.iconService.getBalance(address).execute();
       return CurrencyAmount.fromRawAmount(

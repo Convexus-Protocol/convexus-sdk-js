@@ -32,10 +32,10 @@ export class Contract {
   public address: string;
   public nid: number;
 
-  public static getAbi (iconService: IconService, address: string): Promise<any> {
-    return iconService.getScoreApi(address).execute().then(result => {
-      return result.getList()
-    })
+  public static async getAbi (iconService: IconService, address: string): Promise<any> {
+    const result = await iconService.getScoreApi(address).execute();
+
+    return result.getList();
   }
 
   /**
@@ -45,14 +45,15 @@ export class Contract {
    * @param output_transform - Transform function for result
    * @param args
    */
-  public buildAndExecuteCallArray (to: string, method: string, output_transform: OutputTransform, ...args: any): Promise<any> {
+  public async buildAndExecuteCallArray (to: string, method: string, output_transform: OutputTransform, ...args: any): Promise<any> {
     const data = this.interface.encodeFunctionData(method, args, to)
-    return this.buildAndExecuteCall(data).then(result => {
-      if (output_transform) {
-        result = output_transform(result);
-      }
-      return result;
-    })
+    const result = await this.buildAndExecuteCall(data);
+
+    if (output_transform) {
+      return output_transform(result);
+    }
+
+    return result;
   }
 
   /**
@@ -89,13 +90,14 @@ export class Contract {
    * @param wallet - Wallet used to sign the transaction
    * @param args
    */
-  public buildAndExecuteSendArray (to: string, method: string, output_transform: OutputTransform, wallet: Wallet, ...args: any): Promise<any> {
-    return this.buildAndExecuteSendArrayPayable(to, method, "0", wallet, args).then(result => {
-      if (output_transform) {
-        result = output_transform(result);
-      }
-      return result;
-    })
+  public async buildAndExecuteSendArray (to: string, method: string, output_transform: OutputTransform, wallet: Wallet, ...args: any): Promise<any> {
+    const result = await this.buildAndExecuteSendArrayPayable(to, method, "0", wallet, args);
+
+    if (output_transform) {
+      return output_transform(result);
+    }
+
+    return result;
   }
 
   /**
@@ -170,9 +172,7 @@ export class Contract {
     // estimate steps
     var steps
     try {
-      steps = await this.debugService.estimateStep(tx).execute().catch(() => {
-        return 400_000_000
-      })
+      steps = await this.debugService.estimateStep(tx).execute()
     } catch (e) {
       // Default steps
       steps = 400_000_000
@@ -210,7 +210,7 @@ export class Contract {
       switch (obj['type']) {
         case 'function': {
           const name = obj['name']
-          let output_transform = null
+          let output_transform: ((x: string) => JSBI) | ((x: string) => Uint8Array) | null = null
           if ('outputs' in obj) {
             const outputs: [] = obj['outputs'];
             if (outputs.length > 0) {

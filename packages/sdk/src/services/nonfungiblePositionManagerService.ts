@@ -9,6 +9,9 @@ import { Contract } from '@convexus/icon-toolkit';
 import { PoolReadOnlyService } from './poolReadOnlyService';
 import { FactoryService } from './factoryService';
 import { PoolService } from './poolService';
+import { IAddLiquidityTxs } from '../entities/interface/IAddLiquidityTxs';
+import { AddLiquidityOptions, NonfungiblePositionManager } from '../nonfungiblePositionManager';
+import { Address } from '../entities/types';
 
 export class NonfungiblePositionManagerService {
 
@@ -36,11 +39,16 @@ export class NonfungiblePositionManagerService {
     this.nonfungiblePositionManagerContract = new Contract(address, INonfungiblePositionManager, iconService, debugService, nid);
   }
 
-  async getBalanceOf(user: string): Promise<number> {
-    return parseInt(await this.nonfungiblePositionManagerContract["balanceOf"](user));
+  buildAddLiquidityTxs(position: Position, options: AddLiquidityOptions)
+    : IAddLiquidityTxs {
+    return NonfungiblePositionManager.buildAddLiquidityTxs(position, options, this.nonfungiblePositionManagerContract.address);
   }
 
-  async getPositionInfos(user: string): Promise<IPositionInfo[]> {
+  async getBalanceOf(user: string): Promise<JSBI> {
+    return await this.nonfungiblePositionManagerContract["balanceOf"](user);
+  }
+
+  async getPositionInfos(user: Address): Promise<IPositionInfo[]> {
     const tokenIdPositions = await this.getOwnedTokenIdPositions(user);
 
     return await Promise.all(
@@ -62,45 +70,39 @@ export class NonfungiblePositionManagerService {
     )
   }
 
-  async getOwnedTokenIdPositions(user: string): Promise<{ tokenId: number, position: Position}[]> {
+  async getOwnedTokenIdPositions(user: Address): Promise<{ tokenId: number, position: Position}[]> {
     const tokenIds = await this.getAllTokensOfOwner(user);
 
-    const res = Promise.all(
-      tokenIds.map(async (tokenId) => await this.getPosition(tokenId)),
-    ).then((positions) => {
-      // Associate tokenId:position
-      return positions.map((position, index) => {
-        return {
-          tokenId: tokenIds[index],
-          position: position,
-        };
-      });
-    });
+    const positions = await Promise.all(tokenIds.map(async (tokenId) => await this.getPosition(tokenId)));
 
-    return res;
+    // Associate tokenId:position
+    return positions.map((position, index) => {
+      return {
+        tokenId: tokenIds[index],
+        position: position,
+      };
+    });
   }
 
-  async getAllTokensOfOwner(user: string): Promise<number[]> {
-    const count = await this.getBalanceOf(user);
+  async getAllTokensOfOwner(user: Address): Promise<number[]> {
+    const count = JSBI.toNumber(await this.getBalanceOf(user));
     const indexes = [...Array(count).keys()]; // range(count)
 
     return Promise.all(
-      indexes.map(async (index) =>
-        parseInt(
-          await this.nonfungiblePositionManagerContract["tokenOfOwnerByIndex"](
-            user,
-            index,
-          ),
-        ),
+      indexes.map(async (index) => JSBI.toNumber(await this.getTokenOfOwnerByIndex(user, index))
       ),
     );
+  }
+
+  getTokenOfOwnerByIndex(user: Address, index: number): Promise<JSBI> {
+    return this.nonfungiblePositionManagerContract["tokenOfOwnerByIndex"](user, index);
   }
 
   async getPosition(tokenId: number): Promise<Position> {
     const position = await this.nonfungiblePositionManagerContract["positions"](tokenId);
 
-    const fee = parseInt(position.fee);
-    const poolAddress = await this.factoryService.getPoolAddress(position.token0.address, position.token1.address, fee);
+    const fee = parseInt(position.fee, 16);
+    const poolAddress = await this.factoryService.getPoolAddress(position.token0, position.token1, fee);
     const pool = await this.poolService.getPoolFromAddress(poolAddress);
 
     return new Position({

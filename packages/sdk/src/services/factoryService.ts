@@ -2,26 +2,38 @@ import { Contract } from '@convexus/icon-toolkit';
 import IconService from 'icon-sdk-js';
 import * as IConvexusFactory from '../artifacts/contracts/ConvexusFactory/ConvexusFactory.json';
 import { Address } from '../entities/types';
-import { ScoreMethods } from '../entities/ScoreMethods';
+import { PoolFactoryProvider } from '../entities';
+import { Token } from '@convexus/sdk-core';
+import { FeeAmount } from '../constants';
+import JSBI from 'jsbi';
 
-export class FactoryService {
+export class FactoryService implements PoolFactoryProvider {
   /**
    * Class which provides APIs of Factory contract
    */
 
   factoryContract: Contract;
 
-  constructor(address: string, iconService: IconService, debugService: IconService, nid: number) {
+  constructor(address: Address, iconService: IconService, debugService: IconService, nid: number) {
     this.factoryContract = new Contract(address, IConvexusFactory, iconService, debugService, nid);
   }
+
+  poolFactoryProvider(): PoolFactoryProvider {
+    return this;
+  }
+
+  getPool(tokenA: Token, tokenB: Token, fee: FeeAmount): Promise<string> {
+      return this.getPoolAddress(tokenA.address, tokenB.address, fee);
+    }
 
   /**
    * @description Get the deployed pools list size
    * @return number - Pools size, i.e. number of pools
    */
-  public async getPoolsSize(): Promise<number> {
-    return parseInt(this.factoryContract[ScoreMethods.POOLS_SIZE](), 16);
+  async getPoolsSize(): Promise<JSBI> {
+    return this.factoryContract["poolsSize"]();
   }
+
 
   /**
    * @description Get pool contract address from given tokens and fee
@@ -29,7 +41,7 @@ export class FactoryService {
    * @param tokenB - 2nd token address
    * @param fee - Pool fee
    */
-  async getPoolAddress(tokenA: string, tokenB: string, fee: number): Promise<Address> {
+  getPoolAddress(tokenA: Address, tokenB: Address, fee: number): Promise<Address> {
     return this.factoryContract['getPool'](tokenA, tokenB, fee);
   }
 
@@ -38,7 +50,7 @@ export class FactoryService {
    * @param index - the index of the item to read from the deployed pools list
    * @return Address - Address of pool contract
    */
-  async getPoolAddressFromIndex(index: number): Promise<Address> {
+  getPoolAddressFromIndex(index: number): Promise<Address> {
     return this.factoryContract['pools'](index);
   }
 

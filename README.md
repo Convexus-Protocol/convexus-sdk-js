@@ -35,3 +35,7 @@ Runs tests in all packages
 
 `yarn clean`
 Cleans everything
+
+## ⚙️ Browser
+
+Make sure that your `tsconfig.json` file on frontend (Angular, React..) has `"ESNext"` in `"lib"` list!

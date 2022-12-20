@@ -21,7 +21,7 @@ export default class ConvexusService {
   public factoryService: FactoryService;
   public nonfungiblePositionManagerService: NonfungiblePositionManagerService;
   public poolService: PoolService;
-  public poolReadOnlyContractService: PoolReadOnlyService;
+  public poolReadOnlyService: PoolReadOnlyService;
   public poolInitializerService: PoolInitializerService;
   public quoterService: QuoterService;
   public swapRouterService: SwapRouterService;
@@ -53,7 +53,7 @@ export default class ConvexusService {
       this.tokenService
     );
 
-    this.poolReadOnlyContractService = new PoolReadOnlyService(
+    this.poolReadOnlyService = new PoolReadOnlyService(
       addresses.poolReadonlyAddress,
       iconService,
       debugService,
@@ -66,7 +66,7 @@ export default class ConvexusService {
       iconService,
       debugService,
       nid,
-      this.poolReadOnlyContractService,
+      this.poolReadOnlyService,
       this.factoryService,
       this.poolService
     );
