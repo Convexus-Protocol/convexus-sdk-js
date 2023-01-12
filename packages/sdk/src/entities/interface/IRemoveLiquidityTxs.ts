@@ -1,6 +1,6 @@
 import { CallData } from '@convexus/icon-toolkit';
 
-export interface IRemoveCallTxs {
+export interface IRemoveLiquidityTxs {
   decreaseLiquidityTx: CallData,
   collectTx: CallData,
   burnTx?: CallData,

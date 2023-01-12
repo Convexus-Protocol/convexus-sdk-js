@@ -10,8 +10,9 @@ import { PoolReadOnlyService } from './poolReadOnlyService';
 import { FactoryService } from './factoryService';
 import { PoolService } from './poolService';
 import { IAddLiquidityTxs } from '../entities/interface/IAddLiquidityTxs';
-import { AddLiquidityOptions, NonfungiblePositionManager } from '../nonfungiblePositionManager';
+import { AddLiquidityOptions, NonfungiblePositionManager, RemoveLiquidityOptions } from '../nonfungiblePositionManager';
 import { Address } from '../entities/types';
+import { IRemoveLiquidityTxs } from '../entities/interface/IRemoveLiquidityTxs';
 
 export class NonfungiblePositionManagerService {
 
@@ -42,6 +43,10 @@ export class NonfungiblePositionManagerService {
   buildAddLiquidityTxs(position: Position, options: AddLiquidityOptions)
     : IAddLiquidityTxs {
     return NonfungiblePositionManager.buildAddLiquidityTxs(position, options, this.nonfungiblePositionManagerContract.address);
+  }
+
+  buildRemoveLiquidityTxs(position: Position, options: RemoveLiquidityOptions): IRemoveLiquidityTxs {
+    return NonfungiblePositionManager.buildRemoveLiquidityTxs(position, options, this.nonfungiblePositionManagerContract.address)
   }
 
   async getBalanceOf(user: string): Promise<JSBI> {

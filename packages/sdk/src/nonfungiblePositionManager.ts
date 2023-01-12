@@ -15,7 +15,7 @@ import { ONE, ZERO } from './internalConstants'
 import INonfungiblePositionManager from './artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json'
 import { IAddLiquidityTxs } from './entities/interface/IAddLiquidityTxs';
 import { IIncreaseLiquidityTxs } from './entities/interface/IIncreaseLiquidityTxs';
-import { IRemoveCallTxs } from './entities/interface/IRemoveCallTxs';
+import { IRemoveLiquidityTxs } from './entities/interface/IRemoveLiquidityTxs';
 
 export interface MintSpecificOptions {
   /**
@@ -341,7 +341,7 @@ export abstract class NonfungiblePositionManager {
     position: Position,
     options: RemoveLiquidityOptions,
     nonfungiblePositionManagerAddress: string
-  ): IRemoveCallTxs {
+  ): IRemoveLiquidityTxs {
     const deadline = toHex(options.deadline)
     const tokenId = toHex(options.tokenId)
 
