@@ -2,17 +2,23 @@ import * as INonfungiblePositionManager
   from '../artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json';
 import IconService from 'icon-sdk-js';
 import { IPositionInfo } from '../entities/interface/IPositionInfo';
-import { CurrencyAmount } from '@convexus/sdk-core';
+import { CurrencyAmount, Token } from '@convexus/sdk-core';
 import JSBI from 'jsbi';
 import { Position } from '../entities';
-import { Contract } from '@convexus/icon-toolkit';
+import { CallData, Contract } from '@convexus/icon-toolkit';
 import { PoolReadOnlyService } from './poolReadOnlyService';
 import { FactoryService } from './factoryService';
 import { PoolService } from './poolService';
 import { IAddLiquidityTxs } from '../entities/interface/IAddLiquidityTxs';
-import { AddLiquidityOptions, NonfungiblePositionManager, RemoveLiquidityOptions } from '../nonfungiblePositionManager';
+import {
+  AddLiquidityOptions,
+  CollectOptions,
+  NonfungiblePositionManager,
+  RemoveLiquidityOptions,
+} from '../nonfungiblePositionManager';
 import { Address } from '../entities/types';
 import { IRemoveLiquidityTxs } from '../entities/interface/IRemoveLiquidityTxs';
+import { IIncreaseLiquidityTxs } from '../entities/interface/IIncreaseLiquidityTxs';
 
 export class NonfungiblePositionManagerService {
 
@@ -45,10 +51,21 @@ export class NonfungiblePositionManagerService {
     return NonfungiblePositionManager.buildAddLiquidityTxs(position, options, this.nonfungiblePositionManagerContract.address);
   }
 
+  buildIncreaseLiquidityTxs(position: Position, options: AddLiquidityOptions,): IIncreaseLiquidityTxs {
+    return NonfungiblePositionManager.buildIncreaseLiquidityTxs(position, options, this.nonfungiblePositionManagerContract.address);
+  }
+
   buildRemoveLiquidityTxs(position: Position, options: RemoveLiquidityOptions): IRemoveLiquidityTxs {
     return NonfungiblePositionManager.buildRemoveLiquidityTxs(position, options, this.nonfungiblePositionManagerContract.address)
   }
 
+  buildWithdrawDepositedTx(token: Token ): CallData {
+    return NonfungiblePositionManager.buildWithdrawDepositedTx(token, this.nonfungiblePositionManagerContract.address)
+  }
+
+  buildCollectFeesTx(options: CollectOptions): CallData {
+    return NonfungiblePositionManager.buildCollectFeesTx(options, this.nonfungiblePositionManagerContract.address)
+  }
   async getBalanceOf(user: string): Promise<JSBI> {
     return await this.nonfungiblePositionManagerContract["balanceOf"](user);
   }

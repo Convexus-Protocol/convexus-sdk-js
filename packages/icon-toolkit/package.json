@@ -1,6 +1,6 @@
 {
   "name": "@convexus/icon-toolkit",
-  "version": "1.1.91",
+  "version": "1.1.92",
   "description": "ICON Toolkit",
   "main": "dist/index.js",
   "node": "dist/index.js",

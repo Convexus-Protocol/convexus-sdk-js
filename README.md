@@ -36,6 +36,9 @@ Runs tests in all packages
 `yarn clean`
 Cleans everything
 
+`yarn run publish`
+Publish packages to npm package registry
+
 ## ⚙️ Browser
 
 Make sure that your `tsconfig.json` file on frontend (Angular, React..) has `"ESNext"` in `"lib"` list!

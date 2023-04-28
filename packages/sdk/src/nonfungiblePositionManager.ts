@@ -311,7 +311,13 @@ export abstract class NonfungiblePositionManager {
     }
   }
 
-  private static buildCollectTx(options: CollectOptions, nonfungiblePositionManagerAddress: string): CallData {
+  /**
+   * Produces the calldata for collecting up to a maximum amount of fees owed to a specific position to the recipient
+   * @param options Additional information necessary for generating the calldata
+   * @param nonfungiblePositionManagerAddress SCORE address
+   * @returns The call parameters
+   */
+  public static buildCollectFeesTx(options: CollectOptions, nonfungiblePositionManagerAddress: string): CallData {
     const tokenId = toHex(options.tokenId)
 
     const recipient = validateAndParseAddress(options.recipient)
@@ -324,10 +330,6 @@ export abstract class NonfungiblePositionManager {
         MaxUint256
       ]
     ], nonfungiblePositionManagerAddress)
-  }
-
-  public static collectCallParameters(options: CollectOptions, nonfungiblePositionManagerAddress: string): CallData {
-    return NonfungiblePositionManager.buildCollectTx(options, nonfungiblePositionManagerAddress)
   }
 
   /**
@@ -371,7 +373,7 @@ export abstract class NonfungiblePositionManager {
     ], nonfungiblePositionManagerAddress)
 
     const { expectedCurrencyOwed0, expectedCurrencyOwed1, ...rest } = options.collectOptions
-    const collectTx = NonfungiblePositionManager.buildCollectTx({
+    const collectTx = NonfungiblePositionManager.buildCollectFeesTx({
       tokenId: toHex(options.tokenId),
       // add the underlying value to the expected currency already owed
       expectedCurrencyOwed0: expectedCurrencyOwed0.add(

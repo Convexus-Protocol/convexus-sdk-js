@@ -450,7 +450,7 @@ describe('NonfungiblePositionManager', () => {
 
   describe('#collectCallParameters', () => {
     it('works', () => {
-      const calldata = NonfungiblePositionManager.collectCallParameters({
+      const calldata = NonfungiblePositionManager.buildCollectFeesTx({
         tokenId,
         expectedCurrencyOwed0: CurrencyAmount.fromRawAmount(token0, 0),
         expectedCurrencyOwed1: CurrencyAmount.fromRawAmount(token1, 0),
@@ -474,7 +474,7 @@ describe('NonfungiblePositionManager', () => {
     })
 
     it('works with ICX', () => {
-      const calldata = NonfungiblePositionManager.collectCallParameters({
+      const calldata = NonfungiblePositionManager.buildCollectFeesTx({
         tokenId,
         expectedCurrencyOwed0: CurrencyAmount.fromRawAmount(token1, 0),
         expectedCurrencyOwed1: CurrencyAmount.fromRawAmount(ICX, 0),
