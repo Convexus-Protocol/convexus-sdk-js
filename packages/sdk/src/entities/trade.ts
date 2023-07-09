@@ -222,14 +222,13 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
    * @template TInput The input token, either ICX or an IRC-2.
    * @template TOutput The output token, either ICX or an IRC-2.
    * @template TTradeType The type of the trade, either exact in or exact out.
-   * @param poolFactoryProvider - Provider being able to query for pool address or address as string
    * @param route route to swap through
    * @param amount the amount specified, either input or output, depending on tradeType
    * @param tradeType whether the trade is an exact input or exact output swap
    * @returns The route
    */
   public static async fromRoute<TInput extends Currency, TOutput extends Currency, TTradeType extends TradeType>(
-    poolFactoryProvider: PoolFactoryProvider | string,
+    poolFactoryProvider: PoolFactoryProvider,
     route: Route<TInput, TOutput>,
     amount: TTradeType extends TradeType.EXACT_INPUT ? CurrencyAmount<TInput> : CurrencyAmount<TOutput>,
     tradeType: TTradeType
@@ -268,7 +267,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
       tradeType
     })
 
-    await trade.checkRoute(poolFactoryProvider);
+    trade.checkRoute(poolFactoryProvider);
 
     return trade
   }
@@ -350,7 +349,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
   }
 
   /**
-   * Creates a trade without computing the result of swapping through the route.
+   * Creates a trade without computing the result of swapping through the route. 
    * Useful when you have simulated the trade elsewhere and do not have any tick data
    * @template TInput The input token, either ICX or an IRC-2
    * @template TOutput The output token, either ICX or an IRC-2
@@ -449,24 +448,21 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
 
   /**
    * Need to be called after the constructor to check for the route uniqueness
-   * @param poolFactoryProvider A Factory Provider or pool address
+   * @param factoryProvider A Factory Provider
+   * @param routes The routes through which the trade occurs
    */
   public async checkRoute (
-    poolFactoryProvider: PoolFactoryProvider | string
+    poolFactoryProvider: PoolFactoryProvider
   ) {
     const numPools = this.swaps.map(({ route }) => route.pools.length).reduce((total, cur) => total + cur, 0)
 
     const poolAddressSet = new Set<string>()
     for (const { route } of this.swaps) {
       for (const pool of route.pools) {
-        if (typeof poolFactoryProvider === "string") {
-          poolAddressSet.add(poolFactoryProvider);
-        } else {
-          poolAddressSet.add(await Pool.getAddress(poolFactoryProvider, pool.token0, pool.token1, pool.fee))
-        }
+        poolAddressSet.add(await Pool.getAddress(poolFactoryProvider, pool.token0, pool.token1, pool.fee))
       }
     }
-
+    
     invariant(numPools == poolAddressSet.size, 'POOLS_DUPLICATED')
   }
 
@@ -542,7 +538,6 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
    * amount to an output token, making at most `maxHops` hops.
    * Note this does not consider aggregation, as routes are linear. It's possible a better route exists by splitting
    * the amount in among multiple routes.
-   * @param poolFactoryProvider - Provider being able to query for pool address or address as string
    * @param pools the pools to consider in finding the best trade
    * @param nextAmountIn exact amount of input currency to spend
    * @param currencyOut the desired currency out
@@ -554,7 +549,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
    * @returns The exact in trade
    */
   public static async bestTradeExactIn<TInput extends Currency, TOutput extends Currency>(
-    poolFactoryProvider: PoolFactoryProvider | string,
+    poolFactoryProvider: PoolFactoryProvider,
     pools: Pool[],
     currencyAmountIn: CurrencyAmount<TInput>,
     currencyOut: TOutput,
